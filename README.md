@@ -1,10 +1,17 @@
 # Titanic Survival Prediction Dashboard
 
-[![Streamlit App](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Machine Learning](https://img.shields.io/badge/Machine%20Learning-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://scikit-learn.org/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
 
 Una moderna applicazione web per l'analisi completa e la predizione della sopravvivenza dei passeggeri del Titanic, costruita con **architettura modulare** e **pipeline di Machine Learning production-ready**.
+
+## Links del Progetto
+
+- **🌐 Live Demo**: [https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
+- **💻 GitHub Repository**: [https://github.com/FabriceGhislain7/titanic-streamlit-dashboard](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
+- **📖 Documentation**: [In Progress]
 
 ## Overview del Progetto
 
@@ -217,7 +224,7 @@ python -m pytest tests/test_models.py
 ### Development Setup
 ```bash
 # Clone del repository
-git clone <repository-url>
+git clone https://github.com/FabriceGhislain7/titanic-streamlit-dashboard.git
 cd titanic-streamlit-dashboard
 
 # Setup development environment
@@ -248,8 +255,10 @@ pre-commit install
 - **Purpose**: Educational e demonstration
 
 ### Codebase
-- **License**: [Specificare licenza]
-- **Author**: [Tuo nome]
+- **GitHub**: [https://github.com/FabriceGhislain7/titanic-streamlit-dashboard](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
+- **Live Demo**: [https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
+- **License**: MIT License
+- **Author**: Fabrice Ghislain
 - **Version**: 1.0.0
 
 ### Acknowledgments
@@ -259,8 +268,7 @@ pre-commit install
 
 ---
 
-**Nota**: Questo progetto rappresenta un esempio completo di applicazione data science moderna, con particolare attenzione all'architettura scalabile, best practices di ML engineering e user experience professionale.
-```bash
+**Nota**: Questo progetto rappresenta un esempio completo di applicazione data science moderna, con particolare attenzione all'architettura scalabile, best practices di ML engineering e user experience professionale.bash
    git clone <repository-url>
    cd titanic-streamlit-dashboard
    ```
@@ -345,5 +353,6 @@ titanic-streamlit-dashboard/
 │   ├── config.toml           # App configuration
 │   └── secrets.toml          # Environment secrets
 ├── requirements.txt          # Production dependencies
+├── requirements_complesso.txt # Development dependencies
 └── README.md                # This documentation
 ```
