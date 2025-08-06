@@ -38,6 +38,11 @@ titanic-streamlit-dashboard/
 └── .streamlit/                 # Configurazione Streamlit
 ```
 
+### Analisi strutturale del progetto
+Per osservare la struttura del progetto, eseguiamo il commanndo nel terminale con powershell:
+```powershell
+   Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-Object FullName
+```
 ## Tecnologie Utilizzate
 
 - **Streamlit**: Framework per l'app web
