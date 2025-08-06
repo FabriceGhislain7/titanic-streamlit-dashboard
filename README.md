@@ -23,9 +23,8 @@ Una moderna applicazione Streamlit per l'analisi e la predizione della sopravviv
 ## Struttura del Progetto
 
 ```
-Titanic_Claude/
+titanic-streamlit-dashboard/
 ├── app.py                      # File principale dell'app
-├── Home.py                     # Homepage (multipage app)
 ├── src/                        # Codice sorgente
 │   ├── components/             # Componenti riusabili
 │   ├── data/                   # Dati del progetto
@@ -58,4 +57,4 @@ Titanic_Claude/
 
 ## Sviluppo
 
-Il progetto è stato migrato da un Jupyter Notebook (`docs/main.ipynb`) a un'applicazione Streamlit modulare e scalabile.
+Il progetto è stato migrato da un Jupyter Notebook (`docs/data_analysis.ipynb`) a un'applicazione Streamlit modulare e scalabile. il file Jupyter Notebook (`data_analysis.ipynb`) è ancora in fase di completamento. ma la versione streamlit è già operativa.
