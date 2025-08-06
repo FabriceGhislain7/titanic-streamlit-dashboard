@@ -378,3 +378,66 @@ if __name__ == "__main__":
     if not info['data_file_exists']:
         print(f"\n⚠️  Data file not found at: {DATA_FILE}")
         print("Download it from:", DATA_URL)
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+
+LOGGING_CONFIG = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'detailed': {
+            'format': '[%(asctime)s] %(levelname)s [%(filename)s:%(lineno)d] %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'INFO',
+            'formatter': 'standard',
+            'stream': 'ext://sys.stdout'
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'detailed',
+            'filename': os.path.join(BASE_DIR, 'logs', 'titanic_app.log'),
+            'maxBytes': 10485760,  # 10MB
+            'backupCount': 5,
+            'encoding': 'utf8'
+        }
+    },
+    'loggers': {
+        '': {  # root logger
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'streamlit': {
+            'level': 'WARNING',
+            'propagate': False
+        }
+    }
+}
+
+# Crea la cartella logs se non esiste
+os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+
+def setup_logging():
+    """Configura il sistema di logging globale"""
+    import logging.config
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger = logging.getLogger(__name__)
+    logger.info("Logging configurato correttamente")
+    return logger
+
+# Configurazione automatica se DEBUG_MODE è True
+if DEBUG_MODE:
+    LOGGING_CONFIG['handlers']['console']['level'] = 'DEBUG'
+    LOGGING_CONFIG['loggers']['']['level'] = 'DEBUG'
