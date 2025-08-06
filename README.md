@@ -194,8 +194,8 @@ python -m pytest tests/test_models.py
 
 1. **Streamlit Cloud**:
    ```bash
-   # Push to GitHub e collega Streamlit Cloud
-   git push origin main
+      # Push to GitHub e collega Streamlit Cloud
+      git push origin main
    ```
 
 2. **Docker Container**:
@@ -268,20 +268,21 @@ pre-commit install
 
 ---
 
-**Nota**: Questo progetto rappresenta un esempio completo di applicazione data science moderna, con particolare attenzione all'architettura scalabile, best practices di ML engineering e user experience professionale.bash
+**Nota**: Questo progetto rappresenta un esempio completo di applicazione data science moderna, con particolare attenzione all'architettura scalabile, best practices di ML engineering e user experience professionale.
+```bash
    git clone <repository-url>
    cd titanic-streamlit-dashboard
-   ```
+```
 
 2. **Crea e attiva virtual environment:**
    ```bash
-   # Windows
-   python -m venv venv
-   .\venv\Scripts\activate
-   
-   # Linux/Mac
-   python3 -m venv venv
-   source venv/bin/activate
+      # Windows
+      python -m venv venv
+      .\venv\Scripts\activate
+      
+      # Linux/Mac
+      python3 -m venv venv
+      source venv/bin/activate
    ```
 
 3. **Installa le dipendenze:**
