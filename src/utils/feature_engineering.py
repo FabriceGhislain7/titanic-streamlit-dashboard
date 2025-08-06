@@ -6,8 +6,12 @@ Funzioni per feature engineering avanzato
 import pandas as pd
 import numpy as np
 import re
+import logging
 from sklearn.preprocessing import LabelEncoder
 import streamlit as st
+
+logger = logging.getLogger(__name__)
+logger.info(f"Caricamento {__name__}")
 
 # ----------------1. Estrazione Titolo dal Nome (estensione analisi nomi)
 def extract_title_from_name(df):
@@ -15,13 +19,17 @@ def extract_title_from_name(df):
     Estrae il titolo dal nome del passeggero
     Estende l'analisi dei nomi dal notebook
     """
+    logger.info("Esecuzione extract_title_from_name")
     if df is None or 'Name' not in df.columns:
+        logger.warning("DataFrame vuoto o colonna 'Name' mancante")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Estrai titolo usando regex
     df_copy['Title'] = df_copy['Name'].str.extract(' ([A-Za-z]+)\.', expand=False)
+    logger.debug(f"Estratti {df_copy['Title'].nunique()} titoli grezzi")
     
     # Raggruppa titoli rari in categorie comuni
     title_mapping = {
@@ -48,7 +56,9 @@ def extract_title_from_name(df):
     df_copy['Title'] = df_copy['Title'].map(title_mapping)
     df_copy['Title'].fillna('Other', inplace=True)
     
-    st.info(f"Estratti {df_copy['Title'].nunique()} titoli unici dal nome")
+    unique_titles = df_copy['Title'].nunique()
+    logger.info(f"Estratti {unique_titles} titoli unici dal nome")
+    st.info(f"Estratti {unique_titles} titoli unici dal nome")
     
     return df_copy
 
@@ -57,15 +67,16 @@ def extract_deck_from_cabin(df):
     """
     Estrae il deck dalla cabina per analisi posizione sulla nave
     """
+    logger.info("Esecuzione extract_deck_from_cabin")
     if df is None or 'Cabin' not in df.columns:
+        logger.warning("DataFrame vuoto o colonna 'Cabin' mancante")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Estrai prima lettera della cabina come deck
     df_copy['Deck'] = df_copy['Cabin'].str[0]
-    
-    # Sostituisci NaN con 'Unknown'
     df_copy['Deck'].fillna('Unknown', inplace=True)
     
     # Raggruppa deck rari
@@ -73,7 +84,9 @@ def extract_deck_from_cabin(df):
     rare_decks = deck_counts[deck_counts < 10].index
     df_copy.loc[df_copy['Deck'].isin(rare_decks), 'Deck'] = 'Other'
     
-    st.info(f"Estratti {df_copy['Deck'].nunique()} deck dalla cabina")
+    unique_decks = df_copy['Deck'].nunique()
+    logger.info(f"Estratti {unique_decks} deck dalla cabina")
+    st.info(f"Estratti {unique_decks} deck dalla cabina")
     
     return df_copy
 
@@ -82,21 +95,27 @@ def calculate_fare_per_person(df):
     """
     Calcola tariffa per persona considerando la famiglia
     """
+    logger.info("Esecuzione calculate_fare_per_person")
     if df is None or 'Fare' not in df.columns:
+        logger.warning("DataFrame vuoto o colonna 'Fare' mancante")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Calcola dimensione famiglia se non esiste
     if 'Family_Size' not in df_copy.columns:
         df_copy['Family_Size'] = df_copy['SibSp'] + df_copy['Parch'] + 1
+        logger.debug("Calcolata Family_Size mancante")
     
     # Calcola tariffa per persona
     df_copy['Fare_Per_Person'] = df_copy['Fare'] / df_copy['Family_Size']
     
     # Gestisci divisioni per zero o valori nulli
-    df_copy['Fare_Per_Person'].fillna(df_copy['Fare_Per_Person'].median(), inplace=True)
+    median_fare = df_copy['Fare_Per_Person'].median()
+    df_copy['Fare_Per_Person'].fillna(median_fare, inplace=True)
     
+    logger.info("Calcolata tariffa per persona basata sulla dimensione famiglia")
     st.info("Calcolata tariffa per persona basata sulla dimensione famiglia")
     
     return df_copy
@@ -107,10 +126,13 @@ def create_advanced_age_groups(df):
     Crea fasce di età più dettagliate
     Estende l'analisi gruppi età del notebook
     """
+    logger.info("Esecuzione create_advanced_age_groups")
     if df is None or 'Age' not in df.columns:
+        logger.warning("DataFrame vuoto o colonna 'Age' mancante")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Fasce età dettagliate
     df_copy['Age_Group_Detailed'] = pd.cut(
@@ -125,6 +147,7 @@ def create_advanced_age_groups(df):
     df_copy['Is_Senior'] = (df_copy['Age'] >= 60).astype(int)
     df_copy['Is_Adult_Prime'] = ((df_copy['Age'] >= 25) & (df_copy['Age'] <= 45)).astype(int)
     
+    logger.debug("Create 4 nuove feature relative all'età")
     return df_copy
 
 # ----------------5. Analisi Nome Avanzata (pattern nei nomi)
@@ -132,10 +155,13 @@ def analyze_name_patterns(df):
     """
     Analizza pattern nei nomi per feature engineering
     """
+    logger.info("Esecuzione analyze_name_patterns")
     if df is None or 'Name' not in df.columns:
+        logger.warning("DataFrame vuoto o colonna 'Name' mancante")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Lunghezza nome
     df_copy['Name_Length'] = df_copy['Name'].str.len()
@@ -150,6 +176,7 @@ def analyze_name_patterns(df):
     nobility_pattern = r'(Count|Countess|Lady|Sir|Don|Dona|Jonkheer)'
     df_copy['Is_Nobility'] = df_copy['Name'].str.contains(nobility_pattern, case=False).astype(int)
     
+    logger.debug("Create 4 nuove feature dai pattern dei nomi")
     return df_copy
 
 # ----------------6. Feature Interazioni (combinazioni variabili)
@@ -157,27 +184,34 @@ def create_interaction_features(df):
     """
     Crea feature di interazione tra variabili
     """
+    logger.info("Esecuzione create_interaction_features")
     if df is None:
+        logger.warning("DataFrame vuoto in input")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Interazione Classe-Genere
     if 'Pclass' in df_copy.columns and 'Sex' in df_copy.columns:
         df_copy['Class_Sex'] = df_copy['Pclass'].astype(str) + '_' + df_copy['Sex']
+        logger.debug("Creata feature Class_Sex")
     
     # Interazione Età-Classe
     if 'Age' in df_copy.columns and 'Pclass' in df_copy.columns:
         df_copy['Age_Class_Ratio'] = df_copy['Age'] / df_copy['Pclass']
+        logger.debug("Creata feature Age_Class_Ratio")
     
     # Interazione Famiglia-Classe
     if 'Family_Size' in df_copy.columns and 'Pclass' in df_copy.columns:
-        df_copy['Family_Class_Score'] = df_copy['Family_Size'] * (4 - df_copy['Pclass'])  # Peso inverso classe
+        df_copy['Family_Class_Score'] = df_copy['Family_Size'] * (4 - df_copy['Pclass'])
+        logger.debug("Creata feature Family_Class_Score")
     
     # Indicatore viaggiatore di lusso
     if 'Fare' in df_copy.columns and 'Pclass' in df_copy.columns:
-        fare_threshold = df_copy['Fare'].quantile(0.8)  # Top 20% fare
+        fare_threshold = df_copy['Fare'].quantile(0.8)
         df_copy['Is_Luxury_Traveler'] = ((df_copy['Fare'] > fare_threshold) & (df_copy['Pclass'] == 1)).astype(int)
+        logger.debug("Creata feature Is_Luxury_Traveler")
     
     return df_copy
 
@@ -186,18 +220,23 @@ def create_economic_features(df):
     """
     Crea feature economiche avanzate
     """
+    logger.info("Esecuzione create_economic_features")
     if df is None or 'Fare' not in df.columns:
+        logger.warning("DataFrame vuoto o colonna 'Fare' mancante")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Fare relativo alla classe
     if 'Pclass' in df_copy.columns:
         class_fare_mean = df_copy.groupby('Pclass')['Fare'].transform('mean')
         df_copy['Fare_Relative_To_Class'] = df_copy['Fare'] / class_fare_mean
+        logger.debug("Creata feature Fare_Relative_To_Class")
     
     # Fare percentile
     df_copy['Fare_Percentile'] = df_copy['Fare'].rank(pct=True)
+    logger.debug("Creata feature Fare_Percentile")
     
     # Indicatori economici
     fare_q25 = df_copy['Fare'].quantile(0.25)
@@ -205,6 +244,7 @@ def create_economic_features(df):
     
     df_copy['Is_Economy_Fare'] = (df_copy['Fare'] <= fare_q25).astype(int)
     df_copy['Is_Premium_Fare'] = (df_copy['Fare'] >= fare_q75).astype(int)
+    logger.debug("Create 2 feature economiche binarie")
     
     return df_copy
 
@@ -214,10 +254,13 @@ def create_advanced_family_features(df):
     Crea feature familiari avanzate
     Estende analisi famiglia del notebook
     """
+    logger.info("Esecuzione create_advanced_family_features")
     if df is None:
+        logger.warning("DataFrame vuoto in input")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Tipo famiglia dettagliato
     if 'SibSp' in df_copy.columns and 'Parch' in df_copy.columns:
@@ -229,11 +272,13 @@ def create_advanced_family_features(df):
         # Indicatori specifici
         df_copy['Has_Spouse'] = (df_copy['SibSp'] > 0).astype(int)
         df_copy['Has_Children'] = (df_copy['Parch'] > 0).astype(int)
-        df_copy['Has_Siblings'] = (df_copy['SibSp'] > 1).astype(int)  # Più di 1 significa anche fratelli
+        df_copy['Has_Siblings'] = (df_copy['SibSp'] > 1).astype(int)
         
         # Famiglia ottimale (2-4 membri)
         if 'Family_Size' in df_copy.columns:
             df_copy['Is_Optimal_Family'] = ((df_copy['Family_Size'] >= 2) & (df_copy['Family_Size'] <= 4)).astype(int)
+        
+        logger.debug("Create 5 nuove feature familiari")
     
     return df_copy
 
@@ -242,23 +287,28 @@ def create_advanced_categorical_features(df):
     """
     Crea versioni avanzate delle feature categoriche
     """
+    logger.info("Esecuzione create_advanced_categorical_features")
     if df is None:
+        logger.warning("DataFrame vuoto in input")
         return df
     
     df_copy = df.copy()
+    logger.debug("Creato copy del DataFrame")
     
     # Encoding ordinale per classe (inverso per importanza)
     if 'Pclass' in df_copy.columns:
-        df_copy['Class_Rank'] = 4 - df_copy['Pclass']  # 1st class = 3, 3rd class = 1
+        df_copy['Class_Rank'] = 4 - df_copy['Pclass']
+        logger.debug("Creata feature Class_Rank")
     
     # Binario sesso
     if 'Sex' in df_copy.columns:
         df_copy['Is_Female'] = (df_copy['Sex'] == 'female').astype(int)
+        logger.debug("Creata feature Is_Female")
     
     # Porto di imbarco con logica
     if 'Embarked' in df_copy.columns:
-        # S = Southampton (più comune), C = Cherbourg (ricchi), Q = Queenstown (poveri)
         df_copy['Embarked_Wealth_Score'] = df_copy['Embarked'].map({'S': 2, 'C': 3, 'Q': 1}).fillna(2)
+        logger.debug("Creata feature Embarked_Wealth_Score")
     
     return df_copy
 
@@ -267,9 +317,12 @@ def apply_full_feature_engineering(df):
     """
     Applica tutto il feature engineering in sequenza
     """
+    logger.info("Esecuzione apply_full_feature_engineering")
     if df is None:
+        logger.warning("DataFrame vuoto in input")
         return df
     
+    logger.info("Iniziando feature engineering completo...")
     st.info("Iniziando feature engineering completo...")
     
     # Pipeline completa
@@ -299,13 +352,19 @@ def apply_full_feature_engineering(df):
     df_engineered = create_interaction_features(df_engineered)
     
     # Rimuovi colonne con troppi NaN
+    cols_removed = 0
     for col in df_engineered.columns:
         null_pct = df_engineered[col].isnull().sum() / len(df_engineered)
-        if null_pct > 0.8:  # Rimuovi se >80% NaN
+        if null_pct > 0.8:
             df_engineered.drop(col, axis=1, inplace=True)
+            cols_removed += 1
+            logger.warning(f"Rimossa colonna {col} (troppi valori mancanti)")
             st.warning(f"Rimossa colonna {col} (troppi valori mancanti)")
     
     new_features_count = len(df_engineered.columns) - len(df.columns)
+    logger.info(f"Feature engineering completato! Aggiunte {new_features_count} nuove feature, rimosse {cols_removed} colonne")
     st.success(f"Feature engineering completato! Aggiunte {new_features_count} nuove feature")
     
     return df_engineered
+
+logger.info(f"Caricamento completato {__name__}")

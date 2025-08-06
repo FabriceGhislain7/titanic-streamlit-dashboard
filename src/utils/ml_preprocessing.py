@@ -6,6 +6,7 @@ Preprocessing avanzato per Machine Learning
 import pandas as pd
 import numpy as np
 import warnings
+import logging
 from sklearn.preprocessing import (
     StandardScaler, MinMaxScaler, RobustScaler, PowerTransformer,
     LabelEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder
@@ -31,6 +32,9 @@ import re
 
 from src.config import FEATURE_ENGINEERING, PREPROCESSING_CONFIG, COLUMN_LABELS
 
+logger = logging.getLogger(__name__)
+logger.info(f"Caricamento {__name__}")
+
 warnings.filterwarnings('ignore')
 
 # ----------------1. Custom Transformers
@@ -47,6 +51,14 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
                  create_fare_features=True,
                  create_age_groups=True,
                  create_interaction_features=False):
+        logger.debug(f"Inizializzazione TitanicFeatureEngineer: "
+                    f"extract_title={extract_title}, "
+                    f"extract_deck={extract_deck}, "
+                    f"create_family_features={create_family_features}, "
+                    f"create_fare_features={create_fare_features}, "
+                    f"create_age_groups={create_age_groups}, "
+                    f"create_interaction_features={create_interaction_features}")
+        
         self.extract_title = extract_title
         self.extract_deck = extract_deck
         self.create_family_features = create_family_features
@@ -57,44 +69,55 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         
     def fit(self, X, y=None):
         """Fit del transformer"""
+        logger.info("Esecuzione fit TitanicFeatureEngineer")
         self.fitted_ = True
         return self
     
     def transform(self, X):
         """Applica feature engineering"""
+        logger.info("Esecuzione transform TitanicFeatureEngineer")
         if not self.fitted_:
+            logger.error("Transformer deve essere fittato prima del transform")
             raise ValueError("Transformer deve essere fittato prima del transform")
         
         X_transformed = X.copy()
         
         # Extract title from name
         if self.extract_title and 'Name' in X_transformed.columns:
+            logger.debug("Estrazione titolo dal nome")
             X_transformed = self._extract_title(X_transformed)
         
         # Extract deck from cabin
         if self.extract_deck and 'Cabin' in X_transformed.columns:
+            logger.debug("Estrazione deck dalla cabina")
             X_transformed = self._extract_deck(X_transformed)
         
         # Family features
         if self.create_family_features:
+            logger.debug("Creazione feature famiglia")
             X_transformed = self._create_family_features(X_transformed)
         
         # Fare features
         if self.create_fare_features:
+            logger.debug("Creazione feature tariffa")
             X_transformed = self._create_fare_features(X_transformed)
         
         # Age groups
         if self.create_age_groups and 'Age' in X_transformed.columns:
+            logger.debug("Creazione gruppi età")
             X_transformed = self._create_age_groups(X_transformed)
         
         # Interaction features
         if self.create_interaction_features:
+            logger.debug("Creazione feature interazione")
             X_transformed = self._create_interaction_features(X_transformed)
         
+        logger.info(f"Feature engineering completato. Shape finale: {X_transformed.shape}")
         return X_transformed
     
     def _extract_title(self, X):
         """Estrae titolo dal nome"""
+        logger.debug("Esecuzione _extract_title")
         def extract_title_from_name(name):
             if pd.isna(name):
                 return 'Unknown'
@@ -133,10 +156,12 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
             return 'Unknown'
         
         X['Title'] = X['Name'].apply(extract_title_from_name)
+        logger.debug(f"Trovati {X['Title'].nunique()} titoli unici")
         return X
     
     def _extract_deck(self, X):
         """Estrae deck dalla cabina"""
+        logger.debug("Esecuzione _extract_deck")
         def extract_deck_from_cabin(cabin):
             if pd.isna(cabin):
                 return 'Unknown'
@@ -146,10 +171,12 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
             return deck if deck.isalpha() else 'Unknown'
         
         X['Deck'] = X['Cabin'].apply(extract_deck_from_cabin)
+        logger.debug(f"Trovati {X['Deck'].nunique()} deck unici")
         return X
     
     def _create_family_features(self, X):
         """Crea features relative alla famiglia"""
+        logger.debug("Esecuzione _create_family_features")
         if 'SibSp' in X.columns and 'Parch' in X.columns:
             X['Family_Size'] = X['SibSp'] + X['Parch'] + 1
             X['Is_Alone'] = (X['Family_Size'] == 1).astype(int)
@@ -164,11 +191,13 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
                     return 'Large'
             
             X['Family_Category'] = X['Family_Size'].apply(categorize_family_size)
+            logger.debug("Create features: Family_Size, Is_Alone, Family_Category")
         
         return X
     
     def _create_fare_features(self, X):
         """Crea features relative al prezzo"""
+        logger.debug("Esecuzione _create_fare_features")
         if 'Fare' in X.columns:
             # Fare per persona
             if 'Family_Size' in X.columns:
@@ -180,11 +209,13 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
             
             # Log fare per ridurre skewness
             X['Fare_Log'] = np.log1p(X['Fare'].fillna(X['Fare'].median()))
+            logger.debug("Create features: Fare_Per_Person, Fare_Binned, Fare_Log")
         
         return X
     
     def _create_age_groups(self, X):
         """Crea gruppi di età"""
+        logger.debug("Esecuzione _create_age_groups")
         def categorize_age(age):
             if pd.isna(age):
                 return 'Unknown'
@@ -204,11 +235,13 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         # Age binning
         X['Age_Binned'] = pd.cut(X['Age'].fillna(X['Age'].median()), 
                                 bins=5, labels=['Very_Young', 'Young', 'Middle', 'Mature', 'Old'])
+        logger.debug("Create features: Age_Group, Age_Binned")
         
         return X
     
     def _create_interaction_features(self, X):
         """Crea features di interazione"""
+        logger.debug("Esecuzione _create_interaction_features")
         # Interazioni importanti per sopravvivenza
         if 'Sex' in X.columns and 'Pclass' in X.columns:
             X['Sex_Pclass'] = X['Sex'].astype(str) + '_' + X['Pclass'].astype(str)
@@ -219,6 +252,7 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         if 'Title' in X.columns and 'Pclass' in X.columns:
             X['Title_Pclass'] = X['Title'].astype(str) + '_' + X['Pclass'].astype(str)
         
+        logger.debug(f"Create {len(X.columns) - len([c for c in X.columns if not c.endswith('_Pclass') and not c.endswith('_Sex')])} feature di interazione")
         return X
 
 class SmartImputer(BaseEstimator, TransformerMixin):
@@ -230,6 +264,11 @@ class SmartImputer(BaseEstimator, TransformerMixin):
                  numerical_strategy='median',
                  categorical_strategy='most_frequent',
                  use_advanced_imputation=False):
+        logger.debug(f"Inizializzazione SmartImputer: "
+                    f"numerical_strategy={numerical_strategy}, "
+                    f"categorical_strategy={categorical_strategy}, "
+                    f"use_advanced_imputation={use_advanced_imputation}")
+        
         self.numerical_strategy = numerical_strategy
         self.categorical_strategy = categorical_strategy
         self.use_advanced_imputation = use_advanced_imputation
@@ -238,20 +277,23 @@ class SmartImputer(BaseEstimator, TransformerMixin):
         
     def fit(self, X, y=None):
         """Fit degli imputers"""
+        logger.info("Esecuzione fit SmartImputer")
         for column in X.columns:
             if X[column].dtype in ['int64', 'float64']:
                 self.feature_types_[column] = 'numerical'
                 
                 if self.use_advanced_imputation and ITERATIVE_IMPUTER_AVAILABLE:
-                    # IterativeImputer per valori numerici se disponibile
+                    logger.debug(f"Usando IterativeImputer per {column}")
                     self.imputers_[column] = IterativeImputer(random_state=42)
                 elif self.use_advanced_imputation:
-                    # Fallback a KNN se IterativeImputer non disponibile
+                    logger.debug(f"Usando KNNImputer per {column}")
                     self.imputers_[column] = KNNImputer(n_neighbors=5)
                 else:
+                    logger.debug(f"Usando SimpleImputer ({self.numerical_strategy}) per {column}")
                     self.imputers_[column] = SimpleImputer(strategy=self.numerical_strategy)
             else:
                 self.feature_types_[column] = 'categorical'
+                logger.debug(f"Usando SimpleImputer ({self.categorical_strategy}) per {column}")
                 self.imputers_[column] = SimpleImputer(strategy=self.categorical_strategy)
             
             # Fit dell'imputer
@@ -261,13 +303,16 @@ class SmartImputer(BaseEstimator, TransformerMixin):
     
     def transform(self, X):
         """Transform con imputation"""
+        logger.info("Esecuzione transform SmartImputer")
         X_imputed = X.copy()
         
         for column in X.columns:
             if column in self.imputers_:
+                logger.debug(f"Imputazione colonna {column}")
                 imputed_values = self.imputers_[column].transform(X[[column]])
                 X_imputed[column] = imputed_values.flatten()
         
+        logger.debug(f"Valori mancanti dopo imputazione: {X_imputed.isnull().sum().sum()}")
         return X_imputed
 
 class OutlierHandler(BaseEstimator, TransformerMixin):
@@ -280,6 +325,12 @@ class OutlierHandler(BaseEstimator, TransformerMixin):
                  action='clip',
                  threshold=3,
                  columns=None):
+        logger.debug(f"Inizializzazione OutlierHandler: "
+                    f"method={method}, "
+                    f"action={action}, "
+                    f"threshold={threshold}, "
+                    f"columns={columns}")
+        
         self.method = method  # 'iqr', 'zscore', 'isolation'
         self.action = action  # 'clip', 'remove', 'transform'
         self.threshold = threshold
@@ -288,6 +339,7 @@ class OutlierHandler(BaseEstimator, TransformerMixin):
         
     def fit(self, X, y=None):
         """Calcola bounds per outliers"""
+        logger.info("Esecuzione fit OutlierHandler")
         numeric_columns = X.select_dtypes(include=[np.number]).columns
         if self.columns is not None:
             numeric_columns = [col for col in numeric_columns if col in self.columns]
@@ -300,6 +352,7 @@ class OutlierHandler(BaseEstimator, TransformerMixin):
                 lower_bound = Q1 - 1.5 * IQR
                 upper_bound = Q3 + 1.5 * IQR
                 self.outlier_bounds_[column] = (lower_bound, upper_bound)
+                logger.debug(f"Colonna {column}: bounds IQR ({lower_bound:.2f}, {upper_bound:.2f})")
             
             elif self.method == 'zscore':
                 mean = X[column].mean()
@@ -307,20 +360,25 @@ class OutlierHandler(BaseEstimator, TransformerMixin):
                 lower_bound = mean - self.threshold * std
                 upper_bound = mean + self.threshold * std
                 self.outlier_bounds_[column] = (lower_bound, upper_bound)
+                logger.debug(f"Colonna {column}: bounds z-score ({lower_bound:.2f}, {upper_bound:.2f})")
         
         return self
     
     def transform(self, X):
         """Applica gestione outliers"""
+        logger.info("Esecuzione transform OutlierHandler")
         X_cleaned = X.copy()
         
         for column, (lower_bound, upper_bound) in self.outlier_bounds_.items():
             if column in X_cleaned.columns:
                 if self.action == 'clip':
+                    outliers = ((X_cleaned[column] < lower_bound) | (X_cleaned[column] > upper_bound)).sum()
                     X_cleaned[column] = X_cleaned[column].clip(lower_bound, upper_bound)
+                    logger.debug(f"Clippati {outliers} outliers in {column}")
                 elif self.action == 'transform':
                     # Log transform per ridurre impact outliers
                     X_cleaned[column] = np.log1p(X_cleaned[column] - X_cleaned[column].min() + 1)
+                    logger.debug(f"Applicata trasformazione log a {column}")
         
         return X_cleaned
 
@@ -335,6 +393,11 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
                  encoding_strategy='auto',
                  handle_unknown='ignore',
                  target_encoding_smoothing=1.0):
+        logger.debug(f"Inizializzazione AdvancedEncoder: "
+                    f"encoding_strategy={encoding_strategy}, "
+                    f"handle_unknown={handle_unknown}, "
+                    f"target_encoding_smoothing={target_encoding_smoothing}")
+        
         self.encoding_strategy = encoding_strategy
         self.handle_unknown = handle_unknown
         self.target_encoding_smoothing = target_encoding_smoothing
@@ -343,6 +406,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
         
     def fit(self, X, y=None):
         """Fit degli encoders"""
+        logger.info("Esecuzione fit AdvancedEncoder")
         categorical_columns = X.select_dtypes(include=['object']).columns
         
         for column in categorical_columns:
@@ -360,6 +424,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
                 method = self.encoding_strategy
             
             self.encoding_methods_[column] = method
+            logger.debug(f"Colonna {column}: strategia encoding={method} (unique_values={unique_values})")
             
             # Crea encoder
             if method == 'label':
@@ -381,6 +446,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
     
     def transform(self, X):
         """Transform con encoding"""
+        logger.info("Esecuzione transform AdvancedEncoder")
         X_encoded = X.copy()
         
         for column, encoder in self.encoders_.items():
@@ -398,6 +464,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
                             lambda x: x if str(x) in known_values else known_values[0]
                         )
                         X_encoded[column] = encoder.transform(X_encoded[column].astype(str))
+                        logger.warning(f"Valori non visti in {column}, sostituiti con {known_values[0]}")
                 
                 elif method == 'onehot':
                     encoded_array = encoder.transform(X_encoded[[column]])
@@ -407,14 +474,18 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
                     X_encoded = X_encoded.drop(column, axis=1)
                     for i, feature_name in enumerate(feature_names):
                         X_encoded[feature_name] = encoded_array[:, i]
+                    logger.debug(f"OneHot encoding per {column}: creati {len(feature_names)} nuove colonne")
                 
                 elif method == 'target':
                     X_encoded[column] = X_encoded[column].map(encoder).fillna(encoder.get('__unknown__', 0))
+                    logger.debug(f"Target encoding applicato a {column}")
         
+        logger.info(f"Encoding completato. Nuove dimensioni: {X_encoded.shape}")
         return X_encoded
     
     def _create_target_encoder(self, categorical_series, target):
         """Crea target encoder manuale"""
+        logger.debug(f"Creazione target encoder per {categorical_series.name}")
         # Calcola media target per categoria
         target_means = categorical_series.to_frame().assign(target=target).groupby(categorical_series.name)['target'].mean()
         
@@ -445,6 +516,12 @@ class IntelligentFeatureSelector(BaseEstimator, TransformerMixin):
                  k_best=20,
                  variance_threshold=0.01,
                  correlation_threshold=0.95):
+        logger.debug(f"Inizializzazione IntelligentFeatureSelector: "
+                    f"selection_methods={selection_methods}, "
+                    f"k_best={k_best}, "
+                    f"variance_threshold={variance_threshold}, "
+                    f"correlation_threshold={correlation_threshold}")
+        
         self.selection_methods = selection_methods
         self.k_best = k_best
         self.variance_threshold = variance_threshold
@@ -454,6 +531,7 @@ class IntelligentFeatureSelector(BaseEstimator, TransformerMixin):
         
     def fit(self, X, y=None):
         """Seleziona features"""
+        logger.info("Esecuzione fit IntelligentFeatureSelector")
         selected_features = set(X.columns)
         
         # 1. Variance threshold
@@ -466,6 +544,7 @@ class IntelligentFeatureSelector(BaseEstimator, TransformerMixin):
             # Score: variance
             variances = X.var()
             self.feature_scores_['variance'] = variances.to_dict()
+            logger.debug(f"Variance threshold: selezionate {len(variance_features)} features")
         
         # 2. Univariate selection
         if 'univariate' in self.selection_methods and y is not None:
@@ -485,12 +564,14 @@ class IntelligentFeatureSelector(BaseEstimator, TransformerMixin):
                 # Score: chi2
                 scores = dict(zip(X_positive[list(selected_features)].columns, selector.scores_))
                 self.feature_scores_['univariate'] = scores
+                logger.debug(f"Univariate selection (chi2): selezionate {len(univariate_features)} features")
             except:
                 # Fallback a f_classif
                 selector = SelectKBest(score_func=f_classif, k=min(self.k_best, len(selected_features)))
                 selector.fit(X[list(selected_features)], y)
                 univariate_features = selector.get_feature_names_out()
                 selected_features &= set(univariate_features)
+                logger.debug(f"Univariate selection (f_classif): selezionate {len(univariate_features)} features")
         
         # 3. Correlation filtering
         if 'correlation' in self.selection_methods:
@@ -513,20 +594,26 @@ class IntelligentFeatureSelector(BaseEstimator, TransformerMixin):
                     features_to_remove.add(feat2)
             
             selected_features -= features_to_remove
+            logger.debug(f"Correlation filtering: rimosse {len(features_to_remove)} features altamente correlate")
         
         self.selected_features_ = list(selected_features)
+        logger.info(f"Selezionate {len(self.selected_features_)} features finali")
         return self
     
     def transform(self, X):
         """Transform con feature selection"""
+        logger.info("Esecuzione transform IntelligentFeatureSelector")
         if self.selected_features_ is None:
+            logger.error("Feature selector deve essere fittato prima del transform")
             raise ValueError("Feature selector deve essere fittato prima del transform")
         
         return X[self.selected_features_]
     
     def get_feature_importance_summary(self):
         """Restituisce summary importanza features"""
+        logger.debug("Esecuzione get_feature_importance_summary")
         if not self.feature_scores_:
+            logger.warning("Nessun feature score disponibile")
             return None
         
         summary = {}
@@ -547,36 +634,43 @@ class PreprocessingPipelineBuilder:
     """
     
     def __init__(self):
+        logger.debug("Inizializzazione PreprocessingPipelineBuilder")
         self.steps = []
         self.pipeline = None
         
     def add_feature_engineering(self, **kwargs):
         """Aggiunge feature engineering"""
+        logger.debug(f"Aggiunto step feature_engineering con kwargs: {kwargs}")
         self.steps.append(('feature_engineering', TitanicFeatureEngineer(**kwargs)))
         return self
     
     def add_imputation(self, **kwargs):
         """Aggiunge imputazione"""
+        logger.debug(f"Aggiunto step imputation con kwargs: {kwargs}")
         self.steps.append(('imputation', SmartImputer(**kwargs)))
         return self
     
     def add_outlier_handling(self, **kwargs):
         """Aggiunge gestione outliers"""
+        logger.debug(f"Aggiunto step outlier_handling con kwargs: {kwargs}")
         self.steps.append(('outlier_handling', OutlierHandler(**kwargs)))
         return self
     
     def add_encoding(self, **kwargs):
         """Aggiunge encoding"""
+        logger.debug(f"Aggiunto step encoding con kwargs: {kwargs}")
         self.steps.append(('encoding', AdvancedEncoder(**kwargs)))
         return self
     
     def add_feature_selection(self, **kwargs):
         """Aggiunge feature selection"""
+        logger.debug(f"Aggiunto step feature_selection con kwargs: {kwargs}")
         self.steps.append(('feature_selection', IntelligentFeatureSelector(**kwargs)))
         return self
     
     def add_scaling(self, method='standard', **kwargs):
         """Aggiunge scaling"""
+        logger.debug(f"Aggiunto step scaling (method={method}) con kwargs: {kwargs}")
         if method == 'standard':
             scaler = StandardScaler(**kwargs)
         elif method == 'minmax':
@@ -586,6 +680,7 @@ class PreprocessingPipelineBuilder:
         elif method == 'power':
             scaler = PowerTransformer(**kwargs)
         else:
+            logger.error(f"Metodo scaling non supportato: {method}")
             raise ValueError(f"Metodo scaling non supportato: {method}")
         
         self.steps.append(('scaling', scaler))
@@ -593,9 +688,11 @@ class PreprocessingPipelineBuilder:
     
     def add_dimensionality_reduction(self, method='pca', **kwargs):
         """Aggiunge riduzione dimensionalità"""
+        logger.debug(f"Aggiunto step dimensionality_reduction (method={method}) con kwargs: {kwargs}")
         if method == 'pca':
             reducer = PCA(**kwargs)
         else:
+            logger.error(f"Metodo riduzione dimensionalità non supportato: {method}")
             raise ValueError(f"Metodo riduzione dimensionalità non supportato: {method}")
         
         self.steps.append(('dimensionality_reduction', reducer))
@@ -603,14 +700,18 @@ class PreprocessingPipelineBuilder:
     
     def build(self):
         """Costruisce la pipeline"""
+        logger.info("Costruzione pipeline preprocessing")
         if not self.steps:
+            logger.error("Almeno uno step deve essere aggiunto alla pipeline")
             raise ValueError("Almeno uno step deve essere aggiunto alla pipeline")
         
         self.pipeline = Pipeline(self.steps)
+        logger.info(f"Pipeline creata con {len(self.steps)} steps")
         return self.pipeline
     
     def get_step_names(self):
         """Restituisce nomi degli step"""
+        logger.debug("Esecuzione get_step_names")
         return [step[0] for step in self.steps]
 
 # ----------------5. Data Quality Checks
@@ -628,6 +729,7 @@ class DataQualityChecker:
         Returns:
             Report qualità dati
         """
+        logger.info("Esecuzione check_data_quality")
         report = {
             'n_samples': len(X),
             'n_features': len(X.columns),
@@ -698,6 +800,7 @@ class DataQualityChecker:
                 'is_balanced': (min(y.value_counts()) / max(y.value_counts())) > 0.5
             }
         
+        logger.debug(f"Report qualità dati generato: {len(report['missing_values'])} colonne con missing, {len(report['outliers_summary'])} con outliers")
         return report
     
     @staticmethod
@@ -711,6 +814,7 @@ class DataQualityChecker:
         Returns:
             Lista di suggerimenti
         """
+        logger.debug("Esecuzione suggest_preprocessing_steps")
         suggestions = []
         
         # Missing values
@@ -754,6 +858,7 @@ class DataQualityChecker:
         if quality_report['memory_usage'] > 100_000_000:  # >100MB
             suggestions.append("Considera ottimizzazione tipi di dato per ridurre memoria")
         
+        logger.debug(f"Generati {len(suggestions)} suggerimenti di preprocessing")
         return suggestions
 
 # ----------------6. Utility Functions
@@ -768,6 +873,7 @@ def create_titanic_preprocessing_pipeline(config='standard'):
     Returns:
         Pipeline di preprocessing
     """
+    logger.info(f"Creazione pipeline preprocessing (config={config})")
     builder = PreprocessingPipelineBuilder()
     
     if config == 'minimal':
@@ -797,8 +903,10 @@ def create_titanic_preprocessing_pipeline(config='standard'):
                    .build())
     
     else:
+        logger.error(f"Configurazione non supportata: {config}")
         raise ValueError(f"Configurazione non supportata: {config}")
     
+    logger.info(f"Pipeline creata con {len(pipeline.steps)} steps")
     return pipeline
 
 def validate_preprocessing_pipeline(pipeline, X_train, X_test, y_train=None, y_test=None):
@@ -813,6 +921,7 @@ def validate_preprocessing_pipeline(pipeline, X_train, X_test, y_train=None, y_t
     Returns:
         Report di validazione
     """
+    logger.info("Validazione pipeline preprocessing")
     report = {
         'pipeline_steps': [step[0] for step in pipeline.steps],
         'validation_passed': True,
@@ -884,6 +993,7 @@ def validate_preprocessing_pipeline(pipeline, X_train, X_test, y_train=None, y_t
         report['errors'].append(f"Errore durante validazione: {str(e)}")
         report['validation_passed'] = False
     
+    logger.info(f"Validazione completata: {'successo' if report['validation_passed'] else 'fallita'}")
     return report
 
 def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=3):
@@ -899,6 +1009,7 @@ def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=
     Returns:
         Pipeline ottimizzata
     """
+    logger.info("Ottimizzazione pipeline preprocessing")
     from sklearn.model_selection import GridSearchCV
     from sklearn.ensemble import RandomForestClassifier
     
@@ -943,7 +1054,7 @@ def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=
         })
     
     if not param_grid:
-        # Se nessun parametro da ottimizzare, ritorna pipeline originale
+        logger.warning("Nessun parametro da ottimizzare - ritorno pipeline originale")
         return base_pipeline
     
     # Ottimizzazione
@@ -961,6 +1072,7 @@ def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=
     # Estrae pipeline preprocessing ottimizzata
     optimized_pipeline = grid_search.best_estimator_.named_steps['preprocessing']
     
+    logger.info(f"Ottimizzazione completata. Miglior score: {grid_search.best_score_:.4f}")
     return optimized_pipeline, {
         'best_params': grid_search.best_params_,
         'best_score': grid_search.best_score_,
@@ -978,6 +1090,7 @@ def get_preprocessing_recommendations(X, y=None):
     Returns:
         Dizionario con raccomandazioni
     """
+    logger.info("Generazione raccomandazioni preprocessing")
     # Analisi qualità dati
     quality_report = DataQualityChecker.check_data_quality(X, y)
     
@@ -1043,6 +1156,7 @@ def get_preprocessing_recommendations(X, y=None):
     suggestions = DataQualityChecker.suggest_preprocessing_steps(quality_report)
     recommendations['detailed_suggestions'] = suggestions
     
+    logger.info(f"Raccomandazioni generate: config={recommendations['suggested_pipeline_config']}")
     return recommendations
 
 def create_preprocessing_report(X_before, X_after, y=None, pipeline_steps=None):
@@ -1058,6 +1172,7 @@ def create_preprocessing_report(X_before, X_after, y=None, pipeline_steps=None):
     Returns:
         Report completo
     """
+    logger.info("Creazione report preprocessing")
     report = {
         'timestamp': pd.Timestamp.now().isoformat(),
         'pipeline_steps': pipeline_steps or [],
@@ -1120,18 +1235,21 @@ def create_preprocessing_report(X_before, X_after, y=None, pipeline_steps=None):
     if isinstance(X_after, np.ndarray) and (np.any(np.isnan(X_after)) or np.any(np.isinf(X_after))):
         report['recommendations'].append("Valori NaN/infiniti nel risultato finale")
     
+    logger.debug(f"Report creato con {len(report['recommendations'])} raccomandazioni")
     return report
 
 # ----------------7. Export Functions
 
 def save_preprocessing_pipeline(pipeline, filepath):
     """Salva pipeline di preprocessing"""
+    logger.info(f"Salvataggio pipeline in {filepath}")
     import joblib
     joblib.dump(pipeline, filepath)
     return filepath
 
 def load_preprocessing_pipeline(filepath):
     """Carica pipeline di preprocessing"""
+    logger.info(f"Caricamento pipeline da {filepath}")
     import joblib
     return joblib.load(filepath)
 
@@ -1144,6 +1262,7 @@ def export_feature_names(pipeline, original_features, output_path):
         original_features: Feature originali
         output_path: Path per salvare mapping
     """
+    logger.info(f"Esportazione feature names in {output_path}")
     # Applica pipeline a dummy data per ottenere feature names
     dummy_data = pd.DataFrame(np.zeros((1, len(original_features))), columns=original_features)
     
@@ -1167,8 +1286,11 @@ def export_feature_names(pipeline, original_features, output_path):
         with open(output_path, 'w') as f:
             json.dump(mapping, f, indent=2)
         
+        logger.debug(f"Esportati {len(final_features)} feature names")
         return mapping
         
     except Exception as e:
-        print(f"Errore nell'export feature names: {str(e)}")
+        logger.error(f"Errore nell'export feature names: {str(e)}")
         return None
+
+logger.info(f"Caricamento completato {__name__}")

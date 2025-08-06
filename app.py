@@ -12,24 +12,40 @@ from src.config import *
 from src.utils.data_loader import load_titanic_data, get_data_summary
 from src.components.metrics import create_overview_metrics
 from src.components.charts import create_survival_overview_chart, create_class_distribution_chart
+from src.utils.log import logger
+
+# Logger per l'ingresso del file
+logger.info(f"Caricamento file {__name__}")
 
 # ----------------1. Configurazione pagina principale (da config.py)
-st.set_page_config(**PAGE_CONFIG)
+def setup_page_config():
+    """Configura la pagina Streamlit"""
+    logger.info("======================================== INIZIO APP ====================================")
+    logger.info("Configurazione pagina Streamlit")
+    st.set_page_config(**PAGE_CONFIG)
 
 def main():
     """Funzione principale dell'applicazione"""
+    logger.info("Avvio funzione main()")
+    
+    setup_page_config()
     
     # ----------------2. Caricamento dati (da notebook sezione 2.1 - Dataset Loading)
+    logger.info("Caricamento dati Titanic")
     df = load_titanic_data()
     if df is None:
+        logger.error("Fallito caricamento dati Titanic")
         st.error("Errore nel caricamento dei dati")
         return
+    logger.info(f"Dati caricati con successo. Shape: {df.shape}")
     
     # ----------------3. Header principale (da notebook Project Overview)
+    logger.info("Setup header principale")
     st.title(APP_TEXTS['main_title'])
     st.markdown(APP_TEXTS['subtitle'])
     
     # ----------------4. Sidebar informazioni
+    logger.info("Setup sidebar")
     with st.sidebar:
         st.header("Informazioni Dataset")
         st.info(f"Passeggeri totali: {len(df)}")
@@ -37,26 +53,32 @@ def main():
         st.info(APP_TEXTS['data_source'])
     
     # ----------------5. Overview Metrics (da notebook sezione 4.2.2 - Survival Analysis)
+    logger.info("Creazione overview metrics")
     st.subheader("Panoramica Generale")
     create_overview_metrics(df)
     
     # ----------------6. Visualizzazioni principali dashboard
+    logger.info("Setup colonne grafici principali")
     col1, col2 = st.columns(2)
     
     with col1:
         # ----------------7. Grafico sopravvivenza generale (da notebook sezione 4.2.2)
+        logger.debug("Creazione grafico sopravvivenza")
         st.subheader("Tasso di Sopravvivenza")
         fig_survival = create_survival_overview_chart(df)
         st.plotly_chart(fig_survival, use_container_width=True)
     
     with col2:
         # ----------------8. Distribuzione per classe (da notebook sezione 4.2.2.1)
+        logger.debug("Creazione grafico distribuzione classi")
         st.subheader("Distribuzione per Classe")
         fig_class = create_class_distribution_chart(df)
         st.plotly_chart(fig_class, use_container_width=True)
     
     # ----------------9. Informazioni dataset (da notebook sezione 2.1)
+    logger.info("Setup sezione dettagli dataset")
     with st.expander("Dettagli Dataset"):
+        logger.debug("Generazione summary dati")
         summary = get_data_summary(df)
         col1, col2, col3 = st.columns(3)
         
@@ -73,7 +95,16 @@ def main():
             st.metric("Tasso Sopravvivenza", f"{summary['survival_rate']:.1f}%")
     
     # ----------------10. Footer (da config.py)
+    logger.info("Setup footer")
     st.markdown(APP_TEXTS['footer'])
+    logger.info("Applicazione avviata con successo")
 
 if __name__ == "__main__":
-    main()
+    try:
+        logger.info("Avvio applicazione Streamlit")
+        main()
+        logger.info("*************************** FINE APP *****************************")
+    except Exception as e:
+        logger.error(f"Errore nell'esecuzione dell'applicazione: {str(e)}")
+        st.error("Si è verificato un errore nell'applicazione")
+        raise

@@ -1,11 +1,10 @@
-# utils/project_logger.py
 """
 Logger centralizzato per progetti Python
 (versione rinominata da utils/log.py)
 """
 
 import logging
-from src.config import LOGGING_CONFIG, DEBUG_MODE
+import inspect
 
 class ProjectLogger:
     """Logger principale per il progetto"""
@@ -14,10 +13,11 @@ class ProjectLogger:
         self.name = name or self._get_caller_name()
         self.logger = logging.getLogger(self.name)
         self._setup_logger()
+        # Disabilita il logging ricorsivo
+        self._logging_disabled = False
 
     def _get_caller_name(self):
         """Ottiene il nome del chiamante automaticamente"""
-        import inspect
         frame = inspect.stack()[2]
         module = inspect.getmodule(frame[0])
         return module.__name__ if module else __name__
@@ -34,34 +34,44 @@ class ProjectLogger:
         if config['console']:
             ch = logging.StreamHandler()
             ch.setLevel(config['console_level'])
-            ch.setFormatter(logging.Formatter(LOGGING_CONFIG['formatters']['standard']['format']))
+            ch.setFormatter(logging.Formatter(config['formatters']['standard']['format']))
             self.logger.addHandler(ch)
         
         if config['file']:
             fh = logging.FileHandler(
-                filename=LOGGING_CONFIG['handlers']['file']['filename'],
+                filename=config['handlers']['file']['filename'],
                 encoding='utf-8'
             )
             fh.setLevel(config['file_level'])
-            fh.setFormatter(logging.Formatter(LOGGING_CONFIG['formatters']['detailed']['format']))
+            fh.setFormatter(logging.Formatter(config['formatters']['detailed']['format']))
             self.logger.addHandler(fh)
 
         self.logger.setLevel(config['global_level'])
 
     def _get_dynamic_config(self):
         """Restituisce la configurazione in base a DEBUG_MODE"""
+        from src.config import DEBUG_MODE, LOGGING_CONFIG
         return {
             'console': True,
             'file': True,
             'console_level': 'DEBUG' if DEBUG_MODE else LOGGING_CONFIG['handlers']['console']['level'],
             'file_level': LOGGING_CONFIG['handlers']['file']['level'],
-            'global_level': 'DEBUG' if DEBUG_MODE else LOGGING_CONFIG['loggers']['']['level']
+            'global_level': 'DEBUG' if DEBUG_MODE else LOGGING_CONFIG['loggers']['']['level'],
+            'formatters': LOGGING_CONFIG['formatters'],
+            'handlers': LOGGING_CONFIG['handlers']
         }
 
     def log(self, level, message, context=None):
-        if context:
-            message = f"[{context}] {message}"
-        self.logger.log(level, message)
+        if self._logging_disabled:
+            return
+            
+        self._logging_disabled = True
+        try:
+            if context:
+                message = f"[{context}] {message}"
+            self.logger.log(level, message)
+        finally:
+            self._logging_disabled = False
 
     def debug(self, message, context=None):
         self.log(logging.DEBUG, message, context)
@@ -75,13 +85,14 @@ class ProjectLogger:
     def error(self, message, context=None):
         self.log(logging.ERROR, message, context)
 
-def setup_logging():
-    """Configura il sistema di logging globale"""
-    import logging.config
-    logging.config.dictConfig(LOGGING_CONFIG)
+# Configurazione iniziale senza causare ricorsione
+try:
+    logger = ProjectLogger(__name__)
+    logger._logging_disabled = True
+    logger.info(f"Logger globale configurato in {__name__}")
+    logger._logging_disabled = False
+except Exception as e:
+    print(f"Errore durante l'inizializzazione del logger: {str(e)}")
     logger = logging.getLogger(__name__)
-    logger.info("Logging configurato correttamente")
-    return logger
-
-# Logger globale preconfigurato
-logger = ProjectLogger()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())

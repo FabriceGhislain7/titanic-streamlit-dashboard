@@ -3,6 +3,7 @@ src/models/model_evaluator.py
 Valutazione e analisi performance modelli Machine Learning
 """
 
+import logging
 import pandas as pd
 import numpy as np
 from sklearn.metrics import (
@@ -32,6 +33,9 @@ warnings.filterwarnings('ignore')
 
 from src.config import EVALUATION_METRICS, ML_MODELS
 
+logger = logging.getLogger(__name__)
+logger.info(f"Caricamento {__name__}")
+
 # ----------------1. Core Evaluation Class
 
 class ModelEvaluator:
@@ -46,6 +50,10 @@ class ModelEvaluator:
             X_test: Features test set
             y_test: Target test set
         """
+        logger.info("Inizializzazione ModelEvaluator")
+        logger.debug(f"Modelli ricevuti: {list(models_dict.keys())}")
+        logger.debug(f"Dimensioni X_test: {X_test.shape}, y_test: {y_test.shape}")
+        
         self.models = models_dict
         self.X_test = X_test
         self.y_test = y_test
@@ -63,11 +71,15 @@ class ModelEvaluator:
         Returns:
             Dizionario con risultati valutazione
         """
+        logger.info(f"Valutazione di {len(self.models)} modelli (detailed={detailed})")
+        
         for model_name, model_data in self.models.items():
+            logger.debug(f"Valutazione modello: {model_name}")
             self.evaluation_results[model_name] = self.evaluate_single_model(
                 model_name, model_data, detailed=detailed
             )
         
+        logger.info("Valutazione completata per tutti i modelli")
         return self.evaluation_results
     
     def evaluate_single_model(self, model_name, model_data, detailed=True):
@@ -82,16 +94,20 @@ class ModelEvaluator:
         Returns:
             Risultati valutazione del modello
         """
+        logger.info(f"Valutazione modello {model_name}")
+        
         model = model_data['model']
         preprocessor = model_data.get('preprocessor')
         
         # Preprocessing se necessario
         if preprocessor:
+            logger.debug("Applicazione preprocessor")
             X_test_processed = preprocessor.transform(self.X_test)
         else:
             X_test_processed = self.X_test
         
         # Predizioni
+        logger.debug("Generazione predizioni")
         y_pred = model.predict(X_test_processed)
         self.predictions[model_name] = y_pred
         
@@ -99,16 +115,19 @@ class ModelEvaluator:
         y_pred_proba = None
         if hasattr(model, 'predict_proba'):
             try:
+                logger.debug("Calcolo probabilità predizioni")
                 y_pred_proba = model.predict_proba(X_test_processed)[:, 1]
                 self.probabilities[model_name] = y_pred_proba
-            except:
-                pass
+            except Exception as e:
+                logger.warning(f"Errore calcolo probabilità per {model_name}: {str(e)}")
         
         # Metriche base
+        logger.debug("Calcolo metriche base")
         results = self._calculate_basic_metrics(y_pred, y_pred_proba)
         
         # Metriche dettagliate
         if detailed:
+            logger.debug("Calcolo metriche dettagliate")
             results.update(self._calculate_detailed_metrics(y_pred, y_pred_proba))
             results.update(self._calculate_confusion_matrix_metrics(y_pred))
             
@@ -118,10 +137,12 @@ class ModelEvaluator:
         # Informazioni modello
         results['model_info'] = self._get_model_info(model_name, model)
         
+        logger.info(f"Valutazione completata per {model_name}")
         return results
     
     def _calculate_basic_metrics(self, y_pred, y_pred_proba):
         """Calcola metriche base"""
+        logger.debug("Calcolo metriche base")
         metrics = {
             'accuracy': accuracy_score(self.y_test, y_pred),
             'precision': precision_score(self.y_test, y_pred, zero_division=0),
@@ -138,6 +159,7 @@ class ModelEvaluator:
     
     def _calculate_detailed_metrics(self, y_pred, y_pred_proba):
         """Calcola metriche dettagliate"""
+        logger.debug("Calcolo metriche dettagliate")
         metrics = {
             'matthews_corrcoef': matthews_corrcoef(self.y_test, y_pred),
             'cohen_kappa': cohen_kappa_score(self.y_test, y_pred),
@@ -155,6 +177,7 @@ class ModelEvaluator:
     
     def _calculate_confusion_matrix_metrics(self, y_pred):
         """Calcola metriche da confusion matrix"""
+        logger.debug("Calcolo confusion matrix metrics")
         cm = confusion_matrix(self.y_test, y_pred)
         tn, fp, fn, tp = cm.ravel()
         
@@ -170,6 +193,7 @@ class ModelEvaluator:
     
     def _calculate_probability_metrics(self, y_pred_proba):
         """Calcola metriche basate su probabilità"""
+        logger.debug("Calcolo probability metrics")
         # Calibration
         fraction_positives, mean_predicted_value = calibration_curve(
             self.y_test, y_pred_proba, n_bins=10
@@ -188,24 +212,28 @@ class ModelEvaluator:
     
     def _calculate_specificity(self, y_pred):
         """Calcola specificity (True Negative Rate)"""
+        logger.debug("Calcolo specificity")
         cm = confusion_matrix(self.y_test, y_pred)
         tn, fp, fn, tp = cm.ravel()
         return tn / (tn + fp) if (tn + fp) > 0 else 0
     
     def _calculate_npv(self, y_pred):
         """Calcola Negative Predictive Value"""
+        logger.debug("Calcolo NPV")
         cm = confusion_matrix(self.y_test, y_pred)
         tn, fp, fn, tp = cm.ravel()
         return tn / (tn + fn) if (tn + fn) > 0 else 0
     
     def _calculate_fallout(self, y_pred):
         """Calcola False Positive Rate"""
+        logger.debug("Calcolo fallout")
         cm = confusion_matrix(self.y_test, y_pred)
         tn, fp, fn, tp = cm.ravel()
         return fp / (fp + tn) if (fp + tn) > 0 else 0
     
     def _get_model_info(self, model_name, model):
         """Ottieni informazioni sul modello"""
+        logger.debug(f"Recupero info per modello {model_name}")
         return {
             'name': ML_MODELS.get(model_name, {}).get('name', model_name),
             'type': model_name,
@@ -221,6 +249,7 @@ class ModelComparison:
     """
     
     def __init__(self, evaluation_results):
+        logger.info("Inizializzazione ModelComparison")
         self.results = evaluation_results
         
     def create_comparison_table(self, metrics=None):
@@ -233,8 +262,11 @@ class ModelComparison:
         Returns:
             DataFrame con confronto
         """
+        logger.info("Creazione comparison table")
+        
         if metrics is None:
             metrics = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+            logger.debug(f"Usando metriche di default: {metrics}")
         
         comparison_data = []
         
@@ -250,6 +282,7 @@ class ModelComparison:
             
             comparison_data.append(row)
         
+        logger.debug(f"Tabella confronto generata con {len(comparison_data)} modelli")
         return pd.DataFrame(comparison_data)
     
     def rank_models(self, metric='f1', ascending=False):
@@ -263,6 +296,8 @@ class ModelComparison:
         Returns:
             Lista ordinata di modelli
         """
+        logger.info(f"Ranking modelli per metrica: {metric}")
+        
         rankings = []
         
         for model_name, results in self.results.items():
@@ -273,7 +308,9 @@ class ModelComparison:
                 'score': score
             })
         
-        return sorted(rankings, key=lambda x: x['score'], reverse=not ascending)
+        rankings = sorted(rankings, key=lambda x: x['score'], reverse=not ascending)
+        logger.debug(f"Top 3 modelli: {rankings[:3]}")
+        return rankings
     
     def find_best_model(self, metric='f1'):
         """
@@ -285,15 +322,18 @@ class ModelComparison:
         Returns:
             Dizionario con info miglior modello
         """
+        logger.info(f"Ricerca miglior modello per metrica: {metric}")
         rankings = self.rank_models(metric)
         if rankings:
             best = rankings[0]
+            logger.info(f"Miglior modello trovato: {best['name']} (score={best['score']})")
             return {
                 'model_type': best['model'],
                 'model_name': best['name'],
                 'score': best['score'],
                 'metric': metric
             }
+        logger.warning("Nessun modello disponibile per la ricerca")
         return None
     
     def calculate_model_consensus(self):
@@ -303,7 +343,9 @@ class ModelComparison:
         Returns:
             Analisi consensus
         """
+        logger.info("Calcolo model consensus")
         if not hasattr(self, 'evaluator'):
+            logger.warning("Evaluator non disponibile per consensus")
             return None
         
         # Raccoglie tutte le predizioni
@@ -316,6 +358,7 @@ class ModelComparison:
                 model_names.append(model_name)
         
         if not all_predictions:
+            logger.warning("Nessuna predizione disponibile per consensus")
             return None
         
         predictions_matrix = np.array(all_predictions).T
@@ -327,6 +370,7 @@ class ModelComparison:
             consensus = np.mean(votes)
             consensus_scores.append(consensus)
         
+        logger.debug(f"Consensus calcolato per {len(consensus_scores)} campioni")
         return {
             'consensus_scores': np.array(consensus_scores),
             'high_consensus': np.sum((np.array(consensus_scores) >= 0.8) | (np.array(consensus_scores) <= 0.2)),
@@ -354,6 +398,7 @@ class StatisticalTests:
         Returns:
             Risultati test McNemar
         """
+        logger.info("Esecuzione McNemar test")
         from statsmodels.stats.contingency_tables import mcnemar
         
         # Crea tabella di contingenza
@@ -366,6 +411,8 @@ class StatisticalTests:
         model2_correct = np.sum(~correct1 & correct2)
         both_wrong = np.sum(~correct1 & ~correct2)
         
+        logger.debug(f"Tabella contingenza - Corretti entrambi: {both_correct}, Modello1 corretto: {model1_correct}, Modello2 corretto: {model2_correct}, Sbagliati entrambi: {both_wrong}")
+        
         # Matrice di contingenza
         contingency_table = np.array([[both_correct, model1_correct],
                                      [model2_correct, both_wrong]])
@@ -373,13 +420,15 @@ class StatisticalTests:
         # Test McNemar
         try:
             result = mcnemar(contingency_table, exact=True)
+            logger.info(f"McNemar test completato - p-value: {result.pvalue}")
             return {
                 'statistic': result.statistic,
                 'p_value': result.pvalue,
                 'contingency_table': contingency_table,
                 'significant': result.pvalue < 0.05
             }
-        except:
+        except Exception as e:
+            logger.error(f"Errore in McNemar test: {str(e)}")
             return {
                 'statistic': np.nan,
                 'p_value': np.nan,
@@ -399,7 +448,13 @@ class StatisticalTests:
         Returns:
             Risultati t-test
         """
+        logger.info("Esecuzione paired t-test")
+        logger.debug(f"Score modello 1: media={np.mean(scores1)}, std={np.std(scores1)}")
+        logger.debug(f"Score modello 2: media={np.mean(scores2)}, std={np.std(scores2)}")
+        
         statistic, p_value = stats.ttest_rel(scores1, scores2)
+        
+        logger.info(f"T-test completato - p-value: {p_value}, significativo: {p_value < 0.05}")
         
         return {
             'statistic': statistic,
@@ -421,7 +476,13 @@ class StatisticalTests:
         Returns:
             Risultati test Wilcoxon
         """
+        logger.info("Esecuzione Wilcoxon test")
+        logger.debug(f"Score modello 1: mediana={np.median(scores1)}")
+        logger.debug(f"Score modello 2: mediana={np.median(scores2)}")
+        
         statistic, p_value = stats.wilcoxon(scores1, scores2)
+        
+        logger.info(f"Wilcoxon test completato - p-value: {p_value}, significativo: {p_value < 0.05}")
         
         return {
             'statistic': statistic,
@@ -438,6 +499,9 @@ class ErrorAnalysis:
     """
     
     def __init__(self, X_test, y_test, predictions, feature_names=None):
+        logger.info("Inizializzazione ErrorAnalysis")
+        logger.debug(f"Numero modelli: {len(predictions)}, Numero feature: {len(feature_names) if feature_names else X_test.shape[1]}")
+        
         self.X_test = X_test
         self.y_test = y_test
         self.predictions = predictions
@@ -453,7 +517,10 @@ class ErrorAnalysis:
         Returns:
             Analisi errori
         """
+        logger.info(f"Analisi errori per modello {model_name}")
+        
         if model_name not in self.predictions:
+            logger.warning(f"Modello {model_name} non trovato nelle predizioni")
             return None
         
         y_pred = self.predictions[model_name]
@@ -462,6 +529,8 @@ class ErrorAnalysis:
         errors = y_pred != self.y_test
         false_positives = (y_pred == 1) & (self.y_test == 0)
         false_negatives = (y_pred == 0) & (self.y_test == 1)
+        
+        logger.debug(f"Errori totali: {np.sum(errors)}, FP: {np.sum(false_positives)}, FN: {np.sum(false_negatives)}")
         
         # Analisi per feature
         error_analysis = {}
@@ -478,6 +547,7 @@ class ErrorAnalysis:
                     'error_correlation': np.corrcoef(feature_values, errors.astype(int))[0,1] if len(np.unique(feature_values)) > 1 else 0
                 }
         
+        logger.info(f"Analisi errori completata per {model_name}")
         return {
             'total_errors': np.sum(errors),
             'false_positives': np.sum(false_positives),
@@ -497,6 +567,8 @@ class ErrorAnalysis:
         Returns:
             Analisi campioni difficili
         """
+        logger.info(f"Ricerca campioni difficili con threshold={threshold}")
+        
         # Conta errori per campione
         error_counts = np.zeros(len(self.y_test))
         
@@ -511,7 +583,10 @@ class ErrorAnalysis:
         difficult_indices = np.where(difficult_mask)[0]
         
         if len(difficult_indices) == 0:
+            logger.info("Nessun campione difficile trovato")
             return {'difficult_samples': 0, 'indices': []}
+        
+        logger.info(f"Trovati {len(difficult_indices)} campioni difficili")
         
         # Analisi campioni difficili
         difficult_samples = self.X_test.iloc[difficult_indices]
@@ -533,9 +608,12 @@ class ErrorAnalysis:
         Returns:
             Pattern comuni di errore
         """
+        logger.info("Analisi pattern di misclassificazione")
         patterns = {}
         
         for model_name, y_pred in self.predictions.items():
+            logger.debug(f"Analisi pattern per modello {model_name}")
+            
             # Pattern per questo modello
             fp_indices = np.where((y_pred == 1) & (self.y_test == 0))[0]
             fn_indices = np.where((y_pred == 0) & (self.y_test == 1))[0]
@@ -545,6 +623,7 @@ class ErrorAnalysis:
                 'false_negative_patterns': self._analyze_feature_patterns(fn_indices)
             }
         
+        logger.info("Analisi pattern completata")
         return patterns
     
     def _analyze_feature_patterns(self, error_indices):
@@ -577,6 +656,7 @@ class PerformanceMonitor:
     """
     
     def __init__(self):
+        logger.info("Inizializzazione PerformanceMonitor")
         self.performance_history = []
         
     def log_performance(self, model_name, metrics, timestamp=None):
@@ -598,6 +678,7 @@ class PerformanceMonitor:
         }
         
         self.performance_history.append(entry)
+        logger.debug(f"Performance registrate per {model_name} a {timestamp}")
     
     def get_performance_trend(self, model_name, metric='accuracy', periods=10):
         """
@@ -611,12 +692,15 @@ class PerformanceMonitor:
         Returns:
             Trend analysis
         """
+        logger.info(f"Analisi trend per {model_name} su metrica {metric}")
+        
         model_history = [
             entry for entry in self.performance_history[-periods:]
             if entry['model_name'] == model_name
         ]
         
         if len(model_history) < 2:
+            logger.warning(f"Dati insufficienti per trend analysis ({len(model_history)} punti)")
             return None
         
         timestamps = [entry['timestamp'] for entry in model_history]
@@ -629,6 +713,8 @@ class PerformanceMonitor:
             )
         else:
             slope = 0
+        
+        logger.debug(f"Trend slope: {slope}, Latest value: {values[-1]}")
         
         return {
             'timestamps': timestamps,
@@ -651,6 +737,8 @@ class PerformanceMonitor:
         Returns:
             Alert se degradazione rilevata
         """
+        logger.info(f"Controllo degradazione per {model_name} su {metric}")
+        
         trend = self.get_performance_trend(model_name, metric)
         
         if trend is None:
@@ -660,6 +748,11 @@ class PerformanceMonitor:
             trend['trend_slope'] < -threshold or
             trend['change_from_first'] < -threshold
         )
+        
+        if degradation_detected:
+            logger.warning(f"Degradazione rilevata per {model_name} - slope: {trend['trend_slope']}, change: {trend['change_from_first']}")
+        else:
+            logger.info(f"Nessuna degradazione rilevata per {model_name}")
         
         return {
             'degradation_detected': degradation_detected,
@@ -687,11 +780,15 @@ class InterpretabilityMetrics:
         Returns:
             Score di stabilità per feature
         """
+        logger.info("Calcolo stabilità feature importance")
+        
         if len(feature_importances_history) < 2:
+            logger.warning("Dati insufficienti per calcolo stabilità")
             return {}
         
         # Converti in DataFrame
         df = pd.DataFrame(feature_importances_history)
+        logger.debug(f"Analisi stabilità per {len(df.columns)} features su {len(df)} periodi")
         
         stability_scores = {}
         for feature in df.columns:
@@ -700,6 +797,7 @@ class InterpretabilityMetrics:
             cv = np.std(values) / np.mean(values) if np.mean(values) != 0 else np.inf
             stability_scores[feature] = 1 / (1 + cv)  # Score tra 0 e 1
         
+        logger.debug(f"Stabilità media: {np.mean(list(stability_scores.values()))}")
         return stability_scores
     
     @staticmethod
@@ -713,8 +811,12 @@ class InterpretabilityMetrics:
         Returns:
             Analisi distribuzione confidence
         """
+        logger.info("Analisi distribuzione confidence predizioni")
+        
         # Converte probabilità in confidence (distanza da 0.5)
         confidence = np.abs(probabilities - 0.5) * 2
+        
+        logger.debug(f"Confidence media: {np.mean(confidence)}, Low confidence ratio: {np.sum(confidence < 0.6) / len(confidence)}")
         
         return {
             'mean_confidence': np.mean(confidence),
@@ -737,6 +839,7 @@ class EvaluationReportGenerator:
     """
     
     def __init__(self, evaluation_results):
+        logger.info("Inizializzazione EvaluationReportGenerator")
         self.results = evaluation_results
         
     def generate_summary_report(self):
@@ -746,6 +849,7 @@ class EvaluationReportGenerator:
         Returns:
             Report strutturato
         """
+        logger.info("Generazione summary report")
         comparison = ModelComparison(self.results)
         best_model = comparison.find_best_model('f1')
         
@@ -762,10 +866,12 @@ class EvaluationReportGenerator:
             'performance_summary': self._create_performance_summary()
         }
         
+        logger.info("Report generato con successo")
         return report
     
     def _create_performance_summary(self):
         """Crea riassunto performance"""
+        logger.debug("Creazione performance summary")
         summary = {}
         
         for model_name, results in self.results.items():
@@ -808,3 +914,5 @@ class EvaluationReportGenerator:
             weaknesses.append('High False Positive Rate')
         
         return weaknesses
+
+logger.info(f"Caricamento completato {__name__}")
