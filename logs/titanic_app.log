@@ -219,3 +219,24 @@
 [2025-08-06 17:55:37,095] DEBUG [log.py:72] Creazione boxplot per Survived
 [2025-08-06 17:55:37,206] INFO [log.py:72] Generazione riepilogo qualità dati
 [2025-08-06 17:55:37,225] INFO [log.py:72] Pagina 1_Data_Overview caricata con successo
+[2025-08-06 18:43:35,903] INFO [log.py:72] Caricamento pagina __main__
+[2025-08-06 18:43:35,904] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-06 18:43:36,071] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-06 18:43:36,324] INFO [log.py:72] Caricamento file __main__
+[2025-08-06 18:43:36,324] INFO [log.py:72] Avvio applicazione Streamlit
+[2025-08-06 18:43:36,325] INFO [log.py:72] Avvio funzione main()
+[2025-08-06 18:43:36,326] INFO [log.py:72] ======================================== INIZIO APP ====================================
+[2025-08-06 18:43:36,327] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-06 18:43:36,329] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-06 18:43:36,388] INFO [log.py:72] Dati caricati con successo. Shape: (891, 12)
+[2025-08-06 18:43:36,399] INFO [log.py:72] Setup header principale
+[2025-08-06 18:43:36,405] INFO [log.py:72] Setup sidebar
+[2025-08-06 18:43:36,472] INFO [log.py:72] Creazione overview metrics
+[2025-08-06 18:43:36,509] INFO [log.py:72] Setup colonne grafici principali
+[2025-08-06 18:43:36,516] DEBUG [log.py:72] Creazione grafico sopravvivenza
+[2025-08-06 18:43:36,719] DEBUG [log.py:72] Creazione grafico distribuzione classi
+[2025-08-06 18:43:36,805] INFO [log.py:72] Setup sezione dettagli dataset
+[2025-08-06 18:43:36,808] DEBUG [log.py:72] Generazione summary dati
+[2025-08-06 18:43:36,839] INFO [log.py:72] Setup footer
+[2025-08-06 18:43:36,846] INFO [log.py:72] Applicazione avviata con successo
+[2025-08-06 18:43:36,848] INFO [log.py:72] *************************** FINE APP *****************************
