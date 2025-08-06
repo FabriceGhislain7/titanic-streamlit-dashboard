@@ -10,25 +10,39 @@ import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
 import matplotlib.pyplot as plt
-from src.config import *
+from src.config import PAGE_CONFIG, COLUMN_LABELS
 from src.utils.data_loader import load_titanic_data, get_data_summary, get_missing_values_info, check_duplicates
 from src.utils.data_processor import clean_dataset_basic, detect_outliers_summary
 from src.components.charts import create_missing_values_heatmap, create_data_types_chart
+from src.utils.log import logger
+
+# Logger per l'ingresso del file
+logger.info(f"Caricamento pagina {__name__}")
 
 # ----------------1. Configurazione pagina (da config.py)
-st.set_page_config(**PAGE_CONFIG)
+def setup_page():
+    """Configura la pagina Streamlit"""
+    logger.info("Configurazione pagina Streamlit")
+    st.set_page_config(**PAGE_CONFIG)
+
+setup_page()
 
 # ----------------2. Caricamento dati (da notebook sezione 2.1 - Structure of dataset)
+logger.info("Caricamento dati Titanic")
 df_original = load_titanic_data()
 if df_original is None:
+    logger.error("Impossibile caricare i dati Titanic")
     st.error("Impossibile caricare i dati")
     st.stop()
+logger.info(f"Dati caricati con successo. Shape: {df_original.shape}")
 
 # ----------------3. Header pagina
+logger.info("Setup header pagina")
 st.title("Panoramica Dataset Titanic")
 st.markdown("Analisi completa della struttura, qualità e caratteristiche del dataset")
 
 # ----------------4. Sidebar controlli
+logger.info("Setup sidebar controlli")
 with st.sidebar:
     st.header("Controlli Visualizzazione")
     
@@ -39,8 +53,10 @@ with st.sidebar:
     
     # Numero righe da visualizzare
     n_rows = st.slider("Righe da visualizzare", 5, 50, 10)
+    logger.debug(f"Parametri visualizzazione: raw={show_raw_data}, cleaned={show_cleaned_data}, stats={show_statistics}, rows={n_rows}")
 
 # ----------------5. Informazioni generali dataset (da notebook sezione 2.1)
+logger.info("Visualizzazione informazioni generali dataset")
 st.header("1. Informazioni Generali")
 
 col1, col2, col3, col4 = st.columns(4)
@@ -54,11 +70,12 @@ with col3:
 with col4:
     duplicates_count = check_duplicates(df_original)
     st.metric("Righe Duplicate", duplicates_count)
+    logger.debug(f"Trovate {duplicates_count} righe duplicate")
 
 # ----------------6. Struttura delle colonne (da notebook sezione 2.1)
+logger.info("Visualizzazione struttura colonne")
 st.subheader("Struttura delle Colonne")
 
-# Informazioni sui tipi di dati
 col1, col2 = st.columns(2)
 
 with col1:
@@ -73,22 +90,18 @@ with col1:
     st.dataframe(column_info, use_container_width=True)
 
 with col2:
-    # ----------------7. Grafico tipi di dati (da notebook - Data type proportions)
+    logger.debug("Creazione grafico tipi di dati")
     st.write("**Distribuzione tipi di dati:**")
     data_types = df_original.dtypes.value_counts()
-    
-    # Converti i tipi di dati in stringhe per evitare errori JSON
-    data_types_str = data_types.astype(str)
-    names_str = [str(name) for name in data_types.index]
-    
     fig_types = px.pie(
-        values=data_types_str.values,
-        names=names_str,
+        values=data_types.values,
+        names=data_types.index.astype(str),
         title="Distribuzione Tipi di Dati"
     )
     st.plotly_chart(fig_types, use_container_width=True)
 
 # ----------------8. Analisi valori mancanti (da notebook sezione 2.2 - Missing values)
+logger.info("Analisi valori mancanti")
 st.header("2. Analisi Valori Mancanti")
 
 missing_info = get_missing_values_info(df_original)
@@ -101,7 +114,7 @@ if missing_info is not None and not missing_info.empty:
         st.dataframe(missing_info, use_container_width=True)
     
     with col2:
-        # ----------------9. Visualizzazione missing values (da notebook sezione 2.2)
+        logger.debug("Creazione grafico valori mancanti")
         st.subheader("Visualizzazione Missing Values")
         fig_missing = px.bar(
             missing_info,
@@ -114,17 +127,21 @@ if missing_info is not None and not missing_info.empty:
         st.plotly_chart(fig_missing, use_container_width=True)
     
     # Heatmap valori mancanti
+    logger.debug("Creazione heatmap valori mancanti")
     st.subheader("Heatmap Valori Mancanti")
     fig_heatmap = create_missing_values_heatmap(df_original)
     st.plotly_chart(fig_heatmap, use_container_width=True)
 else:
+    logger.info("Nessun valore mancante rilevato")
     st.success("Nessun valore mancante rilevato nel dataset!")
 
 # ----------------10. Data Cleaning Preview (da notebook sezione 3 - Data Cleaning)
+logger.info("Anteprima pulizia dati")
 st.header("3. Anteprima Pulizia Dati")
 
 # Applica pulizia base
 df_cleaned = clean_dataset_basic(df_original)
+logger.info(f"Dataset pulito. Shape: {df_cleaned.shape}")
 
 col1, col2 = st.columns(2)
 
@@ -142,6 +159,7 @@ with col2:
 
 # ----------------11. Visualizzazione dati (da notebook sezione 2.1)
 if show_raw_data:
+    logger.debug("Visualizzazione dati grezzi")
     st.header("4. Dati Grezzi")
     st.subheader("Prime righe del dataset originale")
     st.dataframe(df_original.head(n_rows), use_container_width=True)
@@ -150,12 +168,14 @@ if show_raw_data:
     st.dataframe(df_original.tail(n_rows), use_container_width=True)
 
 if show_cleaned_data:
+    logger.debug("Visualizzazione dati puliti")
     st.header("5. Dati Puliti")
     st.subheader("Dataset dopo pulizia base")
     st.dataframe(df_cleaned.head(n_rows), use_container_width=True)
 
 # ----------------12. Statistiche descrittive (da notebook sezione 4.1.1 - Descriptive Statistics)
 if show_statistics:
+    logger.info("Calcolo statistiche descrittive")
     st.header("6. Statistiche Descrittive")
     
     # Statistiche per variabili numeriche
@@ -180,6 +200,7 @@ if show_statistics:
                     st.dataframe(value_counts.reset_index())
                 
                 with col2:
+                    logger.debug(f"Creazione grafico per {col}")
                     st.write("**Distribuzione:**")
                     fig = px.bar(
                         x=value_counts.index,
@@ -189,6 +210,7 @@ if show_statistics:
                     st.plotly_chart(fig, use_container_width=True)
 
 # ----------------13. Rilevamento outliers (da notebook sezione 4.1.1 - Outlier detection)
+logger.info("Rilevamento outliers")
 st.header("7. Rilevamento Outliers")
 
 outliers_summary = detect_outliers_summary(df_cleaned)
@@ -207,6 +229,7 @@ if outliers_summary is not None:
             format_func=lambda x: COLUMN_LABELS.get(x, x)
         )
         
+        logger.debug(f"Creazione boxplot per {selected_col}")
         fig_box = px.box(
             df_cleaned,
             y=selected_col,
@@ -215,6 +238,7 @@ if outliers_summary is not None:
         st.plotly_chart(fig_box, use_container_width=True)
 
 # ----------------14. Summary finale
+logger.info("Generazione riepilogo qualità dati")
 st.header("8. Riepilogo Qualità Dati")
 
 quality_metrics = {
@@ -248,3 +272,5 @@ with st.expander("Note Metodologiche"):
     - Rimozione righe duplicate
     - Rilevamento outliers con metodo IQR
     """)
+
+logger.info("Pagina 1_Data_Overview caricata con successo")

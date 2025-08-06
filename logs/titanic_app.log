@@ -77,3 +77,53 @@
 [2025-08-06 06:25:45,397] INFO [log.py:72] Setup footer
 [2025-08-06 06:25:45,402] INFO [log.py:72] Applicazione avviata con successo
 [2025-08-06 06:25:45,404] INFO [log.py:72] *************************** FINE APP *****************************
+[2025-08-06 16:14:35,713] INFO [log.py:72] Caricamento pagina __main__
+[2025-08-06 16:14:35,723] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-06 16:14:35,729] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-06 16:14:35,734] INFO [log.py:72] Dati caricati con successo. Shape: (891, 12)
+[2025-08-06 16:14:35,751] INFO [log.py:72] Setup header pagina
+[2025-08-06 16:14:35,760] INFO [log.py:72] Setup sidebar controlli
+[2025-08-06 16:14:35,780] DEBUG [log.py:72] Parametri visualizzazione: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-06 16:14:35,780] INFO [log.py:72] Visualizzazione informazioni generali dataset
+[2025-08-06 16:14:35,814] DEBUG [log.py:72] Trovate 0 righe duplicate
+[2025-08-06 16:14:35,814] INFO [log.py:72] Visualizzazione struttura colonne
+[2025-08-06 16:14:36,613] DEBUG [log.py:72] Creazione grafico tipi di dati
+[2025-08-06 16:14:37,467] INFO [log.py:72] Analisi valori mancanti
+[2025-08-06 16:14:37,504] DEBUG [log.py:72] Creazione grafico valori mancanti
+[2025-08-06 16:14:37,854] DEBUG [log.py:72] Creazione heatmap valori mancanti
+[2025-08-06 16:14:37,968] INFO [log.py:72] Anteprima pulizia dati
+[2025-08-06 16:14:38,031] INFO [log.py:72] Dataset pulito. Shape: (891, 11)
+[2025-08-06 16:14:38,099] DEBUG [log.py:72] Visualizzazione dati puliti
+[2025-08-06 16:14:38,112] INFO [log.py:72] Calcolo statistiche descrittive
+[2025-08-06 16:14:38,201] DEBUG [log.py:72] Creazione grafico per Sex
+[2025-08-06 16:14:38,379] DEBUG [log.py:72] Creazione grafico per Ticket
+[2025-08-06 16:14:38,519] DEBUG [log.py:72] Creazione grafico per Embarked
+[2025-08-06 16:14:38,613] INFO [log.py:72] Rilevamento outliers
+[2025-08-06 16:14:38,702] DEBUG [log.py:72] Creazione boxplot per Survived
+[2025-08-06 16:14:38,806] INFO [log.py:72] Generazione riepilogo qualità dati
+[2025-08-06 16:14:38,820] INFO [log.py:72] Pagina 1_Data_Overview caricata con successo
+[2025-08-06 16:16:38,430] INFO [log.py:72] Caricamento pagina __main__
+[2025-08-06 16:16:38,431] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-06 16:16:38,433] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-06 16:16:38,436] INFO [log.py:72] Dati caricati con successo. Shape: (891, 12)
+[2025-08-06 16:16:38,438] INFO [log.py:72] Setup header pagina
+[2025-08-06 16:16:38,455] INFO [log.py:72] Setup sidebar controlli
+[2025-08-06 16:16:38,486] DEBUG [log.py:72] Parametri visualizzazione: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-06 16:16:38,492] INFO [log.py:72] Visualizzazione informazioni generali dataset
+[2025-08-06 16:16:38,569] DEBUG [log.py:72] Trovate 0 righe duplicate
+[2025-08-06 16:16:38,570] INFO [log.py:72] Visualizzazione struttura colonne
+[2025-08-06 16:16:38,603] DEBUG [log.py:72] Creazione grafico tipi di dati
+[2025-08-06 16:16:38,757] INFO [log.py:72] Analisi valori mancanti
+[2025-08-06 16:16:38,775] DEBUG [log.py:72] Creazione grafico valori mancanti
+[2025-08-06 16:16:38,914] DEBUG [log.py:72] Creazione heatmap valori mancanti
+[2025-08-06 16:16:38,939] INFO [log.py:72] Anteprima pulizia dati
+[2025-08-06 16:16:38,969] INFO [log.py:72] Dataset pulito. Shape: (891, 11)
+[2025-08-06 16:16:38,999] DEBUG [log.py:72] Visualizzazione dati puliti
+[2025-08-06 16:16:39,011] INFO [log.py:72] Calcolo statistiche descrittive
+[2025-08-06 16:16:39,075] DEBUG [log.py:72] Creazione grafico per Sex
+[2025-08-06 16:16:39,189] DEBUG [log.py:72] Creazione grafico per Ticket
+[2025-08-06 16:16:39,298] DEBUG [log.py:72] Creazione grafico per Embarked
+[2025-08-06 16:16:39,387] INFO [log.py:72] Rilevamento outliers
+[2025-08-06 16:16:39,425] DEBUG [log.py:72] Creazione boxplot per Survived
+[2025-08-06 16:16:39,520] INFO [log.py:72] Generazione riepilogo qualità dati
+[2025-08-06 16:16:39,534] INFO [log.py:72] Pagina 1_Data_Overview caricata con successo
