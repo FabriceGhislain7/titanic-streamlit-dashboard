@@ -11,6 +11,12 @@ Una moderna applicazione Streamlit per l'analisi e la predizione della sopravviv
    ```
 
 2. Installa le dipendenze:
+
+   Ecco come generare il file requirements.txt se non è stato fatto precedentemente
+   ```bash
+   pip freeze > requirements.txt
+   ```
+   Per istallare tutte le dipendenze per il progetto:
    ```bash
    pip install -r requirements.txt
    ```
@@ -39,7 +45,7 @@ titanic-streamlit-dashboard/
 ```
 
 ### Analisi strutturale del progetto
-Per osservare la struttura del progetto, eseguiamo il commanndo nel terminale con powershell:
+Per osservare la struttura del progetto senza l'ambiente virtuale, eseguiamo il commanndo nel terminale con powershell:
 ```powershell
    Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-Object FullName
 ```
