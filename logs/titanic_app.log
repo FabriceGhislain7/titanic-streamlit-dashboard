@@ -240,3 +240,355 @@
 [2025-08-06 18:43:36,839] INFO [log.py:72] Setup footer
 [2025-08-06 18:43:36,846] INFO [log.py:72] Applicazione avviata con successo
 [2025-08-06 18:43:36,848] INFO [log.py:72] *************************** FINE APP *****************************
+[2025-08-07 02:08:11,780] INFO [log.py:72] Caricamento file __main__
+[2025-08-07 02:08:11,781] INFO [log.py:72] Avvio applicazione Streamlit
+[2025-08-07 02:08:11,782] INFO [log.py:72] Avvio funzione main()
+[2025-08-07 02:08:11,782] INFO [log.py:72] ======================================== INIZIO APP ====================================
+[2025-08-07 02:08:11,783] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-07 02:08:12,091] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-07 02:08:13,288] INFO [log.py:72] Dati caricati con successo. Shape: (891, 12)
+[2025-08-07 02:08:13,291] INFO [log.py:72] Setup header principale
+[2025-08-07 02:08:13,294] INFO [log.py:72] Setup sidebar
+[2025-08-07 02:08:13,303] INFO [log.py:72] Creazione overview metrics
+[2025-08-07 02:08:13,333] INFO [log.py:72] Setup colonne grafici principali
+[2025-08-07 02:08:13,337] DEBUG [log.py:72] Creazione grafico sopravvivenza
+[2025-08-07 02:08:13,445] DEBUG [log.py:72] Creazione grafico distribuzione classi
+[2025-08-07 02:08:13,513] INFO [log.py:72] Setup sezione dettagli dataset
+[2025-08-07 02:08:13,516] DEBUG [log.py:72] Generazione summary dati
+[2025-08-07 02:08:13,536] INFO [log.py:72] Setup footer
+[2025-08-07 02:08:13,537] INFO [log.py:72] Applicazione avviata con successo
+[2025-08-07 02:08:13,542] INFO [log.py:72] *************************** FINE APP *****************************
+[2025-08-07 02:08:37,771] INFO [log.py:72] Loading file __main__
+[2025-08-07 02:08:37,771] INFO [log.py:72] Starting Streamlit application
+[2025-08-07 02:08:37,772] INFO [log.py:72] Starting main() function
+[2025-08-07 02:08:37,773] INFO [log.py:72] ======================================== APP START ====================================
+[2025-08-07 02:08:37,774] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:08:37,776] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:08:37,809] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:08:37,811] INFO [log.py:72] Setting up main header
+[2025-08-07 02:08:37,816] INFO [log.py:72] Setting up sidebar
+[2025-08-07 02:08:37,822] INFO [log.py:72] Creating overview metrics
+[2025-08-07 02:08:37,853] INFO [log.py:72] Setting up main charts columns
+[2025-08-07 02:08:37,864] DEBUG [log.py:72] Creating survival chart
+[2025-08-07 02:08:37,898] DEBUG [log.py:72] Creating class distribution chart
+[2025-08-07 02:08:37,942] INFO [log.py:72] Setting up dataset details section
+[2025-08-07 02:08:37,945] DEBUG [log.py:72] Generating data summary
+[2025-08-07 02:08:37,959] INFO [log.py:72] Setting up footer
+[2025-08-07 02:08:37,965] INFO [log.py:72] Application started successfully
+[2025-08-07 02:08:37,967] INFO [log.py:72] *************************** APP END *****************************
+[2025-08-07 02:09:00,102] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:09:00,103] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:09:00,105] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:09:00,108] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:09:00,110] INFO [log.py:72] Setting up page header
+[2025-08-07 02:09:00,122] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:09:00,153] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:09:00,154] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:09:00,212] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:09:00,213] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:09:00,314] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:09:00,895] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:09:00,921] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:09:01,073] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:09:01,118] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:09:01,182] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:09:01,212] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:09:01,227] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:09:01,298] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:09:01,401] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:09:01,528] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:09:01,607] INFO [log.py:72] Outlier detection
+[2025-08-07 02:09:01,680] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:09:01,777] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:09:01,790] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:09:11,166] INFO [log.py:72] Caricamento pagina __main__
+[2025-08-07 02:09:11,168] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-07 02:09:11,170] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-07 02:09:11,173] INFO [log.py:72] Pulizia dati base
+[2025-08-07 02:09:11,250] INFO [log.py:72] Dati puliti. Shape: (891, 11)
+[2025-08-07 02:09:11,255] INFO [log.py:72] Setup header pagina
+[2025-08-07 02:09:11,267] INFO [log.py:72] Setup sidebar controlli
+[2025-08-07 02:09:11,282] DEBUG [log.py:72] Tipo analisi selezionato: Panoramica Generale
+[2025-08-07 02:09:11,287] DEBUG [log.py:72] Opzioni visualizzazione: stats=True, outliers=True
+[2025-08-07 02:09:11,287] INFO [log.py:72] Avvio analisi panoramica generale
+[2025-08-07 02:09:11,337] DEBUG [log.py:72] Tasso sopravvivenza: 38.4%
+[2025-08-07 02:09:11,338] INFO [log.py:72] Creazione distribuzioni principali
+[2025-08-07 02:09:11,363] DEBUG [log.py:72] Creazione grafico distribuzione età
+[2025-08-07 02:09:11,667] DEBUG [log.py:72] Creazione grafico distribuzione sopravvivenza
+[2025-08-07 02:09:11,684] INFO [log.py:72] Calcolo statistiche descrittive
+[2025-08-07 02:09:11,737] INFO [log.py:72] Pagina __main__ completata con successo
+[2025-08-07 02:16:17,305] INFO [log.py:72] Caricamento pagina __main__
+[2025-08-07 02:16:17,311] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-07 02:16:17,313] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-07 02:16:17,317] INFO [log.py:72] Pulizia dati base
+[2025-08-07 02:16:17,399] INFO [log.py:72] Dati puliti. Shape: (891, 11)
+[2025-08-07 02:16:17,401] INFO [log.py:72] Setup header pagina
+[2025-08-07 02:16:17,404] INFO [log.py:72] Setup sidebar controlli
+[2025-08-07 02:16:17,418] DEBUG [log.py:72] Tipo analisi selezionato: Panoramica Generale
+[2025-08-07 02:16:17,420] DEBUG [log.py:72] Opzioni visualizzazione: stats=True, outliers=True
+[2025-08-07 02:16:17,420] INFO [log.py:72] Avvio analisi panoramica generale
+[2025-08-07 02:16:17,441] DEBUG [log.py:72] Tasso sopravvivenza: 38.4%
+[2025-08-07 02:16:17,445] INFO [log.py:72] Creazione distribuzioni principali
+[2025-08-07 02:16:17,455] DEBUG [log.py:72] Creazione grafico distribuzione età
+[2025-08-07 02:16:17,712] DEBUG [log.py:72] Creazione grafico distribuzione sopravvivenza
+[2025-08-07 02:16:17,733] INFO [log.py:72] Calcolo statistiche descrittive
+[2025-08-07 02:16:17,781] INFO [log.py:72] Pagina __main__ completata con successo
+[2025-08-07 02:16:22,359] INFO [log.py:72] Loading file __main__
+[2025-08-07 02:16:22,362] INFO [log.py:72] Starting Streamlit application
+[2025-08-07 02:16:22,362] INFO [log.py:72] Starting main() function
+[2025-08-07 02:16:22,363] INFO [log.py:72] ======================================== APP START ====================================
+[2025-08-07 02:16:22,365] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:16:22,366] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:16:22,371] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:16:22,373] INFO [log.py:72] Setting up main header
+[2025-08-07 02:16:22,381] INFO [log.py:72] Setting up sidebar
+[2025-08-07 02:16:22,395] INFO [log.py:72] Creating overview metrics
+[2025-08-07 02:16:22,417] INFO [log.py:72] Setting up main charts columns
+[2025-08-07 02:16:22,422] DEBUG [log.py:72] Creating survival chart
+[2025-08-07 02:16:22,456] DEBUG [log.py:72] Creating class distribution chart
+[2025-08-07 02:16:22,513] INFO [log.py:72] Setting up dataset details section
+[2025-08-07 02:16:22,517] DEBUG [log.py:72] Generating data summary
+[2025-08-07 02:16:22,549] INFO [log.py:72] Setting up footer
+[2025-08-07 02:16:22,552] INFO [log.py:72] Application started successfully
+[2025-08-07 02:16:22,553] INFO [log.py:72] *************************** APP END *****************************
+[2025-08-07 02:16:35,546] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:16:35,549] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:16:35,551] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:16:35,561] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:16:35,563] INFO [log.py:72] Setting up page header
+[2025-08-07 02:16:35,568] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:16:35,589] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:16:35,589] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:16:35,634] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:16:35,634] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:16:35,670] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:16:35,782] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:16:35,807] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:16:36,092] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:16:36,116] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:16:36,144] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:16:36,168] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:16:36,180] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:16:36,249] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:16:36,359] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:16:36,479] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:16:36,579] INFO [log.py:72] Outlier detection
+[2025-08-07 02:16:36,652] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:16:36,740] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:16:36,755] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:17:14,659] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:17:14,662] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:17:14,663] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:17:14,674] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:17:14,677] INFO [log.py:72] Setting up page header
+[2025-08-07 02:17:14,734] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:17:14,778] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:17:14,780] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:17:14,819] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:17:14,819] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:17:14,892] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:17:15,070] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:17:15,100] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:17:15,324] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:17:15,362] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:17:15,393] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:17:15,421] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:17:15,436] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:17:15,518] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:17:15,655] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:17:15,799] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:17:15,935] INFO [log.py:72] Outlier detection
+[2025-08-07 02:17:15,981] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:17:16,095] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:17:16,120] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:17:18,764] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:17:18,765] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:17:18,767] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:17:18,775] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:17:18,777] INFO [log.py:72] Setting up page header
+[2025-08-07 02:17:18,781] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:17:18,797] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:17:18,797] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:17:18,834] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:17:18,834] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:17:18,856] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:17:18,952] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:17:18,964] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:17:19,068] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:17:19,107] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:17:19,138] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:17:19,174] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:17:19,186] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:17:19,266] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:17:19,402] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:17:19,523] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:17:19,651] INFO [log.py:72] Outlier detection
+[2025-08-07 02:17:19,702] DEBUG [log.py:72] Creating boxplot for Age
+[2025-08-07 02:17:19,805] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:17:19,832] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:17:27,100] INFO [log.py:72] Caricamento pagina __main__
+[2025-08-07 02:17:27,101] INFO [log.py:72] Configurazione pagina Streamlit
+[2025-08-07 02:17:27,104] INFO [log.py:72] Caricamento dati Titanic
+[2025-08-07 02:17:27,110] INFO [log.py:72] Pulizia dati base
+[2025-08-07 02:17:27,154] INFO [log.py:72] Dati puliti. Shape: (891, 11)
+[2025-08-07 02:17:27,156] INFO [log.py:72] Setup header pagina
+[2025-08-07 02:17:27,164] INFO [log.py:72] Setup sidebar controlli
+[2025-08-07 02:17:27,172] DEBUG [log.py:72] Tipo analisi selezionato: Panoramica Generale
+[2025-08-07 02:17:27,180] DEBUG [log.py:72] Opzioni visualizzazione: stats=True, outliers=True
+[2025-08-07 02:17:27,181] INFO [log.py:72] Avvio analisi panoramica generale
+[2025-08-07 02:17:27,200] DEBUG [log.py:72] Tasso sopravvivenza: 38.4%
+[2025-08-07 02:17:27,203] INFO [log.py:72] Creazione distribuzioni principali
+[2025-08-07 02:17:27,207] DEBUG [log.py:72] Creazione grafico distribuzione età
+[2025-08-07 02:17:27,517] DEBUG [log.py:72] Creazione grafico distribuzione sopravvivenza
+[2025-08-07 02:17:27,537] INFO [log.py:72] Calcolo statistiche descrittive
+[2025-08-07 02:17:27,583] INFO [log.py:72] Pagina __main__ completata con successo
+[2025-08-07 02:17:37,604] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:17:37,605] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:17:37,607] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:17:37,612] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:17:37,613] INFO [log.py:72] Setting up page header
+[2025-08-07 02:17:37,617] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:17:37,637] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:17:37,637] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:17:37,679] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:17:37,680] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:17:37,735] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:17:37,884] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:17:37,909] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:17:38,131] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:17:38,156] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:17:38,209] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:17:38,358] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:17:38,372] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:17:38,550] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:17:38,719] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:17:38,917] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:17:39,037] INFO [log.py:72] Outlier detection
+[2025-08-07 02:17:39,081] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:17:39,188] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:17:39,216] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:31:54,920] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:31:54,922] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:31:54,924] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:31:54,932] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:31:54,933] INFO [log.py:72] Setting up page header
+[2025-08-07 02:31:54,938] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:31:54,967] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:31:54,970] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:31:55,031] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:31:55,032] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:31:55,121] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:31:55,265] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:31:55,291] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:31:55,452] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:31:55,501] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:31:55,538] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:31:55,559] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:31:55,574] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:31:55,675] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:31:55,850] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:31:56,040] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:31:56,208] INFO [log.py:72] Outlier detection
+[2025-08-07 02:31:56,249] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:31:56,388] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:31:56,422] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:32:02,023] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:32:02,025] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:32:02,028] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:32:02,041] INFO [log.py:72] Basic data cleaning
+[2025-08-07 02:32:02,120] INFO [log.py:72] Cleaned data. Shape: (891, 11)
+[2025-08-07 02:32:02,121] INFO [log.py:72] Setting up page header
+[2025-08-07 02:32:02,126] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:32:02,147] DEBUG [log.py:72] Selected analysis type: General Overview
+[2025-08-07 02:32:02,188] DEBUG [log.py:72] Visualization options: stats=True, outliers=True
+[2025-08-07 02:32:02,189] INFO [log.py:72] Starting general overview analysis
+[2025-08-07 02:32:02,207] DEBUG [log.py:72] Survival rate: 38.4%
+[2025-08-07 02:32:02,207] INFO [log.py:72] Creating main distributions
+[2025-08-07 02:32:02,216] DEBUG [log.py:72] Creating age distribution chart
+[2025-08-07 02:32:02,484] DEBUG [log.py:72] Creating survival distribution chart
+[2025-08-07 02:32:02,502] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:32:02,550] INFO [log.py:72] Page __main__ completed successfully
+[2025-08-07 02:52:23,079] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:52:23,088] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:52:23,089] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:52:23,096] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:52:23,097] INFO [log.py:72] Setting up page header
+[2025-08-07 02:52:23,105] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:52:23,121] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:52:23,122] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:52:23,168] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:52:23,170] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:52:23,258] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:52:23,406] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:52:23,431] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:52:23,620] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:52:23,674] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:52:23,720] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:52:23,758] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:52:23,780] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:52:23,912] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:52:24,081] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:52:24,272] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:52:24,469] INFO [log.py:72] Outlier detection
+[2025-08-07 02:52:24,554] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:52:24,776] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:52:24,818] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:52:46,885] INFO [log.py:72] Loading file __main__
+[2025-08-07 02:52:46,890] INFO [log.py:72] Starting Streamlit application
+[2025-08-07 02:52:46,893] INFO [log.py:72] Starting main() function
+[2025-08-07 02:52:46,896] INFO [log.py:72] ======================================== APP START ====================================
+[2025-08-07 02:52:46,901] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:52:46,904] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:52:46,922] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:52:46,923] INFO [log.py:72] Setting up main header
+[2025-08-07 02:52:46,932] INFO [log.py:72] Setting up sidebar
+[2025-08-07 02:52:46,947] INFO [log.py:72] Creating overview metrics
+[2025-08-07 02:52:46,986] INFO [log.py:72] Setting up main charts columns
+[2025-08-07 02:52:47,055] DEBUG [log.py:72] Creating survival chart
+[2025-08-07 02:52:47,105] DEBUG [log.py:72] Creating class distribution chart
+[2025-08-07 02:52:47,153] INFO [log.py:72] Setting up dataset details section
+[2025-08-07 02:52:47,156] DEBUG [log.py:72] Generating data summary
+[2025-08-07 02:52:47,197] INFO [log.py:72] Setting up footer
+[2025-08-07 02:52:47,209] INFO [log.py:72] Application started successfully
+[2025-08-07 02:52:47,215] INFO [log.py:72] *************************** APP END *****************************
+[2025-08-07 02:52:53,497] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:52:53,515] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:52:53,519] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:52:53,533] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 02:52:53,555] INFO [log.py:72] Setting up page header
+[2025-08-07 02:52:53,559] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:52:53,592] DEBUG [log.py:72] Display parameters: raw=False, cleaned=True, stats=True, rows=10
+[2025-08-07 02:52:53,593] INFO [log.py:72] Displaying general dataset information
+[2025-08-07 02:52:53,688] DEBUG [log.py:72] Found 0 duplicate rows
+[2025-08-07 02:52:53,689] INFO [log.py:72] Displaying column structure
+[2025-08-07 02:52:53,758] DEBUG [log.py:72] Creating data types chart
+[2025-08-07 02:52:53,922] INFO [log.py:72] Missing values analysis
+[2025-08-07 02:52:53,943] DEBUG [log.py:72] Creating missing values chart
+[2025-08-07 02:52:54,101] DEBUG [log.py:72] Creating missing values heatmap
+[2025-08-07 02:52:54,133] INFO [log.py:72] Data cleaning preview
+[2025-08-07 02:52:54,189] INFO [log.py:72] Cleaned dataset. Shape: (891, 11)
+[2025-08-07 02:52:54,217] DEBUG [log.py:72] Displaying cleaned data
+[2025-08-07 02:52:54,231] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:52:54,305] DEBUG [log.py:72] Creating chart for Sex
+[2025-08-07 02:52:54,455] DEBUG [log.py:72] Creating chart for Ticket
+[2025-08-07 02:52:54,614] DEBUG [log.py:72] Creating chart for Embarked
+[2025-08-07 02:52:54,733] INFO [log.py:72] Outlier detection
+[2025-08-07 02:52:54,772] DEBUG [log.py:72] Creating boxplot for Survived
+[2025-08-07 02:52:54,890] INFO [log.py:72] Generating data quality summary
+[2025-08-07 02:52:54,923] INFO [log.py:72] Page 1_Data_Overview loaded successfully
+[2025-08-07 02:53:01,188] INFO [log.py:72] Loading page __main__
+[2025-08-07 02:53:01,189] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 02:53:01,190] INFO [log.py:72] Loading Titanic data
+[2025-08-07 02:53:01,193] INFO [log.py:72] Basic data cleaning
+[2025-08-07 02:53:01,238] INFO [log.py:72] Cleaned data. Shape: (891, 11)
+[2025-08-07 02:53:01,240] INFO [log.py:72] Setting up page header
+[2025-08-07 02:53:01,253] INFO [log.py:72] Setting up sidebar controls
+[2025-08-07 02:53:01,262] DEBUG [log.py:72] Selected analysis type: General Overview
+[2025-08-07 02:53:01,272] DEBUG [log.py:72] Visualization options: stats=True, outliers=True
+[2025-08-07 02:53:01,273] INFO [log.py:72] Starting general overview analysis
+[2025-08-07 02:53:01,306] DEBUG [log.py:72] Survival rate: 38.4%
+[2025-08-07 02:53:01,306] INFO [log.py:72] Creating main distributions
+[2025-08-07 02:53:01,320] DEBUG [log.py:72] Creating age distribution chart
+[2025-08-07 02:53:01,610] DEBUG [log.py:72] Creating survival distribution chart
+[2025-08-07 02:53:01,630] INFO [log.py:72] Calculating descriptive statistics
+[2025-08-07 02:53:01,702] INFO [log.py:72] Page __main__ completed successfully

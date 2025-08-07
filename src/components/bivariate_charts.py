@@ -1,6 +1,6 @@
 """
 src/components/bivariate_charts.py
-Grafici specializzati per l'analisi bivariata dei fattori di sopravvivenza
+Specialized charts for bivariate analysis of survival factors
 """
 
 import plotly.express as px
@@ -10,67 +10,67 @@ import pandas as pd
 import numpy as np
 from src.config import COLOR_PALETTES, COLUMN_LABELS, VALUE_MAPPINGS
 
-# ----------------1. Sopravvivenza per Classe Dettagliata (da notebook sezione 4.2.2.2)
+# ----------------1. Detailed Survival by Class (from notebook section 4.2.2.2)
 def create_survival_by_class_detailed(df):
     """
-    Grafico dettagliato sopravvivenza per classe
-    Da notebook sezione 4.2.2.2
+    Detailed survival by class chart
+    From notebook section 4.2.2.2
     """
     if df is None:
         return None
     
-    # Calcola statistiche per classe
+    # Calculate class statistics
     class_stats = df.groupby('Pclass')['Survived'].agg(['sum', 'count', 'mean']).reset_index()
-    class_stats.columns = ['Pclass', 'Sopravvissuti', 'Totale', 'Tasso']
+    class_stats.columns = ['Pclass', 'Survivors', 'Total', 'Rate']
     
-    # Mappa le classi
+    # Map classes
     class_labels = [VALUE_MAPPINGS['Pclass'][pclass] for pclass in class_stats['Pclass']]
     
     fig = go.Figure()
     
-    # Barre sopravvissuti
+    # Survivors bars
     fig.add_trace(go.Bar(
-        name='Sopravvissuti',
+        name='Survivors',
         x=class_labels,
-        y=class_stats['Sopravvissuti'],
+        y=class_stats['Survivors'],
         marker_color=COLOR_PALETTES['survival'][1],
-        text=class_stats['Sopravvissuti'],
+        text=class_stats['Survivors'],
         textposition='auto',
     ))
     
-    # Barre totali (sfondo)
+    # Total bars (background)
     fig.add_trace(go.Bar(
-        name='Morti',
+        name='Deaths',
         x=class_labels,
-        y=class_stats['Totale'] - class_stats['Sopravvissuti'],
+        y=class_stats['Total'] - class_stats['Survivors'],
         marker_color=COLOR_PALETTES['survival'][0],
-        text=class_stats['Totale'] - class_stats['Sopravvissuti'],
+        text=class_stats['Total'] - class_stats['Survivors'],
         textposition='auto',
     ))
     
     fig.update_layout(
-        title='Sopravvivenza per Classe Passeggeri',
-        xaxis_title='Classe',
-        yaxis_title='Numero Passeggeri',
+        title='Survival by Passenger Class',
+        xaxis_title='Class',
+        yaxis_title='Number of Passengers',
         barmode='stack',
         height=400
     )
     
     return fig
 
-# ----------------2. Sopravvivenza per Genere Dettagliata (da notebook sezione 4.2.2.3)
+# ----------------2. Detailed Survival by Gender (from notebook section 4.2.2.3)
 def create_survival_by_gender_detailed(df):
     """
-    Grafico dettagliato sopravvivenza per genere
-    Da notebook sezione 4.2.2.3
+    Detailed survival by gender chart
+    From notebook section 4.2.2.3
     """
     if df is None:
         return None
     
-    # Calcola percentuali sopravvivenza per genere
+    # Calculate survival percentages by gender
     gender_survival = df.groupby('Sex')['Survived'].mean() * 100
     
-    # Mappa i generi
+    # Map genders
     gender_labels = [VALUE_MAPPINGS['Sex'][sex] for sex in gender_survival.index]
     colors = COLOR_PALETTES['gender']
     
@@ -83,31 +83,31 @@ def create_survival_by_gender_detailed(df):
     )])
     
     fig.update_layout(
-        title="Tasso di Sopravvivenza per Genere",
-        xaxis_title="Genere",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        title="Survival Rate by Gender",
+        xaxis_title="Gender",
+        yaxis_title="Survival Rate (%)",
         height=400
     )
     
     return fig
 
-# ----------------3. Matrice Correlazione (da notebook sezione 4.1.2)
+# ----------------3. Correlation Matrix (from notebook section 4.1.2)
 def create_correlation_heatmap(df):
     """
-    Heatmap matrice di correlazione
-    Da notebook sezione 4.1.2 - Spearman correlation
+    Correlation matrix heatmap
+    From notebook section 4.1.2 - Spearman correlation
     """
     if df is None:
         return None
     
-    # Seleziona solo variabili numeriche
+    # Select only numerical variables
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     numeric_cols = [col for col in numeric_cols if col != 'PassengerId']
     
     if len(numeric_cols) < 2:
         return None
     
-    # Calcola correlazione
+    # Calculate correlation
     corr_matrix = df[numeric_cols].corr(method='spearman')
     
     fig = go.Figure(data=go.Heatmap(
@@ -119,21 +119,21 @@ def create_correlation_heatmap(df):
         text=corr_matrix.round(2).values,
         texttemplate="%{text}",
         textfont={"size": 10},
-        colorbar=dict(title="Correlazione")
+        colorbar=dict(title="Correlation")
     ))
     
     fig.update_layout(
-        title="Matrice di Correlazione (Spearman)",
+        title="Correlation Matrix (Spearman)",
         height=500
     )
     
     return fig
 
-# ----------------4. Distribuzione Classe (da notebook sezione 4.2.2.1)
+# ----------------4. Class Distribution (from notebook section 4.2.2.1)
 def create_class_distribution_analysis(df):
     """
-    Analisi distribuzione passeggeri per classe
-    Da notebook sezione 4.2.2.1
+    Passenger distribution by class analysis
+    From notebook section 4.2.2.1
     """
     if df is None:
         return None
@@ -150,19 +150,19 @@ def create_class_distribution_analysis(df):
     )])
     
     fig.update_layout(
-        title="Distribuzione Passeggeri per Classe",
-        xaxis_title="Classe",
-        yaxis_title="Numero Passeggeri",
+        title="Passenger Distribution by Class",
+        xaxis_title="Class",
+        yaxis_title="Number of Passengers",
         height=400
     )
     
     return fig
 
-# ----------------5. Tassi Sopravvivenza per Classe (da notebook sezione 4.2.2.2)
+# ----------------5. Survival Rates by Class (from notebook section 4.2.2.2)
 def create_survival_rates_by_class(df):
     """
-    Tassi di sopravvivenza per classe
-    Da notebook sezione 4.2.2.2
+    Survival rates by class
+    From notebook section 4.2.2.2
     """
     if df is None:
         return None
@@ -179,106 +179,106 @@ def create_survival_rates_by_class(df):
     )])
     
     fig.update_layout(
-        title="Tasso di Sopravvivenza per Classe",
-        xaxis_title="Classe",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        title="Survival Rate by Class",
+        xaxis_title="Class",
+        yaxis_title="Survival Rate (%)",
         height=400
     )
     
     return fig
 
-# ----------------6. Analisi Classe Dettagliata (da notebook sezione 4.2.2.2)
+# ----------------6. Detailed Class Analysis (from notebook section 4.2.2.2)
 def create_class_survival_detailed_analysis(df):
     """
-    Analisi dettagliata classe con sopravvissuti e morti
-    Da notebook sezione 4.2.2.2
+    Detailed class analysis with survivors and deaths
+    From notebook section 4.2.2.2
     """
     if df is None:
         return None
     
-    # Calcola statistiche dettagliate
+    # Calculate detailed statistics
     class_detail = df.groupby(['Pclass', 'Survived']).size().unstack(fill_value=0)
-    class_detail.columns = ['Morti', 'Sopravvissuti']
-    class_detail['Totale'] = class_detail['Morti'] + class_detail['Sopravvissuti']
-    class_detail['Tasso_Sopravvivenza'] = (class_detail['Sopravvissuti'] / class_detail['Totale']) * 100
+    class_detail.columns = ['Deaths', 'Survivors']
+    class_detail['Total'] = class_detail['Deaths'] + class_detail['Survivors']
+    class_detail['Survival_Rate'] = (class_detail['Survivors'] / class_detail['Total']) * 100
     
     class_labels = [VALUE_MAPPINGS['Pclass'][idx] for idx in class_detail.index]
     
-    # Crea subplot con barre e linea
+    # Create subplot with bars and line
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Barre sopravvissuti e morti
+    # Bars for survivors and deaths
     fig.add_trace(
-        go.Bar(name='Morti', x=class_labels, y=class_detail['Morti'], 
+        go.Bar(name='Deaths', x=class_labels, y=class_detail['Deaths'], 
                marker_color=COLOR_PALETTES['survival'][0]),
         secondary_y=False,
     )
     
     fig.add_trace(
-        go.Bar(name='Sopravvissuti', x=class_labels, y=class_detail['Sopravvissuti'],
+        go.Bar(name='Survivors', x=class_labels, y=class_detail['Survivors'],
                marker_color=COLOR_PALETTES['survival'][1]),
         secondary_y=False,
     )
     
-    # Linea tasso sopravvivenza
+    # Survival rate line
     fig.add_trace(
-        go.Scatter(x=class_labels, y=class_detail['Tasso_Sopravvivenza'],
-                   mode='lines+markers', name='Tasso Sopravvivenza (%)',
+        go.Scatter(x=class_labels, y=class_detail['Survival_Rate'],
+                   mode='lines+markers', name='Survival Rate (%)',
                    line=dict(color='red', width=3), marker=dict(size=8)),
         secondary_y=True,
     )
     
-    fig.update_xaxes(title_text="Classe")
-    fig.update_yaxes(title_text="Numero Passeggeri", secondary_y=False)
-    fig.update_yaxes(title_text="Tasso Sopravvivenza (%)", secondary_y=True)
-    fig.update_layout(title="Analisi Dettagliata Sopravvivenza per Classe", height=400)
+    fig.update_xaxes(title_text="Class")
+    fig.update_yaxes(title_text="Number of Passengers", secondary_y=False)
+    fig.update_yaxes(title_text="Survival Rate (%)", secondary_y=True)
+    fig.update_layout(title="Detailed Survival Analysis by Class", height=400)
     
     return fig
 
-# ----------------7. Confronto Sopravvivenza Genere (da notebook sezione 4.2.2.3)
+# ----------------7. Gender Survival Comparison (from notebook section 4.2.2.3)
 def create_gender_survival_comparison(df):
     """
-    Confronto sopravvivenza tra generi
-    Da notebook sezione 4.2.2.3
+    Survival comparison between genders
+    From notebook section 4.2.2.3
     """
     if df is None:
         return None
     
     gender_survival = df.groupby(['Sex', 'Survived']).size().unstack(fill_value=0)
-    gender_survival.columns = ['Morti', 'Sopravvissuti']
+    gender_survival.columns = ['Deaths', 'Survivors']
     
     gender_labels = [VALUE_MAPPINGS['Sex'][sex] for sex in gender_survival.index]
     
     fig = go.Figure()
     
     fig.add_trace(go.Bar(
-        name='Morti',
+        name='Deaths',
         x=gender_labels,
-        y=gender_survival['Morti'],
+        y=gender_survival['Deaths'],
         marker_color=COLOR_PALETTES['survival'][0]
     ))
     
     fig.add_trace(go.Bar(
-        name='Sopravvissuti',
+        name='Survivors',
         x=gender_labels,
-        y=gender_survival['Sopravvissuti'],
+        y=gender_survival['Survivors'],
         marker_color=COLOR_PALETTES['survival'][1]
     ))
     
     fig.update_layout(
-        title='Confronto Sopravvivenza per Genere',
-        xaxis_title='Genere',
-        yaxis_title='Numero Passeggeri',
+        title='Survival Comparison by Gender',
+        xaxis_title='Gender',
+        yaxis_title='Number of Passengers',
         barmode='group',
         height=400
     )
     
     return fig
 
-# ----------------8. Distribuzione Genere per Classe (da notebook sezione 4.2.2.3)
+# ----------------8. Gender Distribution by Class (from notebook section 4.2.2.3)
 def create_gender_class_distribution(df):
     """
-    Distribuzione genere per classe
+    Gender distribution by class
     """
     if df is None:
         return None
@@ -298,25 +298,25 @@ def create_gender_class_distribution(df):
         ))
     
     fig.update_layout(
-        title='Distribuzione Genere per Classe',
-        xaxis_title='Classe',
-        yaxis_title='Numero Passeggeri',
+        title='Gender Distribution by Class',
+        xaxis_title='Class',
+        yaxis_title='Number of Passengers',
         barmode='group',
         height=400
     )
     
     return fig
 
-# ----------------9. Sopravvivenza Genere per Classe (da notebook sezione 4.2.2.3)
+# ----------------9. Gender-Class Survival Analysis (from notebook section 4.2.2.3)
 def create_gender_class_survival_analysis(df):
     """
-    Analisi sopravvivenza per genere e classe
-    Da notebook sezione 4.2.2.3
+    Survival analysis by gender and class
+    From notebook section 4.2.2.3
     """
     if df is None:
         return None
     
-    # Calcola tassi sopravvivenza per genere e classe
+    # Calculate survival rates by gender and class
     survival_by_gender_class = df.groupby(['Pclass', 'Sex'])['Survived'].mean() * 100
     survival_pivot = survival_by_gender_class.unstack()
     
@@ -336,29 +336,29 @@ def create_gender_class_survival_analysis(df):
         ))
     
     fig.update_layout(
-        title='Tasso Sopravvivenza per Genere e Classe',
-        xaxis_title='Classe',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival Rate by Gender and Class',
+        xaxis_title='Class',
+        yaxis_title='Survival Rate (%)',
         barmode='group',
         height=400
     )
     
     return fig
 
-# ----------------10. Distribuzione Età per Sopravvivenza (da notebook sezione 4.2.2.4)
+# ----------------10. Age Distribution by Survival (from notebook section 4.2.2.4)
 def create_age_survival_distribution(df):
     """
-    Distribuzione età per sopravvivenza
-    Da notebook sezione 4.2.2.4
+    Age distribution by survival
+    From notebook section 4.2.2.4
     """
     if df is None or 'Age' not in df.columns:
         return None
     
     fig = go.Figure()
     
-    # Istogramma per sopravvissuti e morti
-    for survived, color, label in [(0, COLOR_PALETTES['survival'][0], 'Morti'), 
-                                   (1, COLOR_PALETTES['survival'][1], 'Sopravvissuti')]:
+    # Histogram for survivors and deaths
+    for survived, color, label in [(0, COLOR_PALETTES['survival'][0], 'Deaths'), 
+                                   (1, COLOR_PALETTES['survival'][1], 'Survivors')]:
         age_data = df[df['Survived'] == survived]['Age'].dropna()
         
         fig.add_trace(go.Histogram(
@@ -370,20 +370,20 @@ def create_age_survival_distribution(df):
         ))
     
     fig.update_layout(
-        title='Distribuzione Età per Sopravvivenza',
-        xaxis_title='Età (anni)',
-        yaxis_title='Frequenza',
+        title='Age Distribution by Survival',
+        xaxis_title='Age (years)',
+        yaxis_title='Frequency',
         barmode='overlay',
         height=400
     )
     
     return fig
 
-# ----------------11. Tassi Sopravvivenza per Gruppo Età (da notebook sezione 4.2.2.4)
+# ----------------11. Age Group Survival Rates (from notebook section 4.2.2.4)
 def create_age_group_survival_rates(df):
     """
-    Tassi sopravvivenza per gruppo di età
-    Da notebook sezione 4.2.2.4
+    Survival rates by age group
+    From notebook section 4.2.2.4
     """
     if df is None or 'Age_Group' not in df.columns:
         return None
@@ -399,24 +399,24 @@ def create_age_group_survival_rates(df):
     )])
     
     fig.update_layout(
-        title='Tasso Sopravvivenza per Gruppo di Età',
-        xaxis_title='Gruppo di Età',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival Rate by Age Group',
+        xaxis_title='Age Group',
+        yaxis_title='Survival Rate (%)',
         height=400
     )
     
     return fig
 
-# ----------------12. Sopravvivenza Età per Genere (da notebook sezione 4.2.2.4)
+# ----------------12. Age-Gender Survival Analysis (from notebook section 4.2.2.4)
 def create_age_gender_survival_analysis(df):
     """
-    Analisi sopravvivenza età per genere
-    Da notebook sezione 4.2.2.4
+    Age-gender survival analysis
+    From notebook section 4.2.2.4
     """
     if df is None or 'Age_Group' not in df.columns:
         return None
     
-    # Calcola tassi per età e genere
+    # Calculate rates by age and gender
     age_gender_survival = df.groupby(['Age_Group', 'Sex'])['Survived'].mean() * 100
     survival_pivot = age_gender_survival.unstack()
     
@@ -432,20 +432,20 @@ def create_age_gender_survival_analysis(df):
         ))
     
     fig.update_layout(
-        title='Tasso Sopravvivenza per Età e Genere',
-        xaxis_title='Gruppo di Età',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival Rate by Age and Gender',
+        xaxis_title='Age Group',
+        yaxis_title='Survival Rate (%)',
         barmode='group',
         height=400
     )
     
     return fig
 
-# ----------------13. Sopravvivenza per Categoria Prezzo (da notebook sezione 4.2.2.5)
+# ----------------13. Survival by Fare Category (from notebook section 4.2.2.5)
 def create_fare_category_survival(df):
     """
-    Sopravvivenza per categoria prezzo
-    Da notebook sezione 4.2.2.5
+    Survival by fare category
+    From notebook section 4.2.2.5
     """
     if df is None or 'Fare_Category' not in df.columns:
         return None
@@ -461,27 +461,27 @@ def create_fare_category_survival(df):
     )])
     
     fig.update_layout(
-        title='Tasso Sopravvivenza per Categoria Prezzo',
-        xaxis_title='Categoria Prezzo',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival Rate by Fare Category',
+        xaxis_title='Fare Category',
+        yaxis_title='Survival Rate (%)',
         height=400
     )
     
     return fig
 
-# ----------------14. Distribuzione Prezzi per Sopravvivenza (da notebook sezione 4.2.2.5)
+# ----------------14. Fare Distribution by Survival (from notebook section 4.2.2.5)
 def create_fare_distribution_by_survival(df):
     """
-    Distribuzione prezzi per sopravvivenza
-    Da notebook sezione 4.2.2.5
+    Fare distribution by survival
+    From notebook section 4.2.2.5
     """
     if df is None:
         return None
     
     fig = go.Figure()
     
-    for survived, color, label in [(0, COLOR_PALETTES['survival'][0], 'Morti'), 
-                                   (1, COLOR_PALETTES['survival'][1], 'Sopravvissuti')]:
+    for survived, color, label in [(0, COLOR_PALETTES['survival'][0], 'Deaths'), 
+                                   (1, COLOR_PALETTES['survival'][1], 'Survivors')]:
         fare_data = df[df['Survived'] == survived]['Fare']
         
         fig.add_trace(go.Box(
@@ -491,58 +491,58 @@ def create_fare_distribution_by_survival(df):
         ))
     
     fig.update_layout(
-        title='Distribuzione Prezzi per Sopravvivenza',
-        yaxis_title='Prezzo Biglietto',
+        title='Fare Distribution by Survival',
+        yaxis_title='Ticket Fare',
         height=400
     )
     
     return fig
 
-# ----------------15. Analisi Prezzo-Classe-Sopravvivenza
+# ----------------15. Fare-Class-Survival Analysis
 def create_fare_class_survival_analysis(df):
     """
-    Analisi combinata prezzo-classe-sopravvivenza
+    Combined fare-class-survival analysis
     """
     if df is None:
         return None
     
-    # Media prezzi per classe e sopravvivenza
+    # Average fares by class and survival
     fare_class_survival = df.groupby(['Pclass', 'Survived'])['Fare'].mean().unstack()
-    fare_class_survival.columns = ['Morti', 'Sopravvissuti']
+    fare_class_survival.columns = ['Deaths', 'Survivors']
     
     class_labels = [VALUE_MAPPINGS['Pclass'][pclass] for pclass in fare_class_survival.index]
     
     fig = go.Figure()
     
     fig.add_trace(go.Bar(
-        name='Morti',
+        name='Deaths',
         x=class_labels,
-        y=fare_class_survival['Morti'],
+        y=fare_class_survival['Deaths'],
         marker_color=COLOR_PALETTES['survival'][0]
     ))
     
     fig.add_trace(go.Bar(
-        name='Sopravvissuti',
+        name='Survivors',
         x=class_labels,
-        y=fare_class_survival['Sopravvissuti'],
+        y=fare_class_survival['Survivors'],
         marker_color=COLOR_PALETTES['survival'][1]
     ))
     
     fig.update_layout(
-        title='Prezzo Medio per Classe e Sopravvivenza',
-        xaxis_title='Classe',
-        yaxis_title='Prezzo Medio',
+        title='Average Fare by Class and Survival',
+        xaxis_title='Class',
+        yaxis_title='Average Fare',
         barmode='group',
         height=400
     )
     
     return fig
 
-# ----------------16. Sopravvivenza per Dimensione Famiglia (da notebook sezione 4.2.2.6)
+# ----------------16. Survival by Family Size (from notebook section 4.2.2.6)
 def create_family_size_survival(df):
     """
-    Sopravvivenza per dimensione famiglia
-    Da notebook sezione 4.2.2.6
+    Survival by family size
+    From notebook section 4.2.2.6
     """
     if df is None or 'Family_Size' not in df.columns:
         return None
@@ -558,25 +558,25 @@ def create_family_size_survival(df):
     )])
     
     fig.update_layout(
-        title='Tasso Sopravvivenza per Dimensione Famiglia',
-        xaxis_title='Dimensione Famiglia',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival Rate by Family Size',
+        xaxis_title='Family Size',
+        yaxis_title='Survival Rate (%)',
         height=400
     )
     
     return fig
 
-# ----------------17. Solo vs Famiglia (da notebook sezione 4.2.2.6)
+# ----------------17. Alone vs Family (from notebook section 4.2.2.6)
 def create_alone_vs_family_analysis(df):
     """
-    Confronto tra viaggiatori soli e con famiglia
-    Da notebook sezione 4.2.2.6
+    Comparison between solo travelers and families
+    From notebook section 4.2.2.6
     """
     if df is None or 'Is_Alone' not in df.columns:
         return None
     
     alone_survival = df.groupby('Is_Alone')['Survived'].mean() * 100
-    labels = ['Con Famiglia', 'Solo']
+    labels = ['With Family', 'Alone']
     
     fig = go.Figure(data=[go.Bar(
         x=labels,
@@ -587,27 +587,27 @@ def create_alone_vs_family_analysis(df):
     )])
     
     fig.update_layout(
-        title='Sopravvivenza: Solo vs Con Famiglia',
-        xaxis_title='Tipo Viaggiatore',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival: Alone vs With Family',
+        xaxis_title='Traveler Type',
+        yaxis_title='Survival Rate (%)',
         height=400
     )
     
     return fig
 
-# ----------------18. Composizione Famiglia Dettagliata (da notebook sezione 4.2.2.6)
+# ----------------18. Detailed Family Composition (from notebook section 4.2.2.6)
 def create_family_composition_analysis(df):
     """
-    Analisi dettagliata composizione famiglia
-    Da notebook sezione 4.2.2.6
+    Detailed family composition analysis
+    From notebook section 4.2.2.6
     """
     if df is None:
         return None
     
-    # Analisi SibSp e Parch separatamente
+    # Analyze SibSp and Parch separately
     fig = make_subplots(
         rows=1, cols=2,
-        subplot_titles=('Sopravvivenza per Fratelli/Coniugi', 'Sopravvivenza per Genitori/Figli')
+        subplot_titles=('Survival by Siblings/Spouses', 'Survival by Parents/Children')
     )
     
     # SibSp analysis
@@ -629,15 +629,15 @@ def create_family_composition_analysis(df):
     fig.update_layout(height=400, showlegend=False)
     return fig
 
-# ----------------19. Analisi Multivariata (combinazione tutti i fattori)
+# ----------------19. Multivariate Analysis (combination of all factors)
 def create_multivariate_survival_analysis(df):
     """
-    Analisi multivariata di tutti i fattori
+    Multivariate analysis of all factors
     """
     if df is None:
         return None
     
-    # Heatmap sopravvivenza per classe e genere
+    # Heatmap survival by class and gender
     survival_matrix = df.groupby(['Pclass', 'Sex'])['Survived'].mean() * 100
     survival_pivot = survival_matrix.unstack()
     
@@ -652,55 +652,55 @@ def create_multivariate_survival_analysis(df):
         text=survival_pivot.round(1).values,
         texttemplate="%{text}%",
         textfont={"size": 12},
-        colorbar=dict(title="Tasso Sopravvivenza (%)")
+        colorbar=dict(title="Survival Rate (%)")
     ))
     
     fig.update_layout(
-        title="Tasso Sopravvivenza per Classe e Genere",
-        xaxis_title="Genere",
-        yaxis_title="Classe",
+        title="Survival Rate by Class and Gender",
+        xaxis_title="Gender",
+        yaxis_title="Class",
         height=400
     )
     
     return fig
 
-# ----------------20. Ranking Fattori Influenza
+# ----------------20. Survival Factors Ranking
 def calculate_survival_factors_ranking(df):
     """
-    Calcola ranking dei fattori di influenza sulla sopravvivenza
+    Calculate ranking of survival influence factors
     """
     if df is None:
         return None
     
     factors_impact = []
     
-    # Calcola range di sopravvivenza per ogni fattore
+    # Calculate survival range for each factor
     
-    # Genere
+    # Gender
     gender_range = df.groupby('Sex')['Survived'].mean().max() - df.groupby('Sex')['Survived'].mean().min()
-    factors_impact.append({'Fattore': 'Genere', 'Range_Impatto': gender_range * 100, 'Importanza': 'Molto Alta'})
+    factors_impact.append({'Factor': 'Gender', 'Impact_Range': gender_range * 100, 'Importance': 'Very High'})
     
-    # Classe
+    # Class
     class_range = df.groupby('Pclass')['Survived'].mean().max() - df.groupby('Pclass')['Survived'].mean().min()
-    factors_impact.append({'Fattore': 'Classe', 'Range_Impatto': class_range * 100, 'Importanza': 'Alta'})
+    factors_impact.append({'Factor': 'Class', 'Impact_Range': class_range * 100, 'Importance': 'High'})
     
-    # Età (se disponibile)
+    # Age (if available)
     if 'Age_Group' in df.columns:
         age_range = df.groupby('Age_Group')['Survived'].mean().max() - df.groupby('Age_Group')['Survived'].mean().min()
-        factors_impact.append({'Fattore': 'Gruppo Età', 'Range_Impatto': age_range * 100, 'Importanza': 'Media'})
+        factors_impact.append({'Factor': 'Age Group', 'Impact_Range': age_range * 100, 'Importance': 'Medium'})
     
-    # Famiglia
+    # Family
     if 'Family_Size' in df.columns:
         family_range = df.groupby('Family_Size')['Survived'].mean().max() - df.groupby('Family_Size')['Survived'].mean().min()
-        factors_impact.append({'Fattore': 'Dimensione Famiglia', 'Range_Impatto': family_range * 100, 'Importanza': 'Media'})
+        factors_impact.append({'Factor': 'Family Size', 'Impact_Range': family_range * 100, 'Importance': 'Medium'})
     
-    # Prezzo
+    # Fare
     if 'Fare_Category' in df.columns:
         fare_range = df.groupby('Fare_Category')['Survived'].mean().max() - df.groupby('Fare_Category')['Survived'].mean().min()
-        factors_impact.append({'Fattore': 'Categoria Prezzo', 'Range_Impatto': fare_range * 100, 'Importanza': 'Media'})
+        factors_impact.append({'Factor': 'Fare Category', 'Impact_Range': fare_range * 100, 'Importance': 'Medium'})
     
     factors_df = pd.DataFrame(factors_impact)
-    factors_df = factors_df.sort_values('Range_Impatto', ascending=False)
-    factors_df['Range_Impatto'] = factors_df['Range_Impatto'].round(1)
+    factors_df = factors_df.sort_values('Impact_Range', ascending=False)
+    factors_df['Impact_Range'] = factors_df['Impact_Range'].round(1)
     
     return factors_df

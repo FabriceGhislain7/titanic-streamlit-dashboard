@@ -2,24 +2,24 @@
 Titanic Survival Analysis - Configuration File
 ==============================================
 
-Configurazione centralizzata per l'applicazione Streamlit di analisi del Titanic.
-Tutti i parametri, percorsi e impostazioni sono definiti qui per facilitare
-la manutenzione e la personalizzazione.
+Centralized configuration for the Titanic analysis Streamlit application.
+All parameters, paths and settings are defined here to facilitate
+maintenance and customization.
 
-Autore: Data Analyst
-Data: 2025
+Author: Data Analyst
+Date: 2025
 """
 
 import os
 
 def find_project_root():
     """
-    Trova la cartella root del progetto cercando file marker caratteristici.
-    Questo approccio funziona ovunque il progetto venga spostato.
+    Find the project root folder by searching for characteristic marker files.
+    This approach works wherever the project is moved.
     """
     current_path = os.path.dirname(os.path.abspath(__file__))
     
-    # File/cartelle che indicano la root del progetto
+    # Files/folders that indicate the project root
     project_markers = [
         'requirements.txt',
         'README.md', 
@@ -29,46 +29,46 @@ def find_project_root():
         'src'
     ]
     
-    # Risali nella gerarchia fino a trovare la root
-    max_levels = 5  # Limite per evitare loop infiniti
+    # Go up in the hierarchy until finding the root
+    max_levels = 5  # Limit to avoid infinite loops
     for _ in range(max_levels):
-        # Controlla se esistono i marker nella cartella corrente
+        # Check if markers exist in current folder
         for marker in project_markers:
             if os.path.exists(os.path.join(current_path, marker)):
                 return current_path
         
-        # Se siamo già alla root del filesystem, fermati
+        # If already at filesystem root, stop
         parent_path = os.path.dirname(current_path)
         if parent_path == current_path:
             break
             
         current_path = parent_path
     
-    # Se non trova la root, usa la cartella del file config
+    # If root not found, use config file folder
     return os.path.dirname(os.path.abspath(__file__))
 
-# Trova automaticamente la root del progetto
+# Automatically find project root
 PROJECT_ROOT = find_project_root()
 
-# Directory struttura del progetto (percorsi relativi alla root)
+# Project structure directories (paths relative to root)
 BASE_DIR = PROJECT_ROOT
 DATA_DIR = os.path.join(BASE_DIR, "src", "data")
 MODELS_DIR = os.path.join(BASE_DIR, "src", "models")
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 STYLES_DIR = os.path.join(ASSETS_DIR, "styles")
 
-# Crea le directory se non esistono
+# Create directories if they don't exist
 def ensure_directories():
-    """Crea le directory necessarie se non esistono"""
+    """Create necessary directories if they don't exist"""
     directories = [DATA_DIR, MODELS_DIR, ASSETS_DIR, STYLES_DIR]
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
 
-# File di dati
+# Data files
 DATA_FILE = os.path.join(DATA_DIR, "data_titanic.csv")
 DATA_URL = "https://raw.githubusercontent.com/FabriceGhislain7/data_analyst_scientist/main/titanic_project/data_titanic.csv"
 
-# Colonne del dataset
+# Dataset columns
 DATASET_COLUMNS = {
     'NUMERICAL': ['PassengerId', 'Age', 'SibSp', 'Parch', 'Fare'],
     'CATEGORICAL': ['Survived', 'Pclass', 'Sex', 'Embarked'],
@@ -76,31 +76,31 @@ DATASET_COLUMNS = {
     'TARGET': 'Survived'
 }
 
-# Mapping per etichette leggibili
+# Mapping for readable labels
 COLUMN_LABELS = {
-    'PassengerId': 'ID Passeggero',
-    'Survived': 'Sopravvissuto',
-    'Pclass': 'Classe',
-    'Name': 'Nome',
-    'Sex': 'Sesso',
-    'Age': 'Eta',
-    'SibSp': 'Fratelli/Coniugi',
-    'Parch': 'Genitori/Figli',
-    'Ticket': 'Biglietto',
-    'Fare': 'Prezzo Biglietto',
-    'Cabin': 'Cabina',
-    'Embarked': 'Porto di Imbarco'
+    'PassengerId': 'Passenger ID',
+    'Survived': 'Survived',
+    'Pclass': 'Class',
+    'Name': 'Name',
+    'Sex': 'Gender',
+    'Age': 'Age',
+    'SibSp': 'Siblings/Spouses',
+    'Parch': 'Parents/Children',
+    'Ticket': 'Ticket',
+    'Fare': 'Ticket Fare',
+    'Cabin': 'Cabin',
+    'Embarked': 'Port of Embarkation'
 }
 
-# Mapping per valori categorici
+# Mapping for categorical values
 VALUE_MAPPINGS = {
-    'Survived': {0: 'No', 1: 'Si'},
-    'Pclass': {1: '1a Classe', 2: '2a Classe', 3: '3a Classe'},
-    'Sex': {'male': 'Uomo', 'female': 'Donna'},
+    'Survived': {0: 'No', 1: 'Yes'},
+    'Pclass': {1: '1st Class', 2: '2nd Class', 3: '3rd Class'},
+    'Sex': {'male': 'Male', 'female': 'Female'},
     'Embarked': {'C': 'Cherbourg', 'Q': 'Queenstown', 'S': 'Southampton'}
 }
 
-# Parametri per la gestione degli outlier
+# Parameters for outlier handling
 OUTLIER_CONFIG = {
     'method': 'IQR',
     'lower_quantile': 0.25,
@@ -109,28 +109,28 @@ OUTLIER_CONFIG = {
     'replacement_methods': ['remove', 'mean', 'median', 'mode']
 }
 
-# Configurazione gruppi di eta
+# Age groups configuration
 AGE_GROUPS = {
-    'Children': {'min': 0, 'max': 12, 'label': 'Bambini (0-12 anni)'},
-    'Young_Adults': {'min': 13, 'max': 25, 'label': 'Giovani Adulti (13-25 anni)'},
-    'Middle_Adults': {'min': 26, 'max': 40, 'label': 'Adulti (26-40 anni)'},
-    'Older_Adults': {'min': 41, 'max': 100, 'label': 'Anziani (41+ anni)'}
+    'Children': {'min': 0, 'max': 12, 'label': 'Children (0-12 years)'},
+    'Young_Adults': {'min': 13, 'max': 25, 'label': 'Young Adults (13-25 years)'},
+    'Middle_Adults': {'min': 26, 'max': 40, 'label': 'Adults (26-40 years)'},
+    'Older_Adults': {'min': 41, 'max': 100, 'label': 'Seniors (41+ years)'}
 }
 
-# Configurazione categorie prezzo
+# Fare categories configuration
 FARE_CATEGORIES = {
     'bins': 4,
-    'labels': ['Basso', 'Medio', 'Alto', 'Molto Alto'],
+    'labels': ['Low', 'Medium', 'High', 'Very High'],
     'method': 'qcut'
 }
 
-# Soglie per missing values
+# Thresholds for missing values
 MISSING_VALUE_THRESHOLDS = {
     'drop_column_threshold': 0.5,
     'drop_row_threshold': 0.8
 }
 
-# Palette colori
+# Color palettes
 COLOR_PALETTES = {
     'primary': '#FF6B6B',
     'secondary': '#4ECDC4',
@@ -144,7 +144,7 @@ COLOR_PALETTES = {
     'seaborn_palettes': ['viridis', 'plasma', 'coolwarm', 'Set2', 'Dark2']
 }
 
-# Configurazioni grafici
+# Chart configurations
 CHART_CONFIG = {
     'figure_size': (12, 6),
     'dpi': 100,
@@ -155,7 +155,7 @@ CHART_CONFIG = {
     'legend_fontsize': 10
 }
 
-# Configurazione istogrammi
+# Histogram configuration
 HISTOGRAM_CONFIG = {
     'bins': 20,
     'kde': True,
@@ -164,7 +164,7 @@ HISTOGRAM_CONFIG = {
     'linewidth': 0.5
 }
 
-# Configurazione pagina
+# Page configuration
 PAGE_CONFIG = {
     'page_title': 'Titanic Survival Analysis',
     'page_icon': '🚢',
@@ -172,28 +172,28 @@ PAGE_CONFIG = {
     'initial_sidebar_state': 'expanded'
 }
 
-# Testi e descrizioni
+# Texts and descriptions
 APP_TEXTS = {
-    'main_title': 'Analisi di Sopravvivenza del Titanic',
-    'subtitle': 'Analisi esplorativa e predittiva dei fattori che hanno influenzato la sopravvivenza',
+    'main_title': 'Titanic Survival Analysis',
+    'subtitle': 'Exploratory and predictive analysis of factors that influenced survival',
     'description': '''
-    Questa applicazione fornisce un'analisi completa del famoso dataset del Titanic,
-    esplorando i fattori che hanno influenzato la sopravvivenza dei passeggeri durante
-    il tragico naufragio del 1912.
+    This application provides a comprehensive analysis of the famous Titanic dataset,
+    exploring the factors that influenced passenger survival during
+    the tragic sinking of 1912.
     ''',
-    'data_source': 'Fonte dati: Kaggle Titanic Competition',
+    'data_source': 'Data source: Kaggle Titanic Competition',
     'footer': '''
     ---
-    Sviluppato con: Python, Streamlit, Pandas, Scikit-learn
+    Developed with: Python, Streamlit, Pandas, Scikit-learn
     
-    Nota: Questa analisi è basata sui dati storici disponibili e serve per scopi educativi.
+    Note: This analysis is based on available historical data and serves educational purposes.
     '''
 }
 
-# Modelli ML da utilizzare
+# ML models to use
 ML_MODELS = {
     'LogisticRegression': {
-        'name': 'Regressione Logistica',
+        'name': 'Logistic Regression',
         'params': {'random_state': 42, 'max_iter': 1000}
     },
     'RandomForestClassifier': {
@@ -209,7 +209,7 @@ ML_MODELS = {
         'params': {'random_state': 42, 'probability': True}
     },
     'DecisionTreeClassifier': {
-        'name': 'Albero di Decisione',
+        'name': 'Decision Tree',
         'params': {'random_state': 42}
     }
 }
@@ -224,7 +224,7 @@ FEATURE_ENGINEERING = {
     'create_deck_from_cabin': True
 }
 
-# Preprocessamento
+# Preprocessing
 PREPROCESSING_CONFIG = {
     'test_size': 0.2,
     'random_state': 42,
@@ -233,13 +233,13 @@ PREPROCESSING_CONFIG = {
     'handle_missing': 'median'
 }
 
-# Metriche di valutazione
+# Evaluation metrics
 EVALUATION_METRICS = [
     'accuracy', 'precision', 'recall', 'f1',
     'roc_auc', 'confusion_matrix', 'classification_report'
 ]
 
-# Impostazioni debug
+# Debug settings
 DEBUG_MODE = os.getenv('DEBUG', 'False').lower() == 'true'
 SHOW_RAW_DATA = DEBUG_MODE
 SHOW_PROCESSING_STEPS = DEBUG_MODE
@@ -251,7 +251,7 @@ CACHE_CONFIG = {
     'allow_output_mutation': True
 }
 
-# Mapping delle sezioni del notebook alle pagine Streamlit
+# Mapping of notebook sections to Streamlit pages
 NOTEBOOK_SECTIONS = {
     'data_loading': {
         'page': '1_Data_Overview.py',
@@ -319,18 +319,18 @@ NOTEBOOK_SECTIONS = {
     }
 }
 
-# Funzioni utility aggiornate
+# Updated utility functions
 def get_data_path():
-    """Restituisce il percorso del file dati come stringa"""
+    """Returns the data file path as string"""
     return DATA_FILE
 
 def get_model_path(model_name):
-    """Restituisce il percorso per salvare un modello"""
-    ensure_directories()  # Assicura che la directory esista
+    """Returns the path to save a model"""
+    ensure_directories()  # Ensure directory exists
     return os.path.join(MODELS_DIR, f"{model_name}.pkl")
 
 def load_custom_css():
-    """Carica CSS personalizzato se disponibile"""
+    """Load custom CSS if available"""
     css_file = os.path.join(STYLES_DIR, "main.css")
     if os.path.exists(css_file):
         with open(css_file, 'r', encoding='utf-8') as f:
@@ -338,19 +338,19 @@ def load_custom_css():
     return ""
 
 def get_color_palette(palette_name='survival'):
-    """Restituisce una palette di colori specifica"""
+    """Returns a specific color palette"""
     return COLOR_PALETTES.get(palette_name, COLOR_PALETTES['survival'])
 
 def format_percentage(value, decimals=1):
-    """Formatta un valore come percentuale"""
+    """Format a value as percentage"""
     return f"{value:.{decimals}f}%"
 
 def format_number(value, decimals=2):
-    """Formatta un numero con decimali specificati"""
+    """Format a number with specified decimals"""
     return f"{value:.{decimals}f}"
 
 def get_project_info():
-    """Restituisce informazioni sul progetto e i percorsi"""
+    """Returns project information and paths"""
     return {
         'project_root': PROJECT_ROOT,
         'config_location': os.path.abspath(__file__),
@@ -360,10 +360,10 @@ def get_project_info():
         'directories_created': all(os.path.exists(d) for d in [DATA_DIR, MODELS_DIR, ASSETS_DIR])
     }
 
-# Inizializzazione automatica
+# Automatic initialization
 if __name__ == "__main__":
-    # Quando il file config viene eseguito direttamente, 
-    # mostra informazioni sui percorsi
+    # When config file is run directly, 
+    # show path information
     ensure_directories()
     info = get_project_info()
     
@@ -426,18 +426,18 @@ LOGGING_CONFIG = {
     }
 }
 
-# Crea la cartella logs se non esiste
+# Create logs folder if it doesn't exist
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 
 def setup_logging():
-    """Configura il sistema di logging globale"""
+    """Configure global logging system"""
     import logging.config
     logging.config.dictConfig(LOGGING_CONFIG)
     logger = logging.getLogger(__name__)
-    logger.info("Logging configurato correttamente")
+    logger.info("Logging configured correctly")
     return logger
 
-# Configurazione automatica se DEBUG_MODE è True
+# Automatic configuration if DEBUG_MODE is True
 if DEBUG_MODE:
     LOGGING_CONFIG['handlers']['console']['level'] = 'DEBUG'
     LOGGING_CONFIG['loggers']['']['level'] = 'DEBUG'

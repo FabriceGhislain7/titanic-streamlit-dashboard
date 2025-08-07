@@ -1,6 +1,6 @@
 """
 src/components/univariate_charts.py
-Grafici specializzati per l'analisi univariata delle variabili
+Specialized charts for univariate variable analysis
 """
 
 import plotly.express as px
@@ -10,11 +10,11 @@ import pandas as pd
 import numpy as np
 from src.config import COLOR_PALETTES, COLUMN_LABELS, VALUE_MAPPINGS
 
-# ----------------1. Distribuzione Età Dettagliata (da notebook sezione 4.2.1)
+# ----------------1. Detailed Age Distribution (from notebook section 4.2.1)
 def create_age_distribution_detailed(df):
     """
-    Crea distribuzione età dettagliata con istogramma e KDE
-    Da notebook sezione 4.2.1 - Age distribution
+    Create detailed age distribution with histogram and KDE
+    From notebook section 4.2.1 - Age distribution
     """
     if df is None or 'Age' not in df.columns:
         return None
@@ -24,61 +24,61 @@ def create_age_distribution_detailed(df):
     fig = px.histogram(
         x=age_data,
         nbins=30,
-        title="Distribuzione Età Passeggeri",
-        labels={'x': 'Età (anni)', 'y': 'Frequenza'},
-        marginal="box",  # Aggiunge boxplot sopra
+        title="Passenger Age Distribution",
+        labels={'x': 'Age (years)', 'y': 'Frequency'},
+        marginal="box",  # Adds boxplot above
         color_discrete_sequence=[COLOR_PALETTES['primary']]
     )
     
-    # Aggiungi linea della media
+    # Add mean line
     mean_age = age_data.mean()
     fig.add_vline(
         x=mean_age, 
         line_dash="dash", 
         line_color="red",
-        annotation_text=f"Media: {mean_age:.1f} anni"
+        annotation_text=f"Mean: {mean_age:.1f} years"
     )
     
     fig.update_layout(height=500)
     return fig
 
-# ----------------2. Analisi Numerica Completa (da notebook sezione 4.2.1)
+# ----------------2. Complete Numerical Analysis (from notebook section 4.2.1)
 def create_numerical_analysis_charts(df, variable):
     """
-    Crea set completo di grafici per variabile numerica
-    Basato sull'analisi del notebook sezione 4.2.1
+    Create complete set of charts for numerical variable
+    Based on notebook section 4.2.1 analysis
     """
     if df is None or variable not in df.columns:
         return None
     
     data = df[variable].dropna()
     
-    # Crea subplot con 4 grafici
+    # Create subplot with 4 charts
     fig = make_subplots(
         rows=2, cols=2,
         subplot_titles=(
-            f'Istogramma - {COLUMN_LABELS.get(variable, variable)}',
+            f'Histogram - {COLUMN_LABELS.get(variable, variable)}',
             f'Boxplot - {COLUMN_LABELS.get(variable, variable)}',
             f'Q-Q Plot - {COLUMN_LABELS.get(variable, variable)}',
-            f'Distribuzione Cumulativa - {COLUMN_LABELS.get(variable, variable)}'
+            f'Cumulative Distribution - {COLUMN_LABELS.get(variable, variable)}'
         ),
         specs=[[{"secondary_y": False}, {"secondary_y": False}],
                [{"secondary_y": False}, {"secondary_y": False}]]
     )
     
-    # 1. Istogramma
+    # 1. Histogram
     fig.add_trace(
-        go.Histogram(x=data, nbinsx=20, name="Frequenza", marker_color=COLOR_PALETTES['primary']),
+        go.Histogram(x=data, nbinsx=20, name="Frequency", marker_color=COLOR_PALETTES['primary']),
         row=1, col=1
     )
     
     # 2. Boxplot
     fig.add_trace(
-        go.Box(y=data, name="Distribuzione", marker_color=COLOR_PALETTES['secondary']),
+        go.Box(y=data, name="Distribution", marker_color=COLOR_PALETTES['secondary']),
         row=1, col=2
     )
     
-    # 3. Q-Q Plot (approssimato)
+    # 3. Q-Q Plot (approximated)
     sorted_data = np.sort(data)
     theoretical_quantiles = np.linspace(0, 1, len(sorted_data))
     fig.add_trace(
@@ -92,7 +92,7 @@ def create_numerical_analysis_charts(df, variable):
         row=2, col=1
     )
     
-    # 4. Distribuzione Cumulativa
+    # 4. Cumulative Distribution
     sorted_vals = np.sort(data)
     cumulative_prob = np.arange(1, len(sorted_vals) + 1) / len(sorted_vals)
     fig.add_trace(
@@ -109,75 +109,75 @@ def create_numerical_analysis_charts(df, variable):
     fig.update_layout(height=600, showlegend=False)
     return fig
 
-# ----------------3. Analisi Categorica (da notebook sezione 4.2.2)
+# ----------------3. Categorical Analysis (from notebook section 4.2.2)
 def create_categorical_analysis_chart(df, variable):
     """
-    Crea grafico per analisi variabile categorica
-    Da notebook sezione 4.2.2 - Categorical analysis
+    Create chart for categorical variable analysis
+    From notebook section 4.2.2 - Categorical analysis
     """
     if df is None or variable not in df.columns:
         return None
     
     value_counts = df[variable].value_counts()
     
-    # Mappa i valori se disponibile
+    # Map values if available
     if variable in VALUE_MAPPINGS:
         labels = [VALUE_MAPPINGS[variable].get(val, str(val)) for val in value_counts.index]
     else:
         labels = [str(val) for val in value_counts.index]
     
-    # Crea subplot con grafico a barre e a torta
+    # Create subplot with bar chart and pie chart
     fig = make_subplots(
         rows=1, cols=2,
-        subplot_titles=('Conteggi', 'Percentuali'),
+        subplot_titles=('Counts', 'Percentages'),
         specs=[[{"type": "bar"}, {"type": "pie"}]]
     )
     
-    # Grafico a barre
+    # Bar chart
     fig.add_trace(
-        go.Bar(x=labels, y=value_counts.values, name="Conteggi"),
+        go.Bar(x=labels, y=value_counts.values, name="Counts"),
         row=1, col=1
     )
     
-    # Grafico a torta
+    # Pie chart
     fig.add_trace(
-        go.Pie(labels=labels, values=value_counts.values, name="Percentuali"),
+        go.Pie(labels=labels, values=value_counts.values, name="Percentages"),
         row=1, col=2
     )
     
     fig.update_layout(height=400, showlegend=False)
     return fig
 
-# ----------------4. Analisi Età Completa (da notebook sezione 4.2.1 e 4.2.2.4)
+# ----------------4. Complete Age Analysis (from notebook sections 4.2.1 and 4.2.2.4)
 def create_age_complete_analysis(df):
     """
-    Analisi completa dell'età con multiple visualizzazioni
-    Combina sezioni 4.2.1 e 4.2.2.4 del notebook
+    Complete age analysis with multiple visualizations
+    Combines notebook sections 4.2.1 and 4.2.2.4
     """
     if df is None or 'Age' not in df.columns:
         return None
     
     age_data = df['Age'].dropna()
     
-    # Crea subplot con 3 grafici
+    # Create subplot with 3 charts
     fig = make_subplots(
         rows=2, cols=2,
         subplot_titles=(
-            'Distribuzione Età con KDE',
-            'Boxplot per Rilevamento Outliers',
-            'Distribuzione per Decadi',
-            'Età per Genere'
+            'Age Distribution with KDE',
+            'Boxplot for Outlier Detection',
+            'Distribution by Decades',
+            'Age by Gender'
         ),
         specs=[[{"secondary_y": False}, {"secondary_y": False}],
                [{"secondary_y": False}, {"secondary_y": False}]]
     )
     
-    # 1. Istogramma con curva KDE simulata
+    # 1. Histogram with simulated KDE curve
     fig.add_trace(
         go.Histogram(
             x=age_data, 
             nbinsx=25, 
-            name="Età", 
+            name="Age", 
             opacity=0.7,
             marker_color=COLOR_PALETTES['primary']
         ),
@@ -188,13 +188,13 @@ def create_age_complete_analysis(df):
     fig.add_trace(
         go.Box(
             y=age_data, 
-            name="Distribuzione Età",
+            name="Age Distribution",
             marker_color=COLOR_PALETTES['secondary']
         ),
         row=1, col=2
     )
     
-    # 3. Distribuzione per decadi
+    # 3. Distribution by decades
     age_decades = pd.cut(age_data, bins=range(0, 90, 10), labels=[f"{i}-{i+9}" for i in range(0, 80, 10)])
     decade_counts = age_decades.value_counts().sort_index()
     
@@ -202,13 +202,13 @@ def create_age_complete_analysis(df):
         go.Bar(
             x=decade_counts.index.astype(str), 
             y=decade_counts.values,
-            name="Per Decade",
+            name="By Decade",
             marker_color=COLOR_PALETTES['warning']
         ),
         row=2, col=1
     )
     
-    # 4. Età per genere (se disponibile)
+    # 4. Age by gender (if available)
     if 'Sex' in df.columns:
         for i, sex in enumerate(df['Sex'].unique()):
             age_by_sex = df[df['Sex'] == sex]['Age'].dropna()
@@ -226,11 +226,11 @@ def create_age_complete_analysis(df):
     fig.update_layout(height=600, showlegend=True)
     return fig
 
-# ----------------5. Confronto Trattamento Outliers (da notebook sezione 4.2.1)
+# ----------------5. Outlier Treatment Comparison (from notebook section 4.2.1)
 def create_outlier_comparison_chart(df_original, df_processed, variable):
     """
-    Confronta distribuzione prima e dopo trattamento outliers
-    Da notebook sezione 4.2.1 - Outlier management
+    Compare distribution before and after outlier treatment
+    From notebook section 4.2.1 - Outlier management
     """
     if df_original is None or df_processed is None or variable not in df_original.columns:
         return None
@@ -240,27 +240,27 @@ def create_outlier_comparison_chart(df_original, df_processed, variable):
     
     fig = make_subplots(
         rows=1, cols=2,
-        subplot_titles=('Prima del Trattamento', 'Dopo il Trattamento')
+        subplot_titles=('Before Treatment', 'After Treatment')
     )
     
-    # Distribuzione originale
+    # Original distribution
     fig.add_trace(
         go.Histogram(
             x=original_data,
             nbinsx=20,
-            name="Originale",
+            name="Original",
             opacity=0.7,
             marker_color=COLOR_PALETTES['danger']
         ),
         row=1, col=1
     )
     
-    # Distribuzione processata
+    # Processed distribution
     fig.add_trace(
         go.Histogram(
             x=processed_data,
             nbinsx=20,
-            name="Processato",
+            name="Processed",
             opacity=0.7,
             marker_color=COLOR_PALETTES['success']
         ),
@@ -269,23 +269,23 @@ def create_outlier_comparison_chart(df_original, df_processed, variable):
     
     fig.update_layout(
         height=400,
-        title=f"Confronto Distribuzione {COLUMN_LABELS.get(variable, variable)}"
+        title=f"Distribution Comparison {COLUMN_LABELS.get(variable, variable)}"
     )
     
     return fig
 
-# ----------------6. Grafico Percentili (da notebook sezione 4.1.1)
+# ----------------6. Percentiles Chart (from notebook section 4.1.1)
 def create_percentiles_chart(df, variable):
     """
-    Visualizza i percentili di una variabile
-    Da notebook sezione 4.1.1 - Descriptive statistics
+    Visualize percentiles of a variable
+    From notebook section 4.1.1 - Descriptive statistics
     """
     if df is None or variable not in df.columns:
         return None
     
     data = df[variable].dropna()
     
-    # Calcola percentili
+    # Calculate percentiles
     percentiles = [0, 10, 25, 50, 75, 90, 100]
     percentile_values = [np.percentile(data, p) for p in percentiles]
     
@@ -295,12 +295,12 @@ def create_percentiles_chart(df, variable):
         x=percentiles,
         y=percentile_values,
         mode='lines+markers',
-        name='Percentili',
+        name='Percentiles',
         line=dict(color=COLOR_PALETTES['primary'], width=3),
         marker=dict(size=8)
     ))
     
-    # Evidenzia quartili
+    # Highlight quartiles
     quartile_indices = [2, 3, 4]  # Q1, Q2, Q3
     quartile_values = [percentile_values[i] for i in quartile_indices]
     quartile_names = ['Q1 (25%)', 'Q2 (50%)', 'Q3 (75%)']
@@ -309,24 +309,24 @@ def create_percentiles_chart(df, variable):
         x=[25, 50, 75],
         y=quartile_values,
         mode='markers',
-        name='Quartili',
+        name='Quartiles',
         marker=dict(size=12, color=COLOR_PALETTES['secondary'])
     ))
     
     fig.update_layout(
-        title=f"Percentili - {COLUMN_LABELS.get(variable, variable)}",
+        title=f"Percentiles - {COLUMN_LABELS.get(variable, variable)}",
         xaxis_title="Percentile",
-        yaxis_title="Valore",
+        yaxis_title="Value",
         height=400
     )
     
     return fig
 
-# ----------------7. Distribuzione con Outliers Evidenziati (da notebook sezione 4.2.1)
+# ----------------7. Distribution with Highlighted Outliers (from notebook section 4.2.1)
 def create_distribution_with_outliers(df, variable):
     """
-    Mostra distribuzione con outliers evidenziati
-    Da notebook sezione 4.2.1 - Outlier detection
+    Show distribution with highlighted outliers
+    From notebook section 4.2.1 - Outlier detection
     """
     if df is None or variable not in df.columns:
         return None
@@ -336,26 +336,26 @@ def create_distribution_with_outliers(df, variable):
     data = df[variable].dropna()
     outliers, lower_bound, upper_bound = detect_outliers_iqr(data)
     
-    # Separa outliers e valori normali
+    # Separate outliers and normal values
     normal_values = data[(data >= lower_bound) & (data <= upper_bound)]
     outlier_values = data[(data < lower_bound) | (data > upper_bound)]
     
     fig = go.Figure()
     
-    # Istogramma valori normali
+    # Histogram of normal values
     fig.add_trace(go.Histogram(
         x=normal_values,
         nbinsx=20,
-        name="Valori Normali",
+        name="Normal Values",
         opacity=0.7,
         marker_color=COLOR_PALETTES['success']
     ))
     
-    # Punti outliers
+    # Outlier points
     if len(outlier_values) > 0:
         fig.add_trace(go.Scatter(
             x=outlier_values,
-            y=[1] * len(outlier_values),  # Altezza fissa per visibilità
+            y=[1] * len(outlier_values),  # Fixed height for visibility
             mode='markers',
             name="Outliers",
             marker=dict(
@@ -365,33 +365,33 @@ def create_distribution_with_outliers(df, variable):
             )
         ))
     
-    # Linee per i limiti
+    # Limit lines
     fig.add_vline(x=lower_bound, line_dash="dash", line_color="orange", 
-                  annotation_text=f"Limite Inf: {lower_bound:.2f}")
+                  annotation_text=f"Lower Bound: {lower_bound:.2f}")
     fig.add_vline(x=upper_bound, line_dash="dash", line_color="orange",
-                  annotation_text=f"Limite Sup: {upper_bound:.2f}")
+                  annotation_text=f"Upper Bound: {upper_bound:.2f}")
     
     fig.update_layout(
-        title=f"Distribuzione con Outliers - {COLUMN_LABELS.get(variable, variable)}",
+        title=f"Distribution with Outliers - {COLUMN_LABELS.get(variable, variable)}",
         xaxis_title=COLUMN_LABELS.get(variable, variable),
-        yaxis_title="Frequenza",
+        yaxis_title="Frequency",
         height=400
     )
     
     return fig
 
-# ----------------8. Analisi Valore Mancante Pattern (da notebook sezione 2.2)
+# ----------------8. Missing Value Pattern Analysis (from notebook section 2.2)
 def create_missing_pattern_chart(df):
     """
-    Analizza pattern dei valori mancanti
-    Da notebook sezione 2.2 - Missing values analysis
+    Analyze missing value patterns
+    From notebook section 2.2 - Missing values analysis
     """
     if df is None:
         return None
     
-    # Calcola percentuali valori mancanti
+    # Calculate missing value percentages
     missing_pct = (df.isnull().sum() / len(df) * 100).sort_values(ascending=True)
-    missing_pct = missing_pct[missing_pct > 0]  # Solo colonne con missing values
+    missing_pct = missing_pct[missing_pct > 0]  # Only columns with missing values
     
     if len(missing_pct) == 0:
         return None
@@ -408,18 +408,18 @@ def create_missing_pattern_chart(df):
     ))
     
     fig.update_layout(
-        title="Percentuale Valori Mancanti per Variabile",
-        xaxis_title="Percentuale Missing (%)",
-        yaxis_title="Variabili",
+        title="Missing Values Percentage by Variable",
+        xaxis_title="Missing Percentage (%)",
+        yaxis_title="Variables",
         height=400
     )
     
     return fig
 
-# ----------------9. Distribuzione Multipla Comparativa (per confronti)
+# ----------------9. Multiple Distribution Comparison (for comparisons)
 def create_multiple_distribution_comparison(df, variables):
     """
-    Confronta distribuzioni di multiple variabili numeriche
+    Compare distributions of multiple numerical variables
     """
     if df is None or not variables:
         return None
@@ -440,20 +440,20 @@ def create_multiple_distribution_comparison(df, variables):
             ))
     
     fig.update_layout(
-        title="Confronto Distribuzioni Multiple",
-        xaxis_title="Valori",
-        yaxis_title="Frequenza",
+        title="Multiple Distribution Comparison",
+        xaxis_title="Values",
+        yaxis_title="Frequency",
         barmode='overlay',
         height=400
     )
     
     return fig
 
-# ----------------10. Summary Statistics Visual (da notebook sezione 4.1.1)
+# ----------------10. Summary Statistics Visual (from notebook section 4.1.1)
 def create_summary_statistics_visual(df, variable):
     """
-    Visualizzazione grafica delle statistiche descrittive
-    Da notebook sezione 4.1.1
+    Graphic visualization of descriptive statistics
+    From notebook section 4.1.1
     """
     if df is None or variable not in df.columns:
         return None
@@ -461,17 +461,17 @@ def create_summary_statistics_visual(df, variable):
     data = df[variable].dropna()
     
     stats = {
-        'Media': data.mean(),
-        'Mediana': data.median(),
-        'Moda': data.mode().iloc[0] if len(data.mode()) > 0 else data.median(),
-        'Dev. Standard': data.std(),
-        'Minimo': data.min(),
-        'Massimo': data.max()
+        'Mean': data.mean(),
+        'Median': data.median(),
+        'Mode': data.mode().iloc[0] if len(data.mode()) > 0 else data.median(),
+        'Std Dev': data.std(),
+        'Minimum': data.min(),
+        'Maximum': data.max()
     }
     
     fig = go.Figure()
     
-    # Grafico a barre delle statistiche
+    # Bar chart of statistics
     fig.add_trace(go.Bar(
         x=list(stats.keys()),
         y=list(stats.values()),
@@ -481,9 +481,9 @@ def create_summary_statistics_visual(df, variable):
     ))
     
     fig.update_layout(
-        title=f"Statistiche Descrittive - {COLUMN_LABELS.get(variable, variable)}",
-        xaxis_title="Statistiche",
-        yaxis_title="Valori",
+        title=f"Descriptive Statistics - {COLUMN_LABELS.get(variable, variable)}",
+        xaxis_title="Statistics",
+        yaxis_title="Values",
         height=400
     )
     

@@ -5,46 +5,76 @@
 [![Machine Learning](https://img.shields.io/badge/Machine%20Learning-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://scikit-learn.org/)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
 
-Una moderna applicazione web per l'analisi completa e la predizione della sopravvivenza dei passeggeri del Titanic, costruita con **architettura modulare** e **pipeline di Machine Learning production-ready**.
+A modern web application for comprehensive analysis and prediction of Titanic passenger survival, built with **modular architecture** and **production-ready Machine Learning pipeline**.
 
-## Links del Progetto
+## Project Links
 
 - **🌐 Live Demo**: [https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
 - **💻 GitHub Repository**: [https://github.com/FabriceGhislain7/titanic-streamlit-dashboard](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
 - **📖 Documentation**: [In Progress]
 
-## Overview del Progetto
+## Project Overview
 
-Questa applicazione rappresenta un'implementazione completa di data science end-to-end, dalla **Data Quality Analysis** al **Model Deployment**, passando per **Feature Engineering** avanzato, **Statistical Testing** e **Error Analysis** dettagliata.
+This application represents a complete end-to-end data science implementation, from **Data Quality Analysis** to **Model Deployment**, through advanced **Feature Engineering**, **Statistical Testing**, and detailed **Error Analysis**.
 
-### Obiettivi
+### Objectives
 
-- **Analisi Esplorativa**: Insight approfonditi sui fattori di sopravvivenza
-- **Feature Engineering**: Creazione intelligente di variabili predittive
-- **ML Pipeline**: Training, validation e comparison automatizzati
-- **Production Ready**: Deployment, monitoring e batch predictions
-- **User Experience**: Dashboard interattiva e intuitiva
+- **Exploratory Analysis**: Deep insights into survival factors
+- **Feature Engineering**: Intelligent creation of predictive variables
+- **ML Pipeline**: Automated training, validation, and comparison
+- **Production Ready**: Deployment, monitoring, and batch predictions
+- **User Experience**: Interactive and intuitive dashboard
 
 ## Quick Start
 
-### Prerequisiti
+### Prerequisites
 
 - **Python 3.8+**
 - **Git**
-- **Virtual Environment** (raccomandato)
+- **Virtual Environment** (recommended)
 
-### Installazione
+### Installation
 
-1. **Clona il repository:**
-   ### Analisi Strutturale del Progetto
+1. **Clone the repository:**
+   ### Project Structural Analysis
 
-Per osservare la struttura del progetto senza l'ambiente virtuale, esegui il comando PowerShell:
+To observe the project structure without the virtual environment, run the PowerShell command:
 
 ```powershell
 Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-Object FullName
 ```
 
-## Tecnologie e Stack
+```bash
+   git clone <repository-url>
+   cd titanic-streamlit-dashboard
+```
+
+2. **Create and activate virtual environment:**
+   ```bash
+      # Windows
+      python -m venv venv
+      .\venv\Scripts\activate
+      
+      # Linux/Mac
+      python3 -m venv venv
+      source venv/bin/activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   
+   > **Tip**: To generate requirements.txt from scratch: `pip freeze > requirements.txt`
+
+4. **Launch the application:**
+   ```bash
+   streamlit run app.py
+   ```
+
+5. **Open in browser:** `http://localhost:8501`
+
+## Technologies and Stack
 
 ### Core Framework
 - **Streamlit**: Modern web framework for data applications
@@ -73,7 +103,7 @@ Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-
 - **Configuration**: Centralized config management
 - **Documentation**: Inline docs and notebooks
 
-## Funzionalità Principali
+## Key Features
 
 ### 1. Data Overview
 - **Dataset Summary**: Comprehensive statistical overview
@@ -109,7 +139,7 @@ Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-
 - **Prediction Interface**: Single and batch predictions
 - **Model Deployment**: Export and persistence capabilities
 
-## Metodologia di Sviluppo
+## Development Methodology
 
 ### Data Science Workflow
 1. **Exploratory Data Analysis (EDA)**
@@ -127,7 +157,7 @@ Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-
 - **Code Documentation**: Inline and external docs
 - **Testing Infrastructure**: Unit test foundation
 
-## Metriche e Performance
+## Metrics and Performance
 
 ### Machine Learning Metrics
 - **Classification Metrics**: Accuracy, Precision, Recall, F1-Score
@@ -141,60 +171,60 @@ Get-ChildItem -Recurse | Where-Object { $_.FullName -notmatch "venv" } | Select-
 - **Distribution Analysis**: Kolmogorov-Smirnov, Shapiro-Wilk
 - **Effect Size**: Cohen's d, Cramér's V
 
-## Configurazione e Personalizzazione
+## Configuration and Customization
 
-### File di Configurazione
+### Configuration Files
 
-- **src/config.py**: Configurazioni principali, palette colori, mappature
-- **.streamlit/config.toml**: Configurazioni Streamlit UI/UX
-- **requirements.txt**: Dipendenze production
-- **logs/**: Directory logging automatico
+- **src/config.py**: Main configurations, color palettes, mappings
+- **.streamlit/config.toml**: Streamlit UI/UX configurations
+- **requirements.txt**: Production dependencies
+- **logs/**: Automatic logging directory
 
-### Personalizzazione
+### Customization
 
-1. **Modifiche Dataset**: Sostituisci `src/data/data_titanic.csv`
-2. **Nuovi Modelli**: Estendi `src/models/ml_models.py`
-3. **Custom Charts**: Aggiungi in `src/components/`
-4. **Styling**: Modifica `assets/styles/main.css`
+1. **Dataset Modifications**: Replace `src/data/data_titanic.csv`
+2. **New Models**: Extend `src/models/ml_models.py`
+3. **Custom Charts**: Add to `src/components/`
+4. **Styling**: Modify `assets/styles/main.css`
 
-## Testing e Quality Assurance
+## Testing and Quality Assurance
 
 ### Test Suite
 ```bash
-# Esegui tutti i test
+# Run all tests
 python -m pytest tests/
 
-# Test specifici
+# Specific tests
 python -m pytest tests/test_data_processing.py
 python -m pytest tests/test_models.py
 ```
 
 ### Code Quality
-- **Logging**: Comprehensive logging in tutti i moduli
-- **Error Handling**: Try-catch robusto
-- **Type Hints**: Documentazione tipi (in sviluppo)
-- **Docstrings**: Documentazione inline
+- **Logging**: Comprehensive logging in all modules
+- **Error Handling**: Robust try-catch
+- **Type Hints**: Type documentation (in development)
+- **Docstrings**: Inline documentation
 
-## Performance e Scalabilità
+## Performance and Scalability
 
-### Ottimizzazioni Implementate
-- **Caching**: `@st.cache_data` per operazioni costose
-- **Lazy Loading**: Caricamento dati on-demand
-- **Memory Management**: Gestione efficiente memoria
-- **Preprocessing Pipeline**: Ottimizzazione scikit-learn
+### Implemented Optimizations
+- **Caching**: `@st.cache_data` for expensive operations
+- **Lazy Loading**: On-demand data loading
+- **Memory Management**: Efficient memory handling
+- **Preprocessing Pipeline**: Scikit-learn optimization
 
-### Limitazioni Attuali
-- **Dataset Size**: Ottimizzato per dataset ~1000 righe
-- **Memory Usage**: ~100MB per sessione completa
-- **Concurrent Users**: Testato per uso single-user
+### Current Limitations
+- **Dataset Size**: Optimized for ~1000 rows datasets
+- **Memory Usage**: ~100MB per complete session
+- **Concurrent Users**: Tested for single-user usage
 
-## Deployment e Produzione
+## Deployment and Production
 
 ### Deployment Options
 
 1. **Streamlit Cloud**:
    ```bash
-      # Push to GitHub e collega Streamlit Cloud
+      # Push to GitHub and connect Streamlit Cloud
       git push origin main
    ```
 
@@ -214,96 +244,44 @@ python -m pytest tests/test_models.py
    ```
 
 ### Production Considerations
-- **Environment Variables**: Configurazioni sensibili
-- **Monitoring**: Log analysis e performance tracking
-- **Backup Strategy**: Dataset e model versioning
-- **Security**: Input validation e sanitization
+- **Environment Variables**: Sensitive configurations
+- **Monitoring**: Log analysis and performance tracking
+- **Backup Strategy**: Dataset and model versioning
+- **Security**: Input validation and sanitization
 
-## Sviluppo e Contributi
+## Development and Contributions
 
 ### Development Setup
 ```bash
-# Clone del repository
+# Repository clone
 git clone https://github.com/FabriceGhislain7/titanic-streamlit-dashboard.git
 cd titanic-streamlit-dashboard
 
 # Setup development environment
 pip install -r requirements_complesso.txt
 
-# Pre-commit hooks (opzionale)
+# Pre-commit hooks (optional)
 pre-commit install
 ```
 
 ### Project Evolution
-- **Origine**: Migrazione da Jupyter Notebook (`docs/data_analysis.ipynb`)
-- **Architettura**: Refactoring modulare per scalabilità
-- **ML Pipeline**: Implementazione production-ready
-- **UI/UX**: Dashboard professionale con Streamlit
+- **Origin**: Migration from Jupyter Notebook (`docs/data_analysis.ipynb`)
+- **Architecture**: Modular refactoring for scalability
+- **ML Pipeline**: Production-ready implementation
+- **UI/UX**: Professional dashboard with Streamlit
 
-### Roadmap Futuro
+### Future Roadmap
 - **Database Integration**: PostgreSQL/MongoDB support
-- **Real-time Predictions**: API REST endpoints
+- **Real-time Predictions**: REST API endpoints
 - **A/B Testing**: Model comparison framework
 - **Advanced ML**: Deep Learning models integration
-- **Monitoring**: MLOps e model drift detection
+- **Monitoring**: MLOps and model drift detection
 
-## Licenza e Credits
-
-### Dataset
-- **Source**: Kaggle Titanic Competition
-- **License**: Public Domain
-- **Purpose**: Educational e demonstration
-
-### Codebase
-- **GitHub**: [https://github.com/FabriceGhislain7/titanic-streamlit-dashboard](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
-- **Live Demo**: [https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
-- **License**: MIT License
-- **Author**: Fabrice Ghislain
-- **Version**: 1.0.0
-
-### Acknowledgments
-- **Streamlit Community**: Framework e documentation
-- **Scikit-learn**: ML library foundation
-- **Plotly Team**: Interactive visualization tools
-
----
-
-**Nota**: Questo progetto rappresenta un esempio completo di applicazione data science moderna, con particolare attenzione all'architettura scalabile, best practices di ML engineering e user experience professionale.
-```bash
-   git clone <repository-url>
-   cd titanic-streamlit-dashboard
-```
-
-2. **Crea e attiva virtual environment:**
-   ```bash
-      # Windows
-      python -m venv venv
-      .\venv\Scripts\activate
-      
-      # Linux/Mac
-      python3 -m venv venv
-      source venv/bin/activate
-   ```
-
-3. **Installa le dipendenze:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-   
-   > **Tip**: Per generare requirements.txt da zero: `pip freeze > requirements.txt`
-
-4. **Avvia l'applicazione:**
-   ```bash
-   streamlit run app.py
-   ```
-
-5. **Apri nel browser:** `http://localhost:8501`
-
-## Architettura del Progetto
+## Project Architecture
 
 ```
 titanic-streamlit-dashboard/
-├── app.py                       # Entry point principale
+├── app.py                       # Main entry point
 ├── src/                         # Core business logic
 │   ├── components/              # UI Components & Visualizations  
 │   │   ├── advanced_charts.py   # Advanced analytics charts
@@ -357,3 +335,26 @@ titanic-streamlit-dashboard/
 ├── requirements_complesso.txt # Development dependencies
 └── README.md                # This documentation
 ```
+
+## License and Credits
+
+### Dataset
+- **Source**: Kaggle Titanic Competition
+- **License**: Public Domain
+- **Purpose**: Educational and demonstration
+
+### Codebase
+- **GitHub**: [https://github.com/FabriceGhislain7/titanic-streamlit-dashboard](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
+- **Live Demo**: [https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
+- **License**: MIT License
+- **Author**: Fabrice Ghislain
+- **Version**: 1.0.0
+
+### Acknowledgments
+- **Streamlit Community**: Framework and documentation
+- **Scikit-learn**: ML library foundation
+- **Plotly Team**: Interactive visualization tools
+
+---
+
+**Note**: This project represents a complete example of modern data science application, with particular attention to scalable architecture, ML engineering best practices, and professional user experience.
