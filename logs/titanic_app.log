@@ -692,3 +692,21 @@
 [2025-08-07 21:21:16,487] DEBUG [log.py:72] Creating survival distribution chart
 [2025-08-07 21:21:16,510] INFO [log.py:72] Calculating descriptive statistics
 [2025-08-07 21:21:16,562] INFO [log.py:72] Page __main__ completed successfully
+[2025-08-07 22:42:33,979] INFO [log.py:72] Loading file __main__
+[2025-08-07 22:42:33,994] INFO [log.py:72] Starting Streamlit application
+[2025-08-07 22:42:33,995] INFO [log.py:72] Starting main() function
+[2025-08-07 22:42:33,999] INFO [log.py:72] ======================================== APP START ====================================
+[2025-08-07 22:42:34,001] INFO [log.py:72] Configuring Streamlit page
+[2025-08-07 22:42:34,010] INFO [log.py:72] Loading Titanic data
+[2025-08-07 22:42:34,042] INFO [log.py:72] Data loaded successfully. Shape: (891, 12)
+[2025-08-07 22:42:34,052] INFO [log.py:72] Setting up main header
+[2025-08-07 22:42:34,295] INFO [log.py:72] Setting up sidebar
+[2025-08-07 22:42:34,590] INFO [log.py:72] Creating overview metrics
+[2025-08-07 22:42:34,746] INFO [log.py:72] Setting up main charts columns
+[2025-08-07 22:42:34,784] DEBUG [log.py:72] Creating survival chart
+[2025-08-07 22:42:34,919] DEBUG [log.py:72] Creating class distribution chart
+[2025-08-07 22:42:35,055] INFO [log.py:72] Setting up dataset details section
+[2025-08-07 22:42:35,101] DEBUG [log.py:72] Generating data summary
+[2025-08-07 22:42:35,123] INFO [log.py:72] Setting up footer
+[2025-08-07 22:42:35,141] INFO [log.py:72] Application started successfully
+[2025-08-07 22:42:35,156] INFO [log.py:72] *************************** APP END *****************************

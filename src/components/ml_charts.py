@@ -590,7 +590,7 @@ class FeatureImportanceVisualizer:
             orientation='h',
             title=f"Top {top_n} Feature Importance",
             color='Importance',
-            color_continuous_scale='Viridis'
+            color_continuous_scale='viridis'
         )
         
         fig.update_layout(
@@ -1197,7 +1197,7 @@ class AdvancedAnalysisVisualizer:
             marker=dict(
                 size=15,
                 color=list(range(len(model_names))),
-                colorscale='Viridis',
+                colorscale='viridis',
                 showscale=True
             ),
             name='Models'
