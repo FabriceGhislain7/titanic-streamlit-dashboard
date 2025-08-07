@@ -1,6 +1,6 @@
 """
 src/models/model_trainer.py
-Training pipeline e gestione modelli Machine Learning
+Training pipeline and Machine Learning model management
 """
 
 import logging
@@ -23,17 +23,17 @@ from src.models.ml_models import ModelFactory, ModelEnsemble, HyperparameterGrid
 from src.config import PREPROCESSING_CONFIG, MODELS_DIR
 
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
 # ----------------1. Data Preparation
 
 class DataPreprocessor:
     """
-    Classe per preprocessing dati per ML
+    Class for ML data preprocessing
     """
     
     def __init__(self, scaling_method='standard'):
-        logger.info(f"Inizializzazione DataPreprocessor con scaling={scaling_method}")
+        logger.info(f"Initializing DataPreprocessor with scaling={scaling_method}")
         self.scaling_method = scaling_method
         self.scaler = None
         self.feature_names = None
@@ -41,108 +41,108 @@ class DataPreprocessor:
         self.is_fitted = False
         
     def fit_transform(self, X, y=None):
-        """Fit e transform dei dati"""
-        logger.info("Avvio fit_transform")
+        """Fit and transform data"""
+        logger.info("Starting fit_transform")
         logger.debug(f"Input shape: {X.shape}")
         
         X_processed = self._handle_missing_values(X.copy())
         X_processed = self._encode_categorical_features(X_processed)
         
-        # Salva nomi features
+        # Save feature names
         self.feature_names = X_processed.columns.tolist()
-        logger.debug(f"Feature names salvate: {len(self.feature_names)} features")
+        logger.debug(f"Feature names saved: {len(self.feature_names)} features")
         
-        # Scaling se richiesto
+        # Scaling if required
         if self.scaling_method and self.scaling_method != 'none':
-            logger.debug(f"Applicazione scaling: {self.scaling_method}")
+            logger.debug(f"Applying scaling: {self.scaling_method}")
             X_scaled = self._apply_scaling(X_processed, fit=True)
         else:
-            logger.debug("Nessuno scaling applicato")
+            logger.debug("No scaling applied")
             X_scaled = X_processed
             
         self.is_fitted = True
-        logger.info("fit_transform completato")
+        logger.info("fit_transform completed")
         return X_scaled, y
     
     def transform(self, X):
-        """Transform su nuovi dati"""
-        logger.info("Avvio transform")
+        """Transform new data"""
+        logger.info("Starting transform")
         if not self.is_fitted:
-            logger.error("Preprocessor deve essere fittato prima del transform")
-            raise ValueError("Preprocessor deve essere fittato prima del transform")
+            logger.error("Preprocessor must be fitted before transform")
+            raise ValueError("Preprocessor must be fitted before transform")
             
         X_processed = self._handle_missing_values(X.copy())
         X_processed = self._encode_categorical_features(X_processed, fit=False)
         
-        # Assicurati che abbia tutte le features
+        # Ensure it has all features
         for col in self.feature_names:
             if col not in X_processed.columns:
                 X_processed[col] = 0
         
         X_processed = X_processed[self.feature_names]
         
-        # Scaling se richiesto
+        # Scaling if required
         if self.scaler:
-            logger.debug("Applicazione scaling transform")
+            logger.debug("Applying scaling transform")
             X_scaled = pd.DataFrame(
                 self.scaler.transform(X_processed),
                 columns=X_processed.columns,
                 index=X_processed.index
             )
         else:
-            logger.debug("Nessuno scaling applicato in transform")
+            logger.debug("No scaling applied in transform")
             X_scaled = X_processed
             
-        logger.info("Transform completato")
+        logger.info("Transform completed")
         return X_scaled
     
     def _handle_missing_values(self, X):
-        """Gestisce valori mancanti"""
-        logger.debug("Gestione valori mancanti")
+        """Handle missing values"""
+        logger.debug("Handling missing values")
         for col in X.columns:
             if X[col].isnull().any():
-                logger.debug(f"Valori mancanti trovati in {col}")
+                logger.debug(f"Missing values found in {col}")
                 if X[col].dtype in ['float64', 'int64']:
-                    # Numeriche: usa mediana
+                    # Numerical: use median
                     fill_value = X[col].median()
                     X[col].fillna(fill_value, inplace=True)
-                    logger.debug(f"Colonna {col} (numerica) - riempita con mediana: {fill_value}")
+                    logger.debug(f"Column {col} (numerical) - filled with median: {fill_value}")
                 else:
-                    # Categoriche: usa moda
+                    # Categorical: use mode
                     fill_value = X[col].mode()[0] if not X[col].mode().empty else 'Unknown'
                     X[col].fillna(fill_value, inplace=True)
-                    logger.debug(f"Colonna {col} (categorica) - riempita con moda: {fill_value}")
+                    logger.debug(f"Column {col} (categorical) - filled with mode: {fill_value}")
         return X
     
     def _encode_categorical_features(self, X, fit=True):
-        """Codifica features categoriche"""
+        """Encode categorical features"""
         from sklearn.preprocessing import LabelEncoder
         
         categorical_cols = X.select_dtypes(include=['object']).columns
-        logger.debug(f"Colonne categoriche trovate: {list(categorical_cols)}")
+        logger.debug(f"Categorical columns found: {list(categorical_cols)}")
         
         for col in categorical_cols:
             if fit:
                 if col not in self.label_encoders:
                     self.label_encoders[col] = LabelEncoder()
                 X[col] = self.label_encoders[col].fit_transform(X[col].astype(str))
-                logger.debug(f"Fit encoder per {col} - classi: {len(self.label_encoders[col].classes_)}")
+                logger.debug(f"Fit encoder for {col} - classes: {len(self.label_encoders[col].classes_)}")
             else:
                 if col in self.label_encoders:
-                    # Gestisce valori non visti durante training
+                    # Handle unseen values during training
                     try:
                         X[col] = self.label_encoders[col].transform(X[col].astype(str))
                     except ValueError:
-                        # Se ci sono valori non visti, usa il valore più frequente
+                        # If there are unseen values, use most frequent value
                         known_values = self.label_encoders[col].classes_
                         X[col] = X[col].apply(lambda x: x if x in known_values else known_values[0])
                         X[col] = self.label_encoders[col].transform(X[col].astype(str))
-                        logger.warning(f"Valori non visti in {col} - sostituiti con {known_values[0]}")
+                        logger.warning(f"Unseen values in {col} - replaced with {known_values[0]}")
         
         return X
     
     def _apply_scaling(self, X, fit=False):
-        """Applica scaling ai dati"""
+        """Apply scaling to data"""
         if fit:
             if self.scaling_method == 'standard':
                 self.scaler = StandardScaler()
@@ -162,11 +162,11 @@ class DataPreprocessor:
 
 class ModelTrainer:
     """
-    Classe principale per training modelli
+    Main class for model training
     """
     
     def __init__(self, random_state=42):
-        logger.info(f"Inizializzazione ModelTrainer con random_state={random_state}")
+        logger.info(f"Initializing ModelTrainer with random_state={random_state}")
         self.random_state = random_state
         self.trained_models = {}
         self.training_results = {}
@@ -178,19 +178,19 @@ class ModelTrainer:
         
     def prepare_data(self, X, y, test_size=0.2, stratify=True):
         """
-        Prepara dati per training
+        Prepare data for training
         
         Args:
             X: Features
             y: Target
-            test_size: Dimensione test set (se 0, non fa split)
-            stratify: Se usare stratificazione
+            test_size: Test set size (if 0, no split)
+            stratify: Whether to use stratification
         """
-        logger.info(f"Preparazione dati - test_size={test_size}, stratify={stratify}")
+        logger.info(f"Data preparation - test_size={test_size}, stratify={stratify}")
         logger.debug(f"Input shape: X={X.shape}, y={y.shape}")
         
         if test_size == 0 or test_size is None:
-            logger.info("Nessuno split applicato - usando dati così come sono")
+            logger.info("No split applied - using data as is")
             self.X_train = X
             self.y_train = y
             self.X_test = None
@@ -213,27 +213,27 @@ class ModelTrainer:
     
     def train_single_model(self, model_type, use_scaling=None, custom_params=None):
         """
-        Addestra singolo modello
+        Train single model
         
         Args:
-            model_type: Tipo di modello da addestrare
-            use_scaling: Se usare scaling (auto-detect se None)
-            custom_params: Parametri personalizzati
+            model_type: Type of model to train
+            use_scaling: Whether to use scaling (auto-detect if None)
+            custom_params: Custom parameters
         
         Returns:
-            Risultati del training
+            Training results
         """
-        logger.info(f"Avvio training per {model_type}")
+        logger.info(f"Starting training for {model_type}")
         start_time = time.time()
         
-        # Crea modello
+        # Create model
         model = ModelFactory.create_model(model_type, custom_params)
-        logger.debug(f"Modello creato - parametri: {model.hyperparameters}")
+        logger.debug(f"Model created - parameters: {model.hyperparameters}")
         
-        # Determina se usare scaling
+        # Determine whether to use scaling
         if use_scaling is None:
             use_scaling = model.requires_scaling
-        logger.debug(f"Uso scaling: {use_scaling}")
+        logger.debug(f"Use scaling: {use_scaling}")
         
         # Preprocessing
         scaling_method = 'standard' if use_scaling else 'none'
@@ -241,22 +241,22 @@ class ModelTrainer:
         
         X_train_processed, _ = preprocessor.fit_transform(self.X_train, self.y_train)
         X_test_processed = preprocessor.transform(self.X_test)
-        logger.debug(f"Dati preprocessati - shape: {X_train_processed.shape}")
+        logger.debug(f"Data preprocessed - shape: {X_train_processed.shape}")
         
         # Training
-        logger.info("Avvio fitting modello...")
+        logger.info("Starting model fitting...")
         model.model.fit(X_train_processed, self.y_train)
         model.is_trained = True
         model.feature_names = X_train_processed.columns.tolist()
         
         training_time = time.time() - start_time
-        logger.info(f"Training completato in {training_time:.2f} secondi")
+        logger.info(f"Training completed in {training_time:.2f} seconds")
         
-        # Salva modello e preprocessor
+        # Save model and preprocessor
         self.trained_models[model_type] = model
         self.preprocessors[model_type] = preprocessor
         
-        # Risultati
+        # Results
         results = {
             'model': model,
             'preprocessor': preprocessor,
@@ -271,16 +271,16 @@ class ModelTrainer:
     
     def train_multiple_models(self, model_types, progress_callback=None):
         """
-        Addestra multiple modelli
+        Train multiple models
         
         Args:
-            model_types: Lista dei tipi di modello
-            progress_callback: Callback per aggiornare progress bar
+            model_types: List of model types
+            progress_callback: Callback to update progress bar
         
         Returns:
-            Dizionario con risultati di tutti i modelli
+            Dictionary with results of all models
         """
-        logger.info(f"Avvio training multiplo per {len(model_types)} modelli")
+        logger.info(f"Starting multiple training for {len(model_types)} models")
         results = {}
         
         for i, model_type in enumerate(model_types):
@@ -288,54 +288,54 @@ class ModelTrainer:
                 progress_callback(i / len(model_types), f"Training {model_type}...")
             
             try:
-                logger.info(f"Training modello {i+1}/{len(model_types)}: {model_type}")
+                logger.info(f"Training model {i+1}/{len(model_types)}: {model_type}")
                 result = self.train_single_model(model_type)
                 results[model_type] = result
                 
                 if progress_callback:
-                    progress_callback((i + 1) / len(model_types), f"Completato {model_type}")
+                    progress_callback((i + 1) / len(model_types), f"Completed {model_type}")
                     
             except Exception as e:
-                logger.error(f"Errore nel training di {model_type}: {str(e)}")
-                st.error(f"Errore nel training di {model_type}: {str(e)}")
+                logger.error(f"Error training {model_type}: {str(e)}")
+                st.error(f"Error training {model_type}: {str(e)}")
                 continue
         
-        logger.info("Training multiplo completato")
+        logger.info("Multiple training completed")
         return results
     
     def cross_validate_model(self, model_type, cv_folds=5, scoring='accuracy'):
         """
-        Cross validation per singolo modello
+        Cross validation for single model
         
         Args:
-            model_type: Tipo di modello
-            cv_folds: Numero di fold
-            scoring: Metrica di scoring
+            model_type: Model type
+            cv_folds: Number of folds
+            scoring: Scoring metric
         
         Returns:
-            Risultati cross validation
+            Cross validation results
         """
-        logger.info(f"Avvio cross validation per {model_type} (cv_folds={cv_folds})")
+        logger.info(f"Starting cross validation for {model_type} (cv_folds={cv_folds})")
         
         if model_type not in self.trained_models:
-            logger.error(f"Modello {model_type} non è stato addestrato")
-            raise ValueError(f"Modello {model_type} non è stato addestrato")
+            logger.error(f"Model {model_type} has not been trained")
+            raise ValueError(f"Model {model_type} has not been trained")
         
         model = self.trained_models[model_type]
         preprocessor = self.preprocessors[model_type]
         
-        # Prepara dati completi
+        # Prepare complete data
         X_full = pd.concat([self.X_train, self.X_test])
         y_full = pd.concat([self.y_train, self.y_test])
         
         X_processed, _ = preprocessor.fit_transform(X_full, y_full)
-        logger.debug(f"Dati per CV - shape: {X_processed.shape}")
+        logger.debug(f"Data for CV - shape: {X_processed.shape}")
         
         # Cross validation
         cv = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=self.random_state)
         cv_scores = cross_val_score(model.model, X_processed, y_full, cv=cv, scoring=scoring)
         
-        logger.info(f"CV completato - punteggi: {cv_scores}")
+        logger.info(f"CV completed - scores: {cv_scores}")
         
         return {
             'scores': cv_scores,
@@ -347,36 +347,36 @@ class ModelTrainer:
     
     def hyperparameter_tuning(self, model_type, param_grid=None, cv_folds=3, scoring='accuracy'):
         """
-        Hyperparameter tuning con GridSearch
+        Hyperparameter tuning with GridSearch
         
         Args:
-            model_type: Tipo di modello
-            param_grid: Griglia parametri (usa default se None)
-            cv_folds: Numero di fold per CV
-            scoring: Metrica di scoring
+            model_type: Model type
+            param_grid: Parameter grid (use default if None)
+            cv_folds: Number of folds for CV
+            scoring: Scoring metric
         
         Returns:
-            Risultati del tuning
+            Tuning results
         """
-        logger.info(f"Avvio hyperparameter tuning per {model_type}")
+        logger.info(f"Starting hyperparameter tuning for {model_type}")
         
         if param_grid is None:
             param_grid = HyperparameterGrids.get_grid(model_type)
-            logger.debug(f"Usando griglia parametri di default: {param_grid}")
+            logger.debug(f"Using default parameter grid: {param_grid}")
         
         if not param_grid:
-            logger.error(f"Nessuna griglia parametri disponibile per {model_type}")
-            raise ValueError(f"Nessuna griglia parametri disponibile per {model_type}")
+            logger.error(f"No parameter grid available for {model_type}")
+            raise ValueError(f"No parameter grid available for {model_type}")
         
-        # Crea modello base
+        # Create base model
         base_model = ModelFactory.create_model(model_type)
-        logger.debug(f"Modello base creato per tuning")
+        logger.debug(f"Base model created for tuning")
         
         # Preprocessing
         scaling_method = 'standard' if base_model.requires_scaling else 'none'
         preprocessor = DataPreprocessor(scaling_method=scaling_method)
         X_train_processed, _ = preprocessor.fit_transform(self.X_train, self.y_train)
-        logger.debug(f"Dati preprocessati per tuning - shape: {X_train_processed.shape}")
+        logger.debug(f"Data preprocessed for tuning - shape: {X_train_processed.shape}")
         
         # GridSearch
         cv = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=self.random_state)
@@ -390,11 +390,11 @@ class ModelTrainer:
             verbose=1
         )
         
-        logger.info("Avvio GridSearchCV...")
+        logger.info("Starting GridSearchCV...")
         grid_search.fit(X_train_processed, self.y_train)
         
-        logger.info(f"Tuning completato - migliori parametri: {grid_search.best_params_}")
-        logger.debug(f"Miglior score: {grid_search.best_score_}")
+        logger.info(f"Tuning completed - best parameters: {grid_search.best_params_}")
+        logger.debug(f"Best score: {grid_search.best_score_}")
         
         return {
             'best_params': grid_search.best_params_,
@@ -405,31 +405,31 @@ class ModelTrainer:
     
     def create_learning_curves(self, model_type, train_sizes=None):
         """
-        Genera learning curves
+        Generate learning curves
         
         Args:
-            model_type: Tipo di modello
-            train_sizes: Dimensioni training set da testare
+            model_type: Model type
+            train_sizes: Training set sizes to test
         
         Returns:
-            Dati per learning curves
+            Data for learning curves
         """
-        logger.info(f"Generazione learning curves per {model_type}")
+        logger.info(f"Generating learning curves for {model_type}")
         
         if model_type not in self.trained_models:
-            logger.error(f"Modello {model_type} non è stato addestrato")
-            raise ValueError(f"Modello {model_type} non è stato addestrato")
+            logger.error(f"Model {model_type} has not been trained")
+            raise ValueError(f"Model {model_type} has not been trained")
         
         if train_sizes is None:
             train_sizes = np.linspace(0.1, 1.0, 10)
-            logger.debug(f"Usando train_sizes di default: {train_sizes}")
+            logger.debug(f"Using default train_sizes: {train_sizes}")
         
         model = self.trained_models[model_type]
         preprocessor = self.preprocessors[model_type]
         
-        # Prepara dati
+        # Prepare data
         X_processed, _ = preprocessor.fit_transform(self.X_train, self.y_train)
-        logger.debug(f"Dati per learning curves - shape: {X_processed.shape}")
+        logger.debug(f"Data for learning curves - shape: {X_processed.shape}")
         
         # Learning curves
         train_sizes_abs, train_scores, val_scores = learning_curve(
@@ -443,7 +443,7 @@ class ModelTrainer:
             random_state=self.random_state
         )
         
-        logger.info("Learning curves generate con successo")
+        logger.info("Learning curves generated successfully")
         
         return {
             'train_sizes': train_sizes_abs,
@@ -459,27 +459,27 @@ class ModelTrainer:
 
 class EnsembleTrainer:
     """
-    Classe per training ensemble di modelli
+    Class for training model ensembles
     """
     
     def __init__(self, base_trainer):
-        logger.info("Inizializzazione EnsembleTrainer")
+        logger.info("Initializing EnsembleTrainer")
         self.base_trainer = base_trainer
         self.ensemble_models = {}
         
     def create_voting_ensemble(self, model_types, voting='soft', weights=None):
         """
-        Crea ensemble con voting
+        Create ensemble with voting
         
         Args:
-            model_types: Lista tipi di modello
-            voting: 'soft' o 'hard'
-            weights: Pesi per i modelli
+            model_types: List of model types
+            voting: 'soft' or 'hard'
+            weights: Weights for models
         
         Returns:
             Ensemble model
         """
-        logger.info(f"Creazione voting ensemble (voting={voting}) con modelli: {model_types}")
+        logger.info(f"Creating voting ensemble (voting={voting}) with models: {model_types}")
         from sklearn.ensemble import VotingClassifier
         
         estimators = []
@@ -487,28 +487,28 @@ class EnsembleTrainer:
             if model_type in self.base_trainer.trained_models:
                 model = self.base_trainer.trained_models[model_type].model
                 estimators.append((model_type, model))
-                logger.debug(f"Aggiunto modello {model_type} all'ensemble")
+                logger.debug(f"Added model {model_type} to ensemble")
         
         if not estimators:
-            logger.error("Nessun modello addestrato trovato per l'ensemble")
-            raise ValueError("Nessun modello addestrato trovato")
+            logger.error("No trained models found for ensemble")
+            raise ValueError("No trained models found")
         
-        # Crea voting classifier
+        # Create voting classifier
         ensemble = VotingClassifier(
             estimators=estimators,
             voting=voting,
             weights=weights
         )
-        logger.debug(f"VotingClassifier creato con {len(estimators)} modelli")
+        logger.debug(f"VotingClassifier created with {len(estimators)} models")
         
-        # Training su dati preprocessati
+        # Training on preprocessed data
         first_model_type = model_types[0]
         preprocessor = self.base_trainer.preprocessors[first_model_type]
         X_train_processed = self.base_trainer.training_results[first_model_type]['X_train_processed']
         
-        logger.info("Avvio training voting ensemble...")
+        logger.info("Starting voting ensemble training...")
         ensemble.fit(X_train_processed, self.base_trainer.y_train)
-        logger.info("Training voting ensemble completato")
+        logger.info("Voting ensemble training completed")
         
         self.ensemble_models['voting'] = {
             'model': ensemble,
@@ -520,16 +520,16 @@ class EnsembleTrainer:
     
     def create_stacking_ensemble(self, base_models, meta_model='LogisticRegression'):
         """
-        Crea ensemble con stacking
+        Create ensemble with stacking
         
         Args:
-            base_models: Lista modelli base
-            meta_model: Tipo di meta-modello
+            base_models: List of base models
+            meta_model: Type of meta-model
         
         Returns:
             Stacking ensemble
         """
-        logger.info(f"Creazione stacking ensemble con meta-model {meta_model} e base models: {base_models}")
+        logger.info(f"Creating stacking ensemble with meta-model {meta_model} and base models: {base_models}")
         from sklearn.ensemble import StackingClassifier
         
         estimators = []
@@ -537,13 +537,13 @@ class EnsembleTrainer:
             if model_type in self.base_trainer.trained_models:
                 model = self.base_trainer.trained_models[model_type].model
                 estimators.append((model_type, model))
-                logger.debug(f"Aggiunto modello base {model_type}")
+                logger.debug(f"Added base model {model_type}")
         
         # Meta learner
         meta_learner = ModelFactory.create_model(meta_model).model
-        logger.debug(f"Meta-learner creato: {meta_model}")
+        logger.debug(f"Meta-learner created: {meta_model}")
         
-        # Crea stacking classifier
+        # Create stacking classifier
         stacking = StackingClassifier(
             estimators=estimators,
             final_estimator=meta_learner,
@@ -555,9 +555,9 @@ class EnsembleTrainer:
         preprocessor = self.base_trainer.preprocessors[first_model_type]
         X_train_processed = self.base_trainer.training_results[first_model_type]['X_train_processed']
         
-        logger.info("Avvio training stacking ensemble...")
+        logger.info("Starting stacking ensemble training...")
         stacking.fit(X_train_processed, self.base_trainer.y_train)
-        logger.info("Training stacking ensemble completato")
+        logger.info("Stacking ensemble training completed")
         
         self.ensemble_models['stacking'] = {
             'model': stacking,
@@ -572,29 +572,29 @@ class EnsembleTrainer:
 
 class ModelPersistence:
     """
-    Gestione salvataggio e caricamento modelli
+    Model saving and loading management
     """
     
     @staticmethod
     def save_model(model, model_name, save_dir=None):
         """
-        Salva modello su disco
+        Save model to disk
         
         Args:
-            model: Modello da salvare
-            model_name: Nome del modello
-            save_dir: Directory di salvataggio
+            model: Model to save
+            model_name: Model name
+            save_dir: Save directory
         
         Returns:
-            Path del file salvato
+            Path of saved file
         """
-        logger.info(f"Salvataggio modello {model_name}")
+        logger.info(f"Saving model {model_name}")
         if save_dir is None:
             save_dir = MODELS_DIR
-            logger.debug(f"Usando directory di default: {save_dir}")
+            logger.debug(f"Using default directory: {save_dir}")
         
         if not os.path.exists(save_dir):
-            logger.debug(f"Creazione directory: {save_dir}")
+            logger.debug(f"Creating directory: {save_dir}")
             os.makedirs(save_dir)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -604,51 +604,51 @@ class ModelPersistence:
         try:
             with open(filepath, 'wb') as f:
                 pickle.dump(model, f)
-            logger.info(f"Modello salvato con successo in: {filepath}")
+            logger.info(f"Model saved successfully to: {filepath}")
             return filepath
         except Exception as e:
-            logger.error(f"Errore nel salvataggio del modello: {str(e)}")
-            raise Exception(f"Errore nel salvataggio del modello: {str(e)}")
+            logger.error(f"Error saving model: {str(e)}")
+            raise Exception(f"Error saving model: {str(e)}")
     
     @staticmethod
     def load_model(filepath):
         """
-        Carica modello da disco
+        Load model from disk
         
         Args:
-            filepath: Path del file modello
+            filepath: Model file path
         
         Returns:
-            Modello caricato
+            Loaded model
         """
-        logger.info(f"Caricamento modello da: {filepath}")
+        logger.info(f"Loading model from: {filepath}")
         try:
             with open(filepath, 'rb') as f:
                 model = pickle.load(f)
-            logger.info("Modello caricato con successo")
+            logger.info("Model loaded successfully")
             return model
         except Exception as e:
-            logger.error(f"Errore nel caricamento del modello: {str(e)}")
-            raise Exception(f"Errore nel caricamento del modello: {str(e)}")
+            logger.error(f"Error loading model: {str(e)}")
+            raise Exception(f"Error loading model: {str(e)}")
     
     @staticmethod
     def list_saved_models(save_dir=None):
         """
-        Lista modelli salvati
+        List saved models
         
         Args:
-            save_dir: Directory da esplorare
+            save_dir: Directory to explore
         
         Returns:
-            Lista dei file modello
+            List of model files
         """
-        logger.info("Lista modelli salvati")
+        logger.info("Listing saved models")
         if save_dir is None:
             save_dir = MODELS_DIR
-            logger.debug(f"Usando directory di default: {save_dir}")
+            logger.debug(f"Using default directory: {save_dir}")
         
         if not os.path.exists(save_dir):
-            logger.warning(f"Directory non trovata: {save_dir}")
+            logger.warning(f"Directory not found: {save_dir}")
             return []
         
         model_files = []
@@ -662,16 +662,16 @@ class ModelPersistence:
                     'size': stat.st_size,
                     'modified': datetime.fromtimestamp(stat.st_mtime)
                 })
-                logger.debug(f"Trovato modello: {file}")
+                logger.debug(f"Found model: {file}")
         
-        logger.info(f"Trovati {len(model_files)} modelli salvati")
+        logger.info(f"Found {len(model_files)} saved models")
         return sorted(model_files, key=lambda x: x['modified'], reverse=True)
 
 # ----------------5. Training Configuration
 
 class TrainingConfig:
     """
-    Configurazioni per training
+    Training configurations
     """
     
     QUICK_TRAINING = {
@@ -698,19 +698,19 @@ class TrainingConfig:
     
     @classmethod
     def get_config(cls, config_name):
-        """Restituisce configurazione specifica"""
-        logger.info(f"Richiesta configurazione: {config_name}")
+        """Return specific configuration"""
+        logger.info(f"Requesting configuration: {config_name}")
         return getattr(cls, config_name.upper(), cls.QUICK_TRAINING)
 
 # ----------------6. Training Pipeline Manager
 
 class TrainingPipelineManager:
     """
-    Manager completo per pipeline di training
+    Complete manager for training pipeline
     """
     
     def __init__(self, config_name='QUICK_TRAINING'):
-        logger.info(f"Inizializzazione TrainingPipelineManager con config: {config_name}")
+        logger.info(f"Initializing TrainingPipelineManager with config: {config_name}")
         self.config = TrainingConfig.get_config(config_name)
         self.trainer = ModelTrainer()
         self.ensemble_trainer = None
@@ -718,30 +718,30 @@ class TrainingPipelineManager:
         
     def run_full_pipeline(self, X, y, progress_callback=None):
         """
-        Esegue pipeline completa di training
+        Run complete training pipeline
         
         Args:
             X: Features
             y: Target
-            progress_callback: Callback per progress updates
+            progress_callback: Callback for progress updates
         
         Returns:
-            Risultati completi del training
+            Complete training results
         """
-        logger.info("Avvio pipeline di training completa")
-        total_steps = len(self.config['models']) + 2  # +2 per data prep e final evaluation
+        logger.info("Starting complete training pipeline")
+        total_steps = len(self.config['models']) + 2  # +2 for data prep and final evaluation
         current_step = 0
         
-        # Step 1: Preparazione dati
+        # Step 1: Data preparation
         if progress_callback:
-            progress_callback(current_step / total_steps, "Preparazione dati...")
-        logger.info("Step 1: Preparazione dati")
+            progress_callback(current_step / total_steps, "Preparing data...")
+        logger.info("Step 1: Data preparation")
         
         self.trainer.prepare_data(X, y, test_size=self.config['test_size'])
         current_step += 1
         
-        # Step 2: Training modelli
-        logger.info(f"Step 2: Training {len(self.config['models'])} modelli")
+        # Step 2: Model training
+        logger.info(f"Step 2: Training {len(self.config['models'])} models")
         training_results = self.trainer.train_multiple_models(
             self.config['models'],
             lambda p, msg: progress_callback((current_step + p) / total_steps, msg) if progress_callback else None
@@ -756,44 +756,44 @@ class TrainingPipelineManager:
         cv_results = {}
         for model_type in self.config['models']:
             if model_type in training_results:
-                logger.debug(f"CV per modello {model_type}")
+                logger.debug(f"CV for model {model_type}")
                 cv_results[model_type] = self.trainer.cross_validate_model(
                     model_type, cv_folds=self.config['cv_folds']
                 )
         
-        # Step 4: Hyperparameter tuning (opzionale)
+        # Step 4: Hyperparameter tuning (optional)
         if self.config.get('use_hyperparameter_tuning', False):
             logger.info("Step 4: Hyperparameter tuning")
             tuning_results = {}
             for model_type in self.config['models']:
                 if model_type in training_results:
                     try:
-                        logger.debug(f"Tuning per {model_type}")
+                        logger.debug(f"Tuning for {model_type}")
                         tuning_results[model_type] = self.trainer.hyperparameter_tuning(model_type)
                     except Exception as e:
-                        logger.warning(f"Errore tuning {model_type}: {str(e)}")
+                        logger.warning(f"Tuning error {model_type}: {str(e)}")
                         continue
         else:
             tuning_results = {}
-            logger.info("Step 4: Hyperparameter tuning saltato")
+            logger.info("Step 4: Hyperparameter tuning skipped")
         
-        # Step 5: Ensemble (opzionale)
+        # Step 5: Ensemble (optional)
         if self.config.get('use_ensemble', False):
-            logger.info("Step 5: Creazione ensemble")
+            logger.info("Step 5: Creating ensemble")
             self.ensemble_trainer = EnsembleTrainer(self.trainer)
             ensemble_results = {
                 'voting': self.ensemble_trainer.create_voting_ensemble(self.config['models'])
             }
-            logger.info("Ensemble creato con successo")
+            logger.info("Ensemble created successfully")
         else:
             ensemble_results = {}
-            logger.info("Step 5: Creazione ensemble saltata")
+            logger.info("Step 5: Ensemble creation skipped")
         
         current_step += 1
         if progress_callback:
-            progress_callback(1.0, "Training completato!")
+            progress_callback(1.0, "Training completed!")
         
-        # Compila risultati
+        # Compile results
         self.results = {
             'training': training_results,
             'cross_validation': cv_results,
@@ -802,22 +802,22 @@ class TrainingPipelineManager:
             'config': self.config
         }
         
-        logger.info("Pipeline di training completata con successo")
+        logger.info("Training pipeline completed successfully")
         return self.results
     
     def get_best_model(self, metric='accuracy'):
         """
-        Restituisce il miglior modello basato su metrica
+        Return best model based on metric
         
         Args:
-            metric: Metrica per comparazione
+            metric: Metric for comparison
         
         Returns:
-            Nome e score del miglior modello
+            Name and score of best model
         """
-        logger.info(f"Ricerca miglior modello per metrica: {metric}")
+        logger.info(f"Searching best model for metric: {metric}")
         if 'cross_validation' not in self.results:
-            logger.warning("Nessun risultato CV disponibile")
+            logger.warning("No CV results available")
             return None
         
         best_score = 0
@@ -830,18 +830,18 @@ class TrainingPipelineManager:
                 best_model = model_type
         
         if best_model:
-            logger.info(f"Miglior modello trovato: {best_model} (score={best_score})")
+            logger.info(f"Best model found: {best_model} (score={best_score})")
         else:
-            logger.warning("Nessun modello valido trovato")
+            logger.warning("No valid model found")
         
         return {'model': best_model, 'score': best_score}
     
     def save_pipeline_results(self, filepath):
-        """Salva risultati pipeline"""
-        logger.info(f"Salvataggio risultati pipeline in: {filepath}")
+        """Save pipeline results"""
+        logger.info(f"Saving pipeline results to: {filepath}")
         import json
         
-        # Prepara dati serializzabili
+        # Prepare serializable data
         serializable_results = {
             'config': self.config,
             'cross_validation': self.results.get('cross_validation', {}),
@@ -851,10 +851,10 @@ class TrainingPipelineManager:
         try:
             with open(filepath, 'w') as f:
                 json.dump(serializable_results, f, indent=2, default=str)
-            logger.info("Risultati salvati con successo")
+            logger.info("Results saved successfully")
             return filepath
         except Exception as e:
-            logger.error(f"Errore nel salvataggio dei risultati: {str(e)}")
+            logger.error(f"Error saving results: {str(e)}")
             raise
 
-logger.info(f"Caricamento completato {__name__}")
+logger.info(f"Loading completed {__name__}")
