@@ -314,6 +314,49 @@ http://localhost:8501
 
 ---
 
+# Deploy on Render
+
+This project can be deployed on **Render** as a Python web service.
+
+The repository already includes a [`render.yaml`](render.yaml) blueprint with:
+
+* Python runtime
+* dependency installation from `requirements.txt`
+* Streamlit startup command bound to Render's `$PORT`
+
+## Option 1: Blueprint Deploy
+
+1. Push the repository to GitHub.
+2. In Render, click **New +** → **Blueprint**.
+3. Select this repository.
+4. Confirm the service creation from `render.yaml`.
+5. Wait for the first build to complete.
+
+## Option 2: Manual Web Service
+
+If you prefer creating the service manually on Render, use:
+
+* **Environment**: `Python 3`
+* **Build Command**:
+
+```bash
+pip install --upgrade pip && pip install -r requirements.txt
+```
+
+* **Start Command**:
+
+```bash
+streamlit run app.py --server.headless true --server.port $PORT --browser.serverAddress 0.0.0.0
+```
+
+## Notes
+
+* `requirements.txt` includes the packages needed by the analytics and ML modules.
+* No Streamlit Community Cloud configuration is required for Render.
+* If you later add secrets, define them in the Render dashboard under **Environment Variables**.
+
+---
+
 # Testing
 
 Run the test suite:
