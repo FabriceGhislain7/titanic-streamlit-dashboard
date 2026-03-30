@@ -1,4 +1,4 @@
-"""
+﻿"""
 src/components/ml_charts.py
 Componenti per visualizzazioni Machine Learning avanzate
 """
@@ -39,10 +39,10 @@ class TrainingVisualizer:
     @staticmethod
     def create_training_progress_chart(training_results, metric='accuracy'):
         """
-        Visualizza progresso training per multiple modelli
+        Visualizza progresso training per multiple models
         
         Args:
-            training_results: Risultati training da ModelTrainer
+            training_results: Results training da ModelTrainer
             metric: Metrica da visualizzare
         
         Returns:
@@ -66,9 +66,9 @@ class TrainingVisualizer:
             ))
         
         fig.update_layout(
-            title="Tempi di Training per Modello",
-            xaxis_title="Modelli",
-            yaxis_title="Tempo (secondi)",
+            title="Training Time by Model",
+            xaxis_title="Models",
+            yaxis_title="Time (seconds)",
             height=400,
             showlegend=False
         )
@@ -76,12 +76,12 @@ class TrainingVisualizer:
         return fig
     
     @staticmethod
-    def create_cross_validation_chart(cv_results):
+    def create_cross_validataon_chart(cv_results):
         """
-        Visualizza risultati cross-validation
+        Visualizza results cross-validataon
         
         Args:
-            cv_results: Risultati CV da ModelTrainer
+            cv_results: Results CV da ModelTrainer
         
         Returns:
             Plotly figure
@@ -108,7 +108,7 @@ class TrainingVisualizer:
             x='Model',
             y='Score',
             points='all',
-            title="Distribuzione Scores Cross-Validation",
+            title="Cross-Validation Score Distribution",
             color='Model'
         )
         
@@ -132,10 +132,10 @@ class TrainingVisualizer:
     @staticmethod
     def create_hyperparameter_optimization_chart(tuning_results):
         """
-        Visualizza risultati hyperparameter tuning
+        Visualizza results hyperparameter tuning
         
         Args:
-            tuning_results: Risultati da hyperparameter_tuning
+            tuning_results: Results da hyperparameter_tuning
         
         Returns:
             Plotly figure
@@ -143,13 +143,13 @@ class TrainingVisualizer:
         if not tuning_results:
             return None
         
-        # Prende primo modello per esempio
+        # Prende primo model per esempio
         model_name = list(tuning_results.keys())[0]
         results = tuning_results[model_name]
         
         cv_results = results['cv_results']
         
-        # Crea DataFrame dai risultati
+        # Crea DataFrame dai results
         df_results = pd.DataFrame(cv_results)
         
         # Plot dei top 10 parametri
@@ -171,7 +171,7 @@ class TrainingVisualizer:
         
         fig.update_layout(
             title=f"Top 10 Configurazioni Hyperparameter - {ML_MODELS.get(model_name, {}).get('name', model_name)}",
-            xaxis_title="Configurazione",
+            xaxis_title="Configuration",
             yaxis_title="CV Score",
             height=400
         )
@@ -182,16 +182,16 @@ class TrainingVisualizer:
 
 class PerformanceVisualizer:
     """
-    Visualizzazioni per confronto performance modelli
+    Visualizzazioni per comparison performance models
     """
     
     @staticmethod
     def create_metrics_comparison_radar(evaluation_results):
         """
-        Radar chart per confronto metriche multiple
+        Radar chart per comparison metriche multiple
         
         Args:
-            evaluation_results: Risultati da ModelEvaluator
+            evaluation_results: Results da ModelEvaluator
         
         Returns:
             Plotly figure
@@ -226,7 +226,7 @@ class PerformanceVisualizer:
                     tickformat='.1f'
                 )
             ),
-            title="Radar Chart - Confronto Metriche Performance",
+            title="Radar Chart - Performance Metric Comparison",
             height=600,
             showlegend=True
         )
@@ -236,10 +236,10 @@ class PerformanceVisualizer:
     @staticmethod
     def create_performance_heatmap(evaluation_results):
         """
-        Heatmap performance modelli
+        Heatmap performance models
         
         Args:
-            evaluation_results: Risultati evaluazione
+            evaluation_results: Results evaluazione
         
         Returns:
             Plotly figure
@@ -265,7 +265,7 @@ class PerformanceVisualizer:
             x=[m.replace('_', ' ').title() for m in metrics_to_show],
             y=model_names,
             color_continuous_scale='RdYlBu_r',
-            title="Heatmap Performance - Tutti i Modelli",
+            title="Performance Heatmap - All Models",
             text_auto='.3f'
         )
         
@@ -276,10 +276,10 @@ class PerformanceVisualizer:
     @staticmethod
     def create_model_ranking_chart(evaluation_results, metric='f1'):
         """
-        Ranking modelli per metrica specifica
+        Ranking models per metrica specifica
         
         Args:
-            evaluation_results: Risultati evaluazione
+            evaluation_results: Results evaluazione
             metric: Metrica per ranking
         
         Returns:
@@ -288,11 +288,11 @@ class PerformanceVisualizer:
         comparison = ModelComparison(evaluation_results)
         rankings = comparison.rank_models(metric)
         
-        # Prepara dati
+        # Prepara data
         models = [r['name'] for r in rankings]
         scores = [r['score'] for r in rankings]
         
-        # Colori dal migliore al peggiore
+        # Colori dal beste al peggiore
         colors = px.colors.sequential.RdYlGn_r[:len(models)]
         
         fig = go.Figure(data=[
@@ -307,9 +307,9 @@ class PerformanceVisualizer:
         ])
         
         fig.update_layout(
-            title=f"Ranking Modelli per {metric.replace('_', ' ').title()}",
+            title=f"Model Ranking by {metric.replace('_', ' ').title()}",
             xaxis_title=metric.replace('_', ' ').title(),
-            yaxis_title="Modelli",
+            yaxis_title="Models",
             height=400,
             yaxis={'categoryorder': 'total ascending'}
         )
@@ -326,12 +326,12 @@ class CurveVisualizer:
     @staticmethod
     def create_roc_curves_comparison(evaluation_results, y_test, probabilities):
         """
-        Confronto curve ROC
+        Comparison curve ROC
         
         Args:
-            evaluation_results: Risultati evaluazione
+            evaluation_results: Results evaluazione
             y_test: Target veri
-            probabilities: Dizionario probabilità per modello
+            probabilities: Dizionario probabilitÃ  per model
         
         Returns:
             Plotly figure
@@ -366,7 +366,7 @@ class CurveVisualizer:
                 ))
         
         fig.update_layout(
-            title='Curve ROC - Confronto Modelli',
+            title='ROC Curves - Model Comparison',
             xaxis_title='False Positive Rate',
             yaxis_title='True Positive Rate',
             height=600,
@@ -383,9 +383,9 @@ class CurveVisualizer:
         Curve Precision-Recall
         
         Args:
-            evaluation_results: Risultati evaluazione
+            evaluation_results: Results evaluazione
             y_test: Target veri
-            probabilities: Probabilità modelli
+            probabilities: ProbabilitÃ  models
         
         Returns:
             Plotly figure
@@ -444,7 +444,7 @@ class ConfusionMatrixVisualizer:
         Grid di confusion matrices
         
         Args:
-            evaluation_results: Risultati con confusion matrix
+            evaluation_results: Results con confusion matrix
         
         Returns:
             Plotly figure con subplots
@@ -472,18 +472,18 @@ class ConfusionMatrixVisualizer:
                 
                 heatmap = go.Heatmap(
                     z=cm_norm,
-                    text=cm,  # Mostra valori assoluti
+                    text=cm,  # Show valori assoluti
                     texttemplate='%{text}',
                     textfont={"size": 14},
                     colorscale='Blues',
-                    showscale=(i == 0),  # Mostra scala solo per il primo
+                    showscale=(i == 0),  # Show scala solo per il primo
                     hovertemplate='Actual: %{y}<br>Predicted: %{x}<br>Count: %{text}<br>Rate: %{z:.1%}<extra></extra>'
                 )
                 
                 fig.add_trace(heatmap, row=row, col=col)
         
         # Update axes labels
-        class_names = ['Non Sopravvive', 'Sopravvive']
+        class_names = ['Does Not Survive', 'Survives']
         for i in range(1, rows + 1):
             for j in range(1, cols + 1):
                 fig.update_xaxes(
@@ -500,20 +500,20 @@ class ConfusionMatrixVisualizer:
                 )
         
         fig.update_layout(
-            title="Confusion Matrices - Tutti i Modelli",
+            title="Confusion Matrices - All Models",
             height=250 * rows + 100
         )
         
         return fig
     
     @staticmethod
-    def create_confusion_matrix_detailed(cm, model_name, class_names=['Non Sopravvive', 'Sopravvive']):
+    def create_confusion_matrix_detailed(cm, model_name, class_names=['Does Not Survive', 'Survives']):
         """
-        Confusion matrix dettagliata per singolo modello
+        Confusion matrix detailsata per singolo model
         
         Args:
             cm: Confusion matrix
-            model_name: Nome modello
+            model_name: Nome model
             class_names: Nomi classi
         
         Returns:
@@ -537,7 +537,7 @@ class ConfusionMatrixVisualizer:
         fig = px.imshow(
             cm_norm,
             text_auto=False,
-            title=f"Confusion Matrix Dettagliata - {model_display_name}",
+            title=f"Detailed Confusion Matrix - {model_display_name}",
             labels={'x': 'Predicted', 'y': 'Actual', 'color': 'Rate'},
             x=class_names,
             y=class_names,
@@ -568,11 +568,11 @@ class FeatureImportanceVisualizer:
     @staticmethod
     def create_feature_importance_chart(feature_importance_dict, top_n=15):
         """
-        Chart feature importance per singolo modello
+        Chart feature importance per singolo model
         
         Args:
             feature_importance_dict: Dizionario {feature: importance}
-            top_n: Numero top features da mostrare
+            top_n: Numero top features da showre
         
         Returns:
             Plotly figure
@@ -605,7 +605,7 @@ class FeatureImportanceVisualizer:
     @staticmethod
     def create_feature_importance_comparison(importance_data_dict):
         """
-        Confronto feature importance tra modelli
+        Comparison feature importance tra models
         
         Args:
             importance_data_dict: {model_name: {feature: importance}}
@@ -618,7 +618,7 @@ class FeatureImportanceVisualizer:
         for importances in importance_data_dict.values():
             all_features.update(importances.keys())
         
-        # Seleziona top features globali
+        # Select top features globali
         global_importance = {}
         for feature in all_features:
             total_importance = sum(
@@ -647,7 +647,7 @@ class FeatureImportanceVisualizer:
             ))
         
         fig.update_layout(
-            title="Confronto Feature Importance tra Modelli",
+            title="Comparison Feature Importance tra Modelli",
             xaxis_title="Features",
             yaxis_title="Importance Score",
             barmode='group',
@@ -663,7 +663,7 @@ class FeatureImportanceVisualizer:
         Heatmap feature importance
         
         Args:
-            importance_matrix_df: DataFrame con modelli come righe, features come colonne
+            importance_matrix_df: DataFrame con models come rows, features come columns
         
         Returns:
             Plotly figure
@@ -688,16 +688,16 @@ class FeatureImportanceVisualizer:
 
 class PredictionVisualizer:
     """
-    Visualizzazioni per analisi predizioni
+    Visualizzazioni per analysis predictions
     """
     
     @staticmethod
     def create_prediction_confidence_chart(predictions_data):
         """
-        Chart confidence predizioni
+        Chart confidence predictions
         
         Args:
-            predictions_data: DataFrame con colonne Model, Probability, Prediction
+            predictions_data: DataFrame con columns Model, Probability, Prediction
         
         Returns:
             Plotly figure
@@ -707,10 +707,10 @@ class PredictionVisualizer:
             x='Model',
             y='Probability',
             color='Prediction',
-            title="Confidence Predizioni per Modello",
+            title="Confidence Predictions per Modello",
             color_discrete_map={
-                'Sopravvive': COLOR_PALETTES['success'], 
-                'Non Sopravvive': COLOR_PALETTES['danger']
+                'Survives': COLOR_PALETTES['success'], 
+                'Does Not Survive': COLOR_PALETTES['danger']
             }
         )
         
@@ -729,10 +729,10 @@ class PredictionVisualizer:
     @staticmethod
     def create_consensus_visualization(consensus_data):
         """
-        Visualizza consensus tra modelli
+        Visualizza consensus tra models
         
         Args:
-            consensus_data: Dati consensus da ModelComparison
+            consensus_data: Data consensus da ModelComparison
         
         Returns:
             Plotly figure
@@ -742,11 +742,11 @@ class PredictionVisualizer:
         
         fig = go.Figure()
         
-        # Distribuzione consensus scores
+        # Distribution consensus scores
         fig.add_trace(go.Histogram(
             x=consensus_data['consensus_scores'],
             nbinsx=20,
-            name='Distribuzione Consensus',
+            name='Distribution Consensus',
             marker_color=COLOR_PALETTES['primary'],
             opacity=0.7
         ))
@@ -767,9 +767,9 @@ class PredictionVisualizer:
         )
         
         fig.update_layout(
-            title="Distribuzione Consensus tra Modelli",
-            xaxis_title="Consensus Score (0=tutti concordano 'No', 1=tutti concordano 'Sì')",
-            yaxis_title="Numero Predizioni",
+            title="Consensus Distribution Across Models",
+            xaxis_title="Consensus Score (0=all agree 'No', 1=all agree 'Yes')",
+            yaxis_title="Number of Predictions",
             height=400
         )
         
@@ -778,10 +778,10 @@ class PredictionVisualizer:
     @staticmethod
     def create_probability_distribution_chart(probabilities_dict, bins=30):
         """
-        Distribuzione probabilità per tutti i modelli
+        Distribution probabilitÃ  per tutti i models
         
         Args:
-            probabilities_dict: {model_name: array probabilità}
+            probabilities_dict: {model_name: array probabilitÃ }
             bins: Numero bins istogramma
         
         Returns:
@@ -808,13 +808,13 @@ class PredictionVisualizer:
             x=0.5,
             line_dash="dash",
             line_color="red",
-            annotation_text="Soglia Decisione"
+            annotation_text="Decision Threshold"
         )
         
         fig.update_layout(
-            title="Distribuzione Probabilità Predizioni",
-            xaxis_title="Probabilità Sopravvivenza",
-            yaxis_title="Frequenza",
+            title="Prediction Probability Distribution",
+            xaxis_title="Survival Probability",
+            yaxis_title="Frequency",
             barmode='overlay',
             height=500
         )
@@ -825,16 +825,16 @@ class PredictionVisualizer:
 
 class ErrorAnalysisVisualizer:
     """
-    Visualizzazioni per analisi errori
+    Visualizzazioni per analysis errori
     """
     
     @staticmethod
     def create_error_distribution_chart(error_data, feature_name):
         """
-        Distribuzione errori per feature
+        Distribution errori per feature
         
         Args:
-            error_data: DataFrame con colonne Feature_Value, Error, Actual, Predicted
+            error_data: DataFrame con columns Feature_Value, Error, Actual, Predicted
             feature_name: Nome della feature
         
         Returns:
@@ -844,7 +844,7 @@ class ErrorAnalysisVisualizer:
             error_data,
             x='Feature_Value',
             color='Error',
-            title=f"Distribuzione Errori per {feature_name}",
+            title=f"Error Distribution for {feature_name}",
             color_discrete_map={
                 True: COLOR_PALETTES['danger'], 
                 False: COLOR_PALETTES['success']
@@ -860,7 +860,7 @@ class ErrorAnalysisVisualizer:
     @staticmethod
     def create_error_types_chart(error_summary):
         """
-        Chart tipi di errore (TP, TN, FP, FN)
+        Chart tipi di error (TP, TN, FP, FN)
         
         Args:
             error_summary: Dizionario con conteggi errori
@@ -890,8 +890,8 @@ class ErrorAnalysisVisualizer:
         ])
         
         fig.update_layout(
-            title="Distribuzione Tipi di Predizione",
-            yaxis_title="Numero Predizioni",
+            title="Prediction Type Distribution",
+            yaxis_title="Number of Predictions",
             height=400,
             showlegend=False
         )
@@ -902,17 +902,17 @@ class ErrorAnalysisVisualizer:
 
 class CalibrationVisualizer:
     """
-    Visualizzazioni calibrazione modelli
+    Visualizzazioni calibrazione models
     """
     
     @staticmethod
     def create_calibration_plot(y_test, probabilities_dict, n_bins=10):
         """
-        Plot calibrazione per multiple modelli
+        Plot calibrazione per multiple models
         
         Args:
             y_test: Target veri
-            probabilities_dict: Probabilità per modello
+            probabilities_dict: ProbabilitÃ  per model
             n_bins: Numero bins per calibrazione
         
         Returns:
@@ -949,7 +949,7 @@ class CalibrationVisualizer:
                 ))
         
         fig.update_layout(
-            title='Calibration Plot - Affidabilità Probabilità',
+            title='Calibration Plot - Probability Reliability',
             xaxis_title='Mean Predicted Probability',
             yaxis_title='Fraction of Positives',
             height=500,
@@ -961,12 +961,12 @@ class CalibrationVisualizer:
     @staticmethod
     def create_reliability_diagram(y_test, probabilities, model_name, n_bins=10):
         """
-        Diagramma affidabilità per singolo modello
+        Diagramma affidabilitÃ  per singolo model
         
         Args:
             y_test: Target veri
-            probabilities: Probabilità modello
-            model_name: Nome modello
+            probabilities: ProbabilitÃ  model
+            model_name: Nome model
             n_bins: Numero bins
         
         Returns:
@@ -988,7 +988,7 @@ class CalibrationVisualizer:
             rows=1, cols=2,
             subplot_titles=[
                 f'Reliability Diagram - {model_display_name}',
-                'Histogram delle Probabilità'
+                'Probability Histogram'
             ],
             column_widths=[0.7, 0.3]
         )
@@ -1022,7 +1022,7 @@ class CalibrationVisualizer:
             go.Histogram(
                 x=probabilities,
                 nbinsx=n_bins,
-                name='Distribuzione Probabilità',
+                name='Probability Distribution',
                 marker_color='lightblue',
                 opacity=0.7
             ),
@@ -1046,11 +1046,11 @@ class LearningCurveVisualizer:
     @staticmethod
     def create_learning_curve_chart(learning_curve_data, model_name):
         """
-        Learning curve per analisi overfitting/underfitting
+        Learning curve per analysis overfitting/underfitting
         
         Args:
-            learning_curve_data: Dati da create_learning_curves
-            model_name: Nome modello
+            learning_curve_data: Data da create_learning_curves
+            model_name: Nome model
         
         Returns:
             Plotly figure
@@ -1079,7 +1079,7 @@ class LearningCurveVisualizer:
             )
         ))
         
-        # Validation scores
+        # Validataon scores
         fig.add_trace(go.Scatter(
             x=train_sizes,
             y=val_mean,
@@ -1104,16 +1104,16 @@ class LearningCurveVisualizer:
         return fig
     
     @staticmethod
-    def create_validation_curve_chart(param_range, train_scores, val_scores, param_name, model_name):
+    def create_validataon_curve_chart(param_range, train_scores, val_scores, param_name, model_name):
         """
-        Validation curve per analisi iperparametri
+        Validataon curve per analysis iperparametri
         
         Args:
             param_range: Range valori parametro
             train_scores: Scores training
-            val_scores: Scores validation
+            val_scores: Scores validataon
             param_name: Nome parametro
-            model_name: Nome modello
+            model_name: Nome model
         
         Returns:
             Plotly figure
@@ -1137,12 +1137,12 @@ class LearningCurveVisualizer:
             error_y=dict(type='data', array=train_std, visible=True)
         ))
         
-        # Validation scores
+        # Validataon scores
         fig.add_trace(go.Scatter(
             x=param_range,
             y=val_mean,
             mode='lines+markers',
-            name='Validation Score',
+            name='Validataon Score',
             line=dict(color=COLOR_PALETTES['secondary']),
             error_y=dict(type='data', array=val_std, visible=True)
         ))
@@ -1160,16 +1160,16 @@ class LearningCurveVisualizer:
 
 class AdvancedAnalysisVisualizer:
     """
-    Visualizzazioni per analisi avanzate
+    Visualizzazioni per analysis avanzate
     """
     
     @staticmethod
     def create_bias_variance_analysis(models_performance):
         """
-        Analisi bias-variance trade-off
+        Analysis bias-variance trade-off
         
         Args:
-            models_performance: Performance modelli con varianza
+            models_performance: Performance models con varianza
         
         Returns:
             Plotly figure
@@ -1215,10 +1215,10 @@ class AdvancedAnalysisVisualizer:
     @staticmethod
     def create_model_complexity_chart(models_info):
         """
-        Confronto complessità modelli vs performance
+        Comparison complessitÃ  models vs performance
         
         Args:
-            models_info: Info modelli con complessità e performance
+            models_info: Info models con complessitÃ  e performance
         
         Returns:
             Plotly figure
@@ -1231,7 +1231,7 @@ class AdvancedAnalysisVisualizer:
             model_display_name = ML_MODELS.get(model_name, {}).get('name', model_name)
             model_names.append(model_display_name)
             
-            # Complexity score basato su tipo modello
+            # Complexity score basato su tipo model
             complexity_map = {
                 'LogisticRegression': 1,
                 'DecisionTreeClassifier': 2,
@@ -1276,7 +1276,7 @@ class AdvancedAnalysisVisualizer:
         Impatto feature selection su performance
         
         Args:
-            feature_selection_results: Risultati con diversi numeri di features
+            feature_selection_results: Results con diversi numeri di features
         
         Returns:
             Plotly figure
@@ -1306,8 +1306,8 @@ class AdvancedAnalysisVisualizer:
         ))
         
         fig.update_layout(
-            title='Impatto Feature Selection su Performance',
-            xaxis_title='Numero Features',
+            title='Feature Selection Impact on Performance',
+            xaxis_title='Number of Features',
             yaxis_title='Cross-Validation Score',
             height=500
         )
@@ -1327,8 +1327,8 @@ class EnsembleVisualizer:
         Visualizza pesi ensemble
         
         Args:
-            ensemble_weights: Array pesi modelli
-            model_names: Nomi modelli
+            ensemble_weights: Array pesi models
+            model_names: Nomi models
         
         Returns:
             Plotly figure
@@ -1346,9 +1346,9 @@ class EnsembleVisualizer:
         ])
         
         fig.update_layout(
-            title='Pesi Ensemble Models',
-            xaxis_title='Modelli',
-            yaxis_title='Peso',
+            title='Ensemble Model Weights',
+            xaxis_title='Models',
+            yaxis_title='Weight',
             height=400
         )
         
@@ -1357,15 +1357,15 @@ class EnsembleVisualizer:
     @staticmethod
     def create_ensemble_diversity_chart(predictions_matrix):
         """
-        Analisi diversità predizioni ensemble
+        Analysis diversitÃ  predictions ensemble
         
         Args:
-            predictions_matrix: Matrice predizioni (samples x models)
+            predictions_matrix: Matrice predictions (samples x models)
         
         Returns:
             Plotly figure
         """
-        # Calcola agreement tra modelli
+        # Calcola agreement tra models
         n_models = predictions_matrix.shape[1]
         agreement_scores = []
         
@@ -1379,15 +1379,15 @@ class EnsembleVisualizer:
         fig.add_trace(go.Histogram(
             x=agreement_scores,
             nbinsx=20,
-            name='Distribuzione Agreement',
+            name='Distribution Agreement',
             marker_color=COLOR_PALETTES['primary'],
             opacity=0.7
         ))
         
         fig.update_layout(
-            title='Diversità Predizioni Ensemble',
-            xaxis_title='Agreement Score (0=max diversità, 1=completo accordo)',
-            yaxis_title='Numero Samples',
+            title='Ensemble Prediction Diversity',
+            xaxis_title='Agreement Score (0=max diversity, 1=full agreement)',
+            yaxis_title='Number of Samples',
             height=400
         )
         
@@ -1397,11 +1397,11 @@ class EnsembleVisualizer:
 
 def create_comprehensive_model_report_visualization(evaluation_results, training_results=None):
     """
-    Crea visualizzazione report completo
+    Crea display report completo
     
     Args:
-        evaluation_results: Risultati evaluazione
-        training_results: Risultati training (opzionale)
+        evaluation_results: Results evaluazione
+        training_results: Results training (opzionale)
     
     Returns:
         Lista di figure per report completo
@@ -1423,7 +1423,7 @@ def create_comprehensive_model_report_visualization(evaluation_results, training
     
     for model_name in evaluation_results.keys():
         if model_name in models_with_importance:
-            # Placeholder - in pratica verrebbe dal modello addestrato
+            # Placeholder - in pratica verrebbe dal model addestrato
             importance_data[model_name] = {f'feature_{i}': np.random.random() for i in range(10)}
     
     if importance_data:
@@ -1439,7 +1439,7 @@ def create_comprehensive_model_report_visualization(evaluation_results, training
 
 def save_visualization(fig, filepath, format='html'):
     """
-    Salva visualizzazione
+    Salva display
     
     Args:
         fig: Plotly figure
@@ -1491,7 +1491,7 @@ def create_interactive_dashboard_components(evaluation_results):
     Crea componenti per dashboard interattiva
     
     Args:
-        evaluation_results: Risultati evaluazione
+        evaluation_results: Results evaluazione
     
     Returns:
         Dizionario con componenti dashboard
@@ -1514,3 +1514,5 @@ def create_interactive_dashboard_components(evaluation_results):
     components['heatmap'] = perf_viz.create_performance_heatmap(evaluation_results)
     
     return components
+
+

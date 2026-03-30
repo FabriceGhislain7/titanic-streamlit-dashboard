@@ -1,6 +1,6 @@
 """
 src/models/model_evaluator.py
-Valutazione e analisi performance modelli Machine Learning
+Machine learning model evaluation and performance analysis
 """
 
 import logging
@@ -40,13 +40,13 @@ logger.info(f"Caricamento {__name__}")
 
 class ModelEvaluator:
     """
-    Classe principale per valutazione modelli
+    Main class for model evaluation
     """
     
     def __init__(self, models_dict, X_test, y_test):
         """
         Args:
-            models_dict: Dizionario {nome_modello: modello_addestrato}
+            models_dict: Dictionary {model_name: trained_model}
             X_test: Features test set
             y_test: Target test set
         """
@@ -63,38 +63,38 @@ class ModelEvaluator:
         
     def evaluate_all_models(self, detailed=True):
         """
-        Valuta tutti i modelli disponibili
+        Evaluate all available models
         
         Args:
             detailed: Se includere metriche dettagliate
         
         Returns:
-            Dizionario con risultati valutazione
+            Dictionary with evaluation results
         """
-        logger.info(f"Valutazione di {len(self.models)} modelli (detailed={detailed})")
+        logger.info(f"Evaluation of {len(self.models)} models (detailed={detailed})")
         
         for model_name, model_data in self.models.items():
-            logger.debug(f"Valutazione modello: {model_name}")
+            logger.debug(f"Model evaluation: {model_name}")
             self.evaluation_results[model_name] = self.evaluate_single_model(
                 model_name, model_data, detailed=detailed
             )
         
-        logger.info("Valutazione completata per tutti i modelli")
+        logger.info("Evaluation completed for all models")
         return self.evaluation_results
     
     def evaluate_single_model(self, model_name, model_data, detailed=True):
         """
-        Valuta singolo modello
+        Evaluate a single model
         
         Args:
-            model_name: Nome del modello
-            model_data: Dati del modello (model + preprocessor)
+            model_name: Model name
+            model_data: Model data (model + preprocessor)
             detailed: Se includere analisi dettagliate
         
         Returns:
-            Risultati valutazione del modello
+            Model evaluation results
         """
-        logger.info(f"Valutazione modello {model_name}")
+        logger.info(f"Model evaluation {model_name}")
         
         model = model_data['model']
         preprocessor = model_data.get('preprocessor')
@@ -134,7 +134,7 @@ class ModelEvaluator:
             if y_pred_proba is not None:
                 results.update(self._calculate_probability_metrics(y_pred_proba))
         
-        # Informazioni modello
+        # Model information
         results['model_info'] = self._get_model_info(model_name, model)
         
         logger.info(f"Valutazione completata per {model_name}")
@@ -232,8 +232,8 @@ class ModelEvaluator:
         return fp / (fp + tn) if (fp + tn) > 0 else 0
     
     def _get_model_info(self, model_name, model):
-        """Ottieni informazioni sul modello"""
-        logger.debug(f"Recupero info per modello {model_name}")
+        """Get model information"""
+        logger.debug(f"Fetching info for model {model_name}")
         return {
             'name': ML_MODELS.get(model_name, {}).get('name', model_name),
             'type': model_name,
@@ -245,7 +245,7 @@ class ModelEvaluator:
 
 class ModelComparison:
     """
-    Classe per confronto tra modelli
+    Class for model comparison
     """
     
     def __init__(self, evaluation_results):
@@ -282,21 +282,21 @@ class ModelComparison:
             
             comparison_data.append(row)
         
-        logger.debug(f"Tabella confronto generata con {len(comparison_data)} modelli")
+        logger.debug(f"Comparison table generated with {len(comparison_data)} modelli")
         return pd.DataFrame(comparison_data)
     
     def rank_models(self, metric='f1', ascending=False):
         """
-        Classifica modelli per metrica
+        Rank models by metric
         
         Args:
             metric: Metrica per ranking
             ascending: Ordine crescente
         
         Returns:
-            Lista ordinata di modelli
+            Ordered list of models
         """
-        logger.info(f"Ranking modelli per metrica: {metric}")
+        logger.info(f"Model ranking for metric: {metric}")
         
         rankings = []
         
@@ -309,39 +309,39 @@ class ModelComparison:
             })
         
         rankings = sorted(rankings, key=lambda x: x['score'], reverse=not ascending)
-        logger.debug(f"Top 3 modelli: {rankings[:3]}")
+        logger.debug(f"Top 3 models: {rankings[:3]}")
         return rankings
     
     def find_best_model(self, metric='f1'):
         """
-        Trova miglior modello per metrica
+        Find the best model by metric
         
         Args:
             metric: Metrica di riferimento
         
         Returns:
-            Dizionario con info miglior modello
+            Dictionary with best-model info
         """
-        logger.info(f"Ricerca miglior modello per metrica: {metric}")
+        logger.info(f"Searching best model for metric: {metric}")
         rankings = self.rank_models(metric)
         if rankings:
             best = rankings[0]
-            logger.info(f"Miglior modello trovato: {best['name']} (score={best['score']})")
+            logger.info(f"Best model found: {best['name']} (score={best['score']})")
             return {
                 'model_type': best['model'],
                 'model_name': best['name'],
                 'score': best['score'],
                 'metric': metric
             }
-        logger.warning("Nessun modello disponibile per la ricerca")
+        logger.warning("No model available for the search")
         return None
     
     def calculate_model_consensus(self):
         """
-        Calcola consensus tra modelli per ogni predizione
+        Calculate consensus across models for each prediction
         
         Returns:
-            Analisi consensus
+            Consensus analysis
         """
         logger.info("Calcolo model consensus")
         if not hasattr(self, 'evaluator'):
@@ -382,18 +382,18 @@ class ModelComparison:
 
 class StatisticalTests:
     """
-    Test statistici per confronto modelli
+    Statistical tests for model comparison
     """
     
     @staticmethod
     def mcnemar_test(y_true, y_pred1, y_pred2):
         """
-        Test di McNemar per confronto di due modelli
+        McNemar test for comparing two models
         
         Args:
             y_true: Valori veri
-            y_pred1: Predizioni modello 1
-            y_pred2: Predizioni modello 2
+            y_pred1: Predictions from model 1
+            y_pred2: Predictions from model 2
         
         Returns:
             Risultati test McNemar
@@ -442,15 +442,15 @@ class StatisticalTests:
         T-test appaiato per confronto cross-validation scores
         
         Args:
-            scores1: Scores modello 1
-            scores2: Scores modello 2
+            scores1: Scores for model 1
+            scores2: Scores for model 2
         
         Returns:
             Risultati t-test
         """
         logger.info("Esecuzione paired t-test")
-        logger.debug(f"Score modello 1: media={np.mean(scores1)}, std={np.std(scores1)}")
-        logger.debug(f"Score modello 2: media={np.mean(scores2)}, std={np.std(scores2)}")
+        logger.debug(f"Score modello 1: mean={np.mean(scores1)}, std={np.std(scores1)}")
+        logger.debug(f"Score modello 2: mean={np.mean(scores2)}, std={np.std(scores2)}")
         
         statistic, p_value = stats.ttest_rel(scores1, scores2)
         
@@ -470,15 +470,15 @@ class StatisticalTests:
         Test di Wilcoxon per confronto non-parametrico
         
         Args:
-            scores1: Scores modello 1
-            scores2: Scores modello 2
+            scores1: Scores for model 1
+            scores2: Scores for model 2
         
         Returns:
             Risultati test Wilcoxon
         """
         logger.info("Esecuzione Wilcoxon test")
-        logger.debug(f"Score modello 1: mediana={np.median(scores1)}")
-        logger.debug(f"Score modello 2: mediana={np.median(scores2)}")
+        logger.debug(f"Score modello 1: median={np.median(scores1)}")
+        logger.debug(f"Score modello 2: median={np.median(scores2)}")
         
         statistic, p_value = stats.wilcoxon(scores1, scores2)
         
@@ -495,12 +495,12 @@ class StatisticalTests:
 
 class ErrorAnalysis:
     """
-    Analisi dettagliata degli errori
+    Detailed error analysis
     """
     
     def __init__(self, X_test, y_test, predictions, feature_names=None):
         logger.info("Inizializzazione ErrorAnalysis")
-        logger.debug(f"Numero modelli: {len(predictions)}, Numero feature: {len(feature_names) if feature_names else X_test.shape[1]}")
+        logger.debug(f"Number of models: {len(predictions)}, Number of features: {len(feature_names) if feature_names else X_test.shape[1]}")
         
         self.X_test = X_test
         self.y_test = y_test
@@ -509,15 +509,15 @@ class ErrorAnalysis:
         
     def analyze_prediction_errors(self, model_name):
         """
-        Analizza errori di predizione per singolo modello
+        Analyze prediction errors for a single model
         
         Args:
-            model_name: Nome del modello
+            model_name: Model name
         
         Returns:
-            Analisi errori
+            Error analysis
         """
-        logger.info(f"Analisi errori per modello {model_name}")
+        logger.info(f"Error analysis per modello {model_name}")
         
         if model_name not in self.predictions:
             logger.warning(f"Modello {model_name} non trovato nelle predizioni")
@@ -532,7 +532,7 @@ class ErrorAnalysis:
         
         logger.debug(f"Errori totali: {np.sum(errors)}, FP: {np.sum(false_positives)}, FN: {np.sum(false_negatives)}")
         
-        # Analisi per feature
+        # Analysis by feature
         error_analysis = {}
         
         for feature in self.feature_names:
@@ -547,7 +547,7 @@ class ErrorAnalysis:
                     'error_correlation': np.corrcoef(feature_values, errors.astype(int))[0,1] if len(np.unique(feature_values)) > 1 else 0
                 }
         
-        logger.info(f"Analisi errori completata per {model_name}")
+        logger.info(f"Error analysis completata per {model_name}")
         return {
             'total_errors': np.sum(errors),
             'false_positives': np.sum(false_positives),
@@ -559,15 +559,15 @@ class ErrorAnalysis:
     
     def find_difficult_samples(self, threshold=0.5):
         """
-        Trova campioni difficili da classificare
+        Find difficult-to-classify samples
         
         Args:
-            threshold: Soglia per definire campioni difficili
+            threshold: Soglia per definire difficult samples
         
         Returns:
-            Analisi campioni difficili
+            Difficult sample analysis
         """
-        logger.info(f"Ricerca campioni difficili con threshold={threshold}")
+        logger.info(f"Ricerca difficult samples con threshold={threshold}")
         
         # Conta errori per campione
         error_counts = np.zeros(len(self.y_test))
@@ -586,9 +586,9 @@ class ErrorAnalysis:
             logger.info("Nessun campione difficile trovato")
             return {'difficult_samples': 0, 'indices': []}
         
-        logger.info(f"Trovati {len(difficult_indices)} campioni difficili")
+        logger.info(f"Trovati {len(difficult_indices)} difficult samples")
         
-        # Analisi campioni difficili
+        # Difficult sample analysis
         difficult_samples = self.X_test.iloc[difficult_indices]
         difficult_targets = self.y_test.iloc[difficult_indices]
         
@@ -606,15 +606,15 @@ class ErrorAnalysis:
         Analizza pattern di misclassificazione
         
         Returns:
-            Pattern comuni di errore
+            Common error patterns
         """
-        logger.info("Analisi pattern di misclassificazione")
+        logger.info("Misclassification pattern analysis")
         patterns = {}
         
         for model_name, y_pred in self.predictions.items():
-            logger.debug(f"Analisi pattern per modello {model_name}")
+            logger.debug(f"Pattern analysis for model {model_name}")
             
-            # Pattern per questo modello
+            # Patterns for this model
             fp_indices = np.where((y_pred == 1) & (self.y_test == 0))[0]
             fn_indices = np.where((y_pred == 0) & (self.y_test == 1))[0]
             
@@ -623,7 +623,7 @@ class ErrorAnalysis:
                 'false_negative_patterns': self._analyze_feature_patterns(fn_indices)
             }
         
-        logger.info("Analisi pattern completata")
+        logger.info("Pattern analysis completed")
         return patterns
     
     def _analyze_feature_patterns(self, error_indices):
@@ -664,7 +664,7 @@ class PerformanceMonitor:
         Registra performance per monitoraggio
         
         Args:
-            model_name: Nome modello
+            model_name: Model name
             metrics: Dizionario metriche
             timestamp: Timestamp (default: ora corrente)
         """
@@ -685,14 +685,14 @@ class PerformanceMonitor:
         Ottieni trend performance
         
         Args:
-            model_name: Nome modello
+            model_name: Model name
             metric: Metrica da analizzare
             periods: Numero di periodi
         
         Returns:
             Trend analysis
         """
-        logger.info(f"Analisi trend per {model_name} su metrica {metric}")
+        logger.info(f"Trend analysis for {model_name} on metric {metric}")
         
         model_history = [
             entry for entry in self.performance_history[-periods:]
@@ -730,7 +730,7 @@ class PerformanceMonitor:
         Rileva degradazione performance
         
         Args:
-            model_name: Nome modello
+            model_name: Model name
             metric: Metrica da monitorare
             threshold: Soglia di degradazione
         
@@ -809,9 +809,9 @@ class InterpretabilityMetrics:
             probabilities: Array di probabilità
         
         Returns:
-            Analisi distribuzione confidence
+            Confidence distribution analysis
         """
-        logger.info("Analisi distribuzione confidence predizioni")
+        logger.info("Confidence distribution analysis predizioni")
         
         # Converte probabilità in confidence (distanza da 0.5)
         confidence = np.abs(probabilities - 0.5) * 2
@@ -835,7 +835,7 @@ class InterpretabilityMetrics:
 
 class EvaluationReportGenerator:
     """
-    Generatore di report di valutazione
+    Evaluation report generator
     """
     
     def __init__(self, evaluation_results):
@@ -886,7 +886,7 @@ class EvaluationReportGenerator:
         return summary
     
     def _identify_model_strengths(self, results):
-        """Identifica punti di forza del modello"""
+        """Identify model strengths"""
         strengths = []
         
         if results.get('precision', 0) > 0.8:
@@ -901,7 +901,7 @@ class EvaluationReportGenerator:
         return strengths
     
     def _identify_model_weaknesses(self, results):
-        """Identifica punti deboli del modello"""
+        """Identify model weaknesses"""
         weaknesses = []
         
         if results.get('precision', 1) < 0.7:

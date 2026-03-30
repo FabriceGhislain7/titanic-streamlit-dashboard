@@ -1,6 +1,6 @@
 """
 src/utils/statistical_analysis.py
-Funzioni per analisi statistiche avanzate
+Functions for advanced statistical analysis
 """
 
 import pandas as pd
@@ -12,31 +12,31 @@ from sklearn.cluster import KMeans
 import streamlit as st
 
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
-# ----------------1. Correlazioni con Target (da notebook correlazioni estese)
+# ----------------1. Correlations with Target (da notebook correlazioni estese)
 def calculate_target_correlations(df, target_col):
     """
-    Calcola correlazioni di tutte le variabili con il target
-    Estende notebook sezione 4.1.2
+    Calculate correlations for all variables with the target
+    Extends notebook section 4.1.2
     """
-    logger.info(f"Esecuzione calculate_target_correlations per target={target_col}")
+    logger.info(f"Running calculate_target_correlations per target={target_col}")
     if df is None or target_col not in df.columns:
-        logger.warning(f"DataFrame vuoto o colonna target {target_col} mancante")
+        logger.warning(f"Empty DataFrame or target column {target_col} missing")
         return None
     
-    # Seleziona solo variabili numeriche
+    # Select only numerical variables
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     numeric_cols = [col for col in numeric_cols if col not in ['PassengerId', target_col]]
     
     if len(numeric_cols) == 0:
-        logger.warning("Nessuna colonna numerica trovata")
+        logger.warning("No numerical column found")
         return None
     
     correlations = {}
     
     for col in numeric_cols:
-        if df[col].notna().sum() > 10:  # Solo se abbiamo abbastanza dati
+        if df[col].notna().sum() > 10:  # Only if enough data is available
             corr_pearson = df[col].corr(df[target_col])
             corr_spearman = df[col].corr(df[target_col], method='spearman')
             
@@ -45,78 +45,78 @@ def calculate_target_correlations(df, target_col):
                 'Spearman': corr_spearman,
                 'Abs_Pearson': abs(corr_pearson)
             }
-            logger.debug(f"Calcolate correlazioni per {col}: Pearson={corr_pearson:.2f}, Spearman={corr_spearman:.2f}")
+            logger.debug(f"Calculated correlations for {col}: Pearson={corr_pearson:.2f}, Spearman={corr_spearman:.2f}")
     
-    # Converti in DataFrame e ordina per correlazione assoluta
+    # Convert to DataFrame and sort by absolute correlation
     corr_df = pd.DataFrame(correlations).T
     corr_df = corr_df.sort_values('Abs_Pearson', ascending=False)
     
-    logger.info(f"Calcolate correlazioni per {len(correlations)} variabili")
+    logger.info(f"Calculated correlations for {len(correlations)} variables")
     return corr_df['Abs_Pearson']
 
-# ----------------2. Test Normalità (estensione analisi distribuzione)
+# ----------------2. Test NormalitÃ  (estensione analisi distribuzione)
 def calculate_normality_statistics(df, variable):
     """
-    Calcola statistiche di normalità per una variabile
+    Calcola statistics di normalitÃ  per una variable
     """
-    logger.info(f"Esecuzione calculate_normality_statistics per variabile={variable}")
+    logger.info(f"Running calculate_normality_statistics per variable={variable}")
     if df is None or variable not in df.columns:
-        logger.warning(f"DataFrame vuoto o colonna {variable} mancante")
+        logger.warning(f"DataFrame vuoto o column {variable} missing")
         return None
     
     data = df[variable].dropna()
     
     if len(data) < 20:
-        logger.warning(f"Dati insufficienti per {variable} (n={len(data)})")
-        return {"Errore": "Dati insufficienti"}
+        logger.warning(f"Insufficient data per {variable} (n={len(data)})")
+        return {"Error": "Insufficient data"}
     
-    # Statistiche di base
+    # Base statistics
     mean_val = data.mean()
     median_val = data.median()
     std_val = data.std()
     skewness = stats.skew(data)
     kurtosis = stats.kurtosis(data)
     
-    logger.debug(f"Statistiche base per {variable}: mean={mean_val:.2f}, skewness={skewness:.2f}")
+    logger.debug(f"Base statistics for {variable}: mean={mean_val:.2f}, skewness={skewness:.2f}")
     
-    # Test Shapiro-Wilk (per campioni piccoli)
+    # Test Shapiro-Wilk (for small samples)
     if len(data) <= 5000:
         shapiro_stat, shapiro_p = stats.shapiro(data)
     else:
         shapiro_stat, shapiro_p = np.nan, np.nan
-        logger.debug(f"Shapiro-Wilk non eseguito per n={len(data)} > 5000")
+        logger.debug(f"Shapiro-Wilk not executed per n={len(data)} > 5000")
     
     # Test Kolmogorov-Smirnov
-    # Normalizza i dati per il test
+    # Normalize the data for the test
     normalized_data = (data - mean_val) / std_val
     ks_stat, ks_p = stats.kstest(normalized_data, 'norm')
     
     result = {
-        "Media": mean_val,
-        "Mediana": median_val,
-        "Deviazione Standard": std_val,
+        "Mean": mean_val,
+        "Meanna": median_val,
+        "Standard Deviation": std_val,
         "Skewness": skewness,
         "Kurtosis": kurtosis,
         "Shapiro p-value": shapiro_p,
         "KS p-value": ks_p
     }
     
-    logger.debug(f"Risultati test normalità per {variable}: {result}")
+    logger.debug(f"Risultati test normalitÃ  per {variable}: {result}")
     return result
 
 # ----------------3. Feature Importance Proxy (senza ML)
 def calculate_feature_importance_proxy(df, target_col):
     """
-    Calcola importanza approssimata delle feature senza ML
+    Calculate approximate feature importance without ML
     """
-    logger.info(f"Esecuzione calculate_feature_importance_proxy per target={target_col}")
+    logger.info(f"Running calculate_feature_importance_proxy per target={target_col}")
     if df is None or target_col not in df.columns:
-        logger.warning(f"DataFrame vuoto o colonna target {target_col} mancante")
+        logger.warning(f"Empty DataFrame or target column {target_col} missing")
         return None
     
     importance_scores = []
     
-    # Per variabili numeriche: correlazione assoluta
+    # For numerical variables: correlazione assoluta
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     numeric_cols = [col for col in numeric_cols if col not in ['PassengerId', target_col]]
     
@@ -128,14 +128,14 @@ def calculate_feature_importance_proxy(df, target_col):
                 'Importance': corr,
                 'Type': 'Numeric'
             })
-            logger.debug(f"Importanza numerica per {col}: {corr:.2f}")
+            logger.debug(f"Numerical importance for {col}: {corr:.2f}")
     
-    # Per variabili categoriche: Cramér's V
+    # For categorical variables: CramÃ©r's V
     categorical_cols = df.select_dtypes(include=['object']).columns
     categorical_cols = [col for col in categorical_cols if col not in ['Name', 'Ticket']]
     
     for col in categorical_cols:
-        if df[col].notna().sum() > 10 and df[col].nunique() < 20:  # Non troppi valori unici
+        if df[col].notna().sum() > 10 and df[col].nunique() < 20:  # Not too many unique values
             try:
                 cramers_v = calculate_cramers_v(df[col], df[target_col])
                 importance_scores.append({
@@ -143,81 +143,81 @@ def calculate_feature_importance_proxy(df, target_col):
                     'Importance': cramers_v,
                     'Type': 'Categorical'
                 })
-                logger.debug(f"Importanza categorica per {col}: {cramers_v:.2f}")
+                logger.debug(f"Categorical importance for {col}: {cramers_v:.2f}")
             except Exception as e:
-                logger.warning(f"Errore nel calcolo Cramers V per {col}: {str(e)}")
-                st.warning(f"Errore nel calcolo Cramers V per {col}: {str(e)}")
+                logger.warning(f"Error while calculating Cramers V for {col}: {str(e)}")
+                st.warning(f"Error while calculating Cramers V for {col}: {str(e)}")
                 continue
     
     if not importance_scores:
-        logger.warning("Nessun punteggio di importanza calcolato")
+        logger.warning("No importance score calculated")
         return None
     
     importance_df = pd.DataFrame(importance_scores)
     importance_df = importance_df.sort_values('Importance', ascending=False)
     
-    logger.info(f"Calcolata importanza per {len(importance_df)} features")
+    logger.info(f"Calculated importance for {len(importance_df)} features")
     return importance_df
 
-# ----------------4. Cramér's V per variabili categoriche
+# ----------------4. CramÃ©r's V per variables categoriche
 def calculate_cramers_v(x, y):
     """
-    Calcola Cramér's V per misurare associazione tra variabili categoriche
+    Calcola CramÃ©r's V per misurare associazione tra variables categoriche
     """
-    logger.debug(f"Calcolo Cramér's V tra {x.name} e {y.name}")
+    logger.debug(f"Calcolo CramÃ©r's V tra {x.name} e {y.name}")
     try:
-        # Rimuovi valori nulli
+        # Remove null values
         mask = x.notna() & y.notna()
         x_clean = x[mask]
         y_clean = y[mask]
         
         if len(x_clean) < 10:
-            logger.debug("Dati insufficienti per Cramér's V")
+            logger.debug("Insufficient data per CramÃ©r's V")
             return 0
         
-        # Tabella di contingenza
+        # Contingency table
         confusion_matrix = pd.crosstab(x_clean, y_clean)
         
         # Chi-square test
         chi2 = stats.chi2_contingency(confusion_matrix)[0]
         n = confusion_matrix.sum().sum()
         
-        # Cramér's V
+        # CramÃ©r's V
         min_dim = min(confusion_matrix.shape) - 1
         if min_dim == 0:
-            logger.debug("Dimensione minima zero in tabella contingenza")
+            logger.debug("Minimum dimension is zero in contingency table")
             return 0
         
         cramers_v = np.sqrt(chi2 / (n * min_dim))
-        logger.debug(f"Cramér's V calcolato: {cramers_v:.2f}")
+        logger.debug(f"CramÃ©r's V calcolato: {cramers_v:.2f}")
         return cramers_v
         
     except Exception as e:
-        logger.error(f"Errore nel calcolo Cramér's V: {str(e)}")
+        logger.error(f"Error nel calcolo CramÃ©r's V: {str(e)}")
         return 0
 
-# ----------------5. Pattern Mining - Pattern Sopravvivenza
+# ----------------5. Pattern Mining - Pattern Survival
 def discover_survival_patterns(df):
     """
-    Scopre pattern interessanti di sopravvivenza
+    Discover interesting survival patterns
     """
-    logger.info("Esecuzione discover_survival_patterns")
+    logger.info("Running discover_survival_patterns")
     if df is None or 'Survived' not in df.columns:
-        logger.warning("DataFrame vuoto o colonna 'Survived' mancante")
+        logger.warning("DataFrame vuoto o column 'Survived' missing")
         return None
     
     patterns = []
     
-    # Pattern per combinazioni di variabili
+    # Patterns for variable combinations
     categorical_vars = ['Sex', 'Pclass']
     if 'Title' in df.columns:
         categorical_vars.append('Title')
     if 'Deck' in df.columns:
         categorical_vars.append('Deck')
     
-    logger.debug(f"Analisi pattern per variabili: {categorical_vars}")
+    logger.debug(f"Pattern analysis for variables: {categorical_vars}")
     
-    # Analizza combinazioni a coppie
+    # Analyze pairwise combinations
     for i, var1 in enumerate(categorical_vars):
         for var2 in categorical_vars[i+1:]:
             if var1 in df.columns and var2 in df.columns:
@@ -255,14 +255,14 @@ def find_interesting_anomalies(df):
     """
     Trova passeggeri con caratteristiche inusuali ma significative
     """
-    logger.info("Esecuzione find_interesting_anomalies")
+    logger.info("Running find_interesting_anomalies")
     if df is None:
         logger.warning("DataFrame vuoto")
         return None
     
     anomalies = []
     
-    # Bambini in prima classe che non sono sopravvissuti
+    # Bambini in prima class che non sono survivors
     if 'Age' in df.columns:
         child_1st_died = df[
             (df['Age'] <= 12) & 
@@ -271,9 +271,9 @@ def find_interesting_anomalies(df):
         ]
         if len(child_1st_died) > 0:
             anomalies.append(child_1st_died)
-            logger.debug(f"Trovati {len(child_1st_died)} bambini in 1a classe non sopravvissuti")
+            logger.debug(f"Trovati {len(child_1st_died)} bambini in 1a class non survivors")
     
-    # Uomini di prima classe sopravvissuti (contro tendenza)
+    # Uomini di prima class survivors (contro tendenza)
     male_1st_survived = df[
         (df['Sex'] == 'male') & 
         (df['Pclass'] == 1) & 
@@ -281,9 +281,9 @@ def find_interesting_anomalies(df):
     ]
     if len(male_1st_survived) > 0:
         anomalies.append(male_1st_survived)
-        logger.debug(f"Trovati {len(male_1st_survived)} uomini in 1a classe sopravvissuti")
+        logger.debug(f"Trovati {len(male_1st_survived)} uomini in 1a class survivors")
     
-    # Donne di terza classe non sopravvissute
+    # Donne di terza class non sopravvissute
     female_3rd_died = df[
         (df['Sex'] == 'female') & 
         (df['Pclass'] == 3) & 
@@ -291,7 +291,7 @@ def find_interesting_anomalies(df):
     ]
     if len(female_3rd_died) > 0:
         anomalies.append(female_3rd_died)
-        logger.debug(f"Trovati {len(female_3rd_died)} donne in 3a classe non sopravvissute")
+        logger.debug(f"Trovati {len(female_3rd_died)} donne in 3a class non sopravvissute")
     
     if not anomalies:
         logger.info("Nessuna anomalia interessante trovata")
@@ -305,16 +305,16 @@ def find_interesting_anomalies(df):
 # ----------------7. Combinazioni Rare ma Significative
 def find_rare_but_significant_combinations(df):
     """
-    Trova combinazioni rare di caratteristiche con tassi di sopravvivenza estremi
+    Trova combinazioni rare di caratteristiche con tassi di survival estremi
     """
-    logger.info("Esecuzione find_rare_but_significant_combinations")
+    logger.info("Running find_rare_but_significant_combinations")
     if df is None or 'Survived' not in df.columns:
-        logger.warning("DataFrame vuoto o colonna 'Survived' mancante")
+        logger.warning("DataFrame vuoto o column 'Survived' missing")
         return None
     
     combinations = {}
     
-    # Combinazioni tripla: Sesso, Classe, Fascia Età
+    # Combinazioni tripla: Sesso, Class, Fascia EtÃ 
     if 'Age' in df.columns:
         df_temp = df.copy()
         df_temp['Age_Band'] = pd.cut(df_temp['Age'], bins=[0, 18, 60, 100], labels=['Young', 'Adult', 'Senior'])
@@ -338,7 +338,7 @@ def find_rare_but_significant_combinations(df):
             combinations[key] = {
                 'count': int(row['Count']),
                 'survival_rate': row['Survival_Rate'] * 100,
-                'significance': 'Alta' if row['Survival_Rate'] >= 0.8 or row['Survival_Rate'] <= 0.2 else 'Media'
+                'significance': 'High' if row['Survival_Rate'] >= 0.8 or row['Survival_Rate'] <= 0.2 else 'Medium'
             }
         logger.debug(f"Trovate {len(rare_significant)} combinazioni rare significative")
     
@@ -354,12 +354,12 @@ def create_passenger_segments(df):
     """
     Crea segmenti di passeggeri basati su caratteristiche multiple
     """
-    logger.info("Esecuzione create_passenger_segments")
+    logger.info("Running create_passenger_segments")
     if df is None:
         logger.warning("DataFrame vuoto")
         return None
     
-    # Seleziona variabili per clustering
+    # Seleziona variables per clustering
     cluster_vars = []
     
     if 'Age' in df.columns:
@@ -369,7 +369,7 @@ def create_passenger_segments(df):
     if 'Family_Size' in df.columns:
         cluster_vars.append('Family_Size')
     
-    # Aggiungi variabili encoded
+    # Aggiungi variables encoded
     if 'Sex' in df.columns:
         sex_encoded = (df['Sex'] == 'female').astype(int)
         cluster_vars.append('Sex_Encoded')
@@ -386,7 +386,7 @@ def create_passenger_segments(df):
     
     logger.debug(f"Variabili usate per clustering: {cluster_vars}")
     
-    # Prepara dati per clustering
+    # Prepara data per clustering
     cluster_data = df_cluster[cluster_vars].fillna(df_cluster[cluster_vars].median())
     
     # Normalizza
@@ -400,7 +400,7 @@ def create_passenger_segments(df):
         logger.info(f"Creati {len(np.unique(segments))} segmenti di passeggeri")
         return segments
     except Exception as e:
-        logger.error(f"Errore nel clustering: {str(e)}")
+        logger.error(f"Error nel clustering: {str(e)}")
         return None
 
 # ----------------9. Analisi Segmenti
@@ -408,9 +408,9 @@ def analyze_segments(df):
     """
     Analizza caratteristiche dei segmenti creati
     """
-    logger.info("Esecuzione analyze_segments")
+    logger.info("Running analyze_segments")
     if df is None or 'Segment' not in df.columns:
-        logger.warning("DataFrame vuoto o colonna 'Segment' mancante")
+        logger.warning("DataFrame vuoto o column 'Segment' missing")
         return None
     
     # Variabili da analizzare
@@ -418,10 +418,10 @@ def analyze_segments(df):
     available_vars = [var for var in analysis_vars if var in df.columns]
     
     if not available_vars:
-        logger.warning("Nessuna variabile disponibile per l'analisi")
+        logger.warning("Nessuna variable disponibile per l'analisi")
         return None
     
-    logger.debug(f"Analisi segmenti per variabili: {available_vars}")
+    logger.debug(f"Analisi segmenti per variables: {available_vars}")
     
     # Analisi per segmento
     segment_analysis = df.groupby('Segment')[available_vars].agg(['count', 'mean']).round(3)
@@ -438,29 +438,29 @@ def analyze_segments(df):
     if 'Pclass' in df.columns:
         avg_class = df.groupby('Segment')['Pclass'].mean()
         segment_analysis['Avg_Class'] = avg_class
-        logger.debug("Aggiunta classe media all'analisi")
+        logger.debug("Aggiunta class media all'analisi")
     
-    logger.info(f"Analisi segmenti completata per {len(available_vars)} variabili")
+    logger.info(f"Analisi segmenti completata per {len(available_vars)} variables")
     return segment_analysis
 
 # ----------------10. Profili Age-Fare-Class
 def create_age_fare_class_profiles(df):
     """
-    Crea profili basati su età, tariffa e classe
+    Crea profili basati su etÃ , tariffa e class
     """
-    logger.info("Esecuzione create_age_fare_class_profiles")
+    logger.info("Running create_age_fare_class_profiles")
     if df is None:
         logger.warning("DataFrame vuoto")
         return None
     
     required_vars = ['Age', 'Fare', 'Pclass']
     if not all(var in df.columns for var in required_vars):
-        logger.warning(f"Variabili mancanti: {[var for var in required_vars if var not in df.columns]}")
+        logger.warning(f"Variabili missing: {[var for var in required_vars if var not in df.columns]}")
         return None
     
     df_temp = df.copy()
     
-    # Crea bins per età e tariffa
+    # Crea bins per etÃ  e tariffa
     df_temp['Age_Bin'] = pd.qcut(df_temp['Age'], q=3, labels=['Young', 'Middle', 'Old'], duplicates='drop')
     df_temp['Fare_Bin'] = pd.qcut(df_temp['Fare'], q=3, labels=['Low', 'Mid', 'High'], duplicates='drop')
     
@@ -471,7 +471,7 @@ def create_age_fare_class_profiles(df):
         'Class' + df_temp['Pclass'].astype(str)
     )
     
-    # Filtra profili con dati sufficienti
+    # Filtra profili con data sufficienti
     profile_counts = df_temp['Profile'].value_counts()
     valid_profiles = profile_counts[profile_counts >= 5].index
     
@@ -483,9 +483,9 @@ def create_age_fare_class_profiles(df):
 # ----------------11. Data Quality Score
 def calculate_data_quality_score(df):
     """
-    Calcola un punteggio di qualità dei dati
+    Calcola un punteggio di qualitÃ  dei data
     """
-    logger.info("Esecuzione calculate_data_quality_score")
+    logger.info("Running calculate_data_quality_score")
     if df is None:
         logger.warning("DataFrame vuoto")
         return 0
@@ -497,12 +497,12 @@ def calculate_data_quality_score(df):
     scores.append(completeness * 0.4)  # Peso 40%
     logger.debug(f"Completezza: {completeness:.1f}%")
     
-    # Coerenza (% duplicati)
+    # Coerenza (% duplicates)
     uniqueness = (1 - df.duplicated().sum() / len(df)) * 100
     scores.append(uniqueness * 0.2)  # Peso 20%
-    logger.debug(f"Unicità: {uniqueness:.1f}%")
+    logger.debug(f"UnicitÃ : {uniqueness:.1f}%")
     
-    # Validità (% valori nei range attesi)
+    # ValiditÃ  (% valori nei range attesi)
     validity_score = 100  # Assume valido di default
     
     # Controlli specifici
@@ -510,13 +510,13 @@ def calculate_data_quality_score(df):
         invalid_age = ((df['Age'] < 0) | (df['Age'] > 120)).sum()
         age_validity = (1 - invalid_age / len(df)) * 100
         validity_score = min(validity_score, age_validity)
-        logger.debug(f"Validità età: {age_validity:.1f}%")
+        logger.debug(f"ValiditÃ  etÃ : {age_validity:.1f}%")
     
     if 'Fare' in df.columns:
         invalid_fare = (df['Fare'] < 0).sum()
         fare_validity = (1 - invalid_fare / len(df)) * 100
         validity_score = min(validity_score, fare_validity)
-        logger.debug(f"Validità tariffa: {fare_validity:.1f}%")
+        logger.debug(f"ValiditÃ  tariffa: {fare_validity:.1f}%")
     
     scores.append(validity_score * 0.2)  # Peso 20%
     
@@ -528,7 +528,7 @@ def calculate_data_quality_score(df):
     logger.debug(f"Ricchezza: {richness:.1f}%")
     
     total_score = sum(scores)
-    logger.info(f"Punteggio qualità dati calcolato: {total_score:.1f}/100")
+    logger.info(f"Punteggio qualitÃ  data calcolato: {total_score:.1f}/100")
     return total_score
 
-logger.info(f"Caricamento completato {__name__}")
+logger.info(f"Loading completato {__name__}")

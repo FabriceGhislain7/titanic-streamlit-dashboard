@@ -1,11 +1,11 @@
 # Titanic Survival Prediction App
 
-Applicazione Streamlit per l'analisi e predizione della sopravvivenza sul Titanic.
+Streamlit application for Titanic survival analysis and prediction.
 
-## Struttura del Progetto
+## Project Structure
 
-- `app.py`: File principale dell'applicazione
-- `src/`: Codice sorgente modulare
-- `pages/`: Pagine multiple dell'app
-- `assets/`: Risorse statiche (CSS, immagini)
-- `tests/`: Test unitari
+- `app.py`: Main application file
+- `src/`: Modular source code
+- `pages/`: Multiple app pages
+- `assets/`: Static assets (CSS, images)
+- `tests/`: Unit tests

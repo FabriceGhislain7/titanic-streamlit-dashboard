@@ -1,4 +1,4 @@
-"""
+﻿"""
 src/utils/ml_preprocessing.py
 Preprocessing avanzato per Machine Learning
 """
@@ -33,7 +33,7 @@ import re
 from src.config import FEATURE_ENGINEERING, PREPROCESSING_CONFIG, COLUMN_LABELS
 
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
 warnings.filterwarnings('ignore')
 
@@ -94,22 +94,22 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         
         # Family features
         if self.create_family_features:
-            logger.debug("Creazione feature famiglia")
+            logger.debug("Creating feature family")
             X_transformed = self._create_family_features(X_transformed)
         
         # Fare features
         if self.create_fare_features:
-            logger.debug("Creazione feature tariffa")
+            logger.debug("Creating feature tariffa")
             X_transformed = self._create_fare_features(X_transformed)
         
         # Age groups
         if self.create_age_groups and 'Age' in X_transformed.columns:
-            logger.debug("Creazione gruppi età")
+            logger.debug("Creating gruppi etÃ ")
             X_transformed = self._create_age_groups(X_transformed)
         
         # Interaction features
         if self.create_interaction_features:
-            logger.debug("Creazione feature interazione")
+            logger.debug("Creating feature interazione")
             X_transformed = self._create_interaction_features(X_transformed)
         
         logger.info(f"Feature engineering completato. Shape finale: {X_transformed.shape}")
@@ -166,7 +166,7 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
             if pd.isna(cabin):
                 return 'Unknown'
             
-            # Primo carattere della cabina è il deck
+            # Primo carattere della cabina Ã¨ il deck
             deck = str(cabin)[0]
             return deck if deck.isalpha() else 'Unknown'
         
@@ -175,13 +175,13 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         return X
     
     def _create_family_features(self, X):
-        """Crea features relative alla famiglia"""
+        """Crea features relative alla family"""
         logger.debug("Esecuzione _create_family_features")
         if 'SibSp' in X.columns and 'Parch' in X.columns:
             X['Family_Size'] = X['SibSp'] + X['Parch'] + 1
             X['Is_Alone'] = (X['Family_Size'] == 1).astype(int)
             
-            # Categorie famiglia
+            # Categorie family
             def categorize_family_size(size):
                 if size == 1:
                     return 'Alone'
@@ -196,7 +196,7 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         return X
     
     def _create_fare_features(self, X):
-        """Crea features relative al prezzo"""
+        """Crea features relative al fare"""
         logger.debug("Esecuzione _create_fare_features")
         if 'Fare' in X.columns:
             # Fare per persona
@@ -214,7 +214,7 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
         return X
     
     def _create_age_groups(self, X):
-        """Crea gruppi di età"""
+        """Crea gruppi di etÃ """
         logger.debug("Esecuzione _create_age_groups")
         def categorize_age(age):
             if pd.isna(age):
@@ -242,7 +242,7 @@ class TitanicFeatureEngineer(BaseEstimator, TransformerMixin):
     def _create_interaction_features(self, X):
         """Crea features di interazione"""
         logger.debug("Esecuzione _create_interaction_features")
-        # Interazioni importanti per sopravvivenza
+        # Interazioni importanti per survival
         if 'Sex' in X.columns and 'Pclass' in X.columns:
             X['Sex_Pclass'] = X['Sex'].astype(str) + '_' + X['Pclass'].astype(str)
         
@@ -308,11 +308,11 @@ class SmartImputer(BaseEstimator, TransformerMixin):
         
         for column in X.columns:
             if column in self.imputers_:
-                logger.debug(f"Imputazione colonna {column}")
+                logger.debug(f"Imputazione column {column}")
                 imputed_values = self.imputers_[column].transform(X[[column]])
                 X_imputed[column] = imputed_values.flatten()
         
-        logger.debug(f"Valori mancanti dopo imputazione: {X_imputed.isnull().sum().sum()}")
+        logger.debug(f"Valori missing dopo imputazione: {X_imputed.isnull().sum().sum()}")
         return X_imputed
 
 class OutlierHandler(BaseEstimator, TransformerMixin):
@@ -412,7 +412,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
         for column in categorical_columns:
             unique_values = X[column].nunique()
             
-            # Strategia automatica basata su cardinalità
+            # Strategia automatica basata su cardinalitÃ 
             if self.encoding_strategy == 'auto':
                 if unique_values <= 2:
                     method = 'label'
@@ -458,7 +458,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
                     try:
                         X_encoded[column] = encoder.transform(X_encoded[column].astype(str))
                     except ValueError:
-                        # Sostituisce valori non visti con il più frequente
+                        # Sostituisce valori non visti con il piÃ¹ frequente
                         known_values = encoder.classes_
                         X_encoded[column] = X_encoded[column].apply(
                             lambda x: x if str(x) in known_values else known_values[0]
@@ -470,11 +470,11 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
                     encoded_array = encoder.transform(X_encoded[[column]])
                     feature_names = [f"{column}_{cat}" for cat in encoder.categories_[0]]
                     
-                    # Rimuovi colonna originale e aggiungi encoded
+                    # Rimuovi column originale e aggiungi encoded
                     X_encoded = X_encoded.drop(column, axis=1)
                     for i, feature_name in enumerate(feature_names):
                         X_encoded[feature_name] = encoded_array[:, i]
-                    logger.debug(f"OneHot encoding per {column}: creati {len(feature_names)} nuove colonne")
+                    logger.debug(f"OneHot encoding per {column}: creati {len(feature_names)} nuove columns")
                 
                 elif method == 'target':
                     X_encoded[column] = X_encoded[column].map(encoder).fillna(encoder.get('__unknown__', 0))
@@ -485,7 +485,7 @@ class AdvancedEncoder(BaseEstimator, TransformerMixin):
     
     def _create_target_encoder(self, categorical_series, target):
         """Crea target encoder manuale"""
-        logger.debug(f"Creazione target encoder per {categorical_series.name}")
+        logger.debug(f"Creating target encoder per {categorical_series.name}")
         # Calcola media target per categoria
         target_means = categorical_series.to_frame().assign(target=target).groupby(categorical_series.name)['target'].mean()
         
@@ -687,13 +687,13 @@ class PreprocessingPipelineBuilder:
         return self
     
     def add_dimensionality_reduction(self, method='pca', **kwargs):
-        """Aggiunge riduzione dimensionalità"""
+        """Aggiunge riduzione dimensionalitÃ """
         logger.debug(f"Aggiunto step dimensionality_reduction (method={method}) con kwargs: {kwargs}")
         if method == 'pca':
             reducer = PCA(**kwargs)
         else:
-            logger.error(f"Metodo riduzione dimensionalità non supportato: {method}")
-            raise ValueError(f"Metodo riduzione dimensionalità non supportato: {method}")
+            logger.error(f"Metodo riduzione dimensionalitÃ  non supportato: {method}")
+            raise ValueError(f"Metodo riduzione dimensionalitÃ  non supportato: {method}")
         
         self.steps.append(('dimensionality_reduction', reducer))
         return self
@@ -718,16 +718,16 @@ class PreprocessingPipelineBuilder:
 
 class DataQualityChecker:
     """
-    Checker per qualità dei dati
+    Checker per qualitÃ  dei data
     """
     
     @staticmethod
     def check_data_quality(X, y=None):
         """
-        Controlla qualità generale dei dati
+        Controlla qualitÃ  generale dei data
         
         Returns:
-            Report qualità dati
+            Report qualitÃ  data
         """
         logger.info("Esecuzione check_data_quality")
         report = {
@@ -800,13 +800,13 @@ class DataQualityChecker:
                 'is_balanced': (min(y.value_counts()) / max(y.value_counts())) > 0.5
             }
         
-        logger.debug(f"Report qualità dati generato: {len(report['missing_values'])} colonne con missing, {len(report['outliers_summary'])} con outliers")
+        logger.debug(f"Report qualitÃ  data generato: {len(report['missing_values'])} columns con missing, {len(report['outliers_summary'])} con outliers")
         return report
     
     @staticmethod
     def suggest_preprocessing_steps(quality_report):
         """
-        Suggerisce step di preprocessing basati sul report qualità
+        Suggerisce step di preprocessing basati sul report qualitÃ 
         
         Args:
             quality_report: Report da check_data_quality
@@ -822,13 +822,13 @@ class DataQualityChecker:
             high_missing = [col for col, info in quality_report['missing_values'].items() 
                            if info['percentage'] > 50]
             if high_missing:
-                suggestions.append(f"Considera rimozione colonne con >50% missing: {high_missing}")
+                suggestions.append(f"Considera rimozione columns con >50% missing: {high_missing}")
             else:
                 suggestions.append("Applica imputazione per missing values")
         
         # Duplicates
         if quality_report['duplicates'] > 0:
-            suggestions.append(f"Rimuovi {quality_report['duplicates']} righe duplicate")
+            suggestions.append(f"Rimuovi {quality_report['duplicates']} rows duplicate")
         
         # Constant features
         if quality_report['constant_features']:
@@ -837,7 +837,7 @@ class DataQualityChecker:
         # High cardinality
         if quality_report['high_cardinality_features']:
             high_card_features = [f['feature'] for f in quality_report['high_cardinality_features']]
-            suggestions.append(f"Considera encoding speciale per features ad alta cardinalità: {high_card_features}")
+            suggestions.append(f"Considera encoding speciale per features ad alta cardinalitÃ : {high_card_features}")
         
         # Skewed features
         if quality_report['skewed_features']:
@@ -873,7 +873,7 @@ def create_titanic_preprocessing_pipeline(config='standard'):
     Returns:
         Pipeline di preprocessing
     """
-    logger.info(f"Creazione pipeline preprocessing (config={config})")
+    logger.info(f"Creating pipeline preprocessing (config={config})")
     builder = PreprocessingPipelineBuilder()
     
     if config == 'minimal':
@@ -903,8 +903,8 @@ def create_titanic_preprocessing_pipeline(config='standard'):
                    .build())
     
     else:
-        logger.error(f"Configurazione non supportata: {config}")
-        raise ValueError(f"Configurazione non supportata: {config}")
+        logger.error(f"Configuration non supportata: {config}")
+        raise ValueError(f"Configuration non supportata: {config}")
     
     logger.info(f"Pipeline creata con {len(pipeline.steps)} steps")
     return pipeline
@@ -924,7 +924,7 @@ def validate_preprocessing_pipeline(pipeline, X_train, X_test, y_train=None, y_t
     logger.info("Validazione pipeline preprocessing")
     report = {
         'pipeline_steps': [step[0] for step in pipeline.steps],
-        'validation_passed': True,
+        'validataon_passed': True,
         'warnings': [],
         'errors': [],
         'shape_changes': {},
@@ -934,14 +934,14 @@ def validate_preprocessing_pipeline(pipeline, X_train, X_test, y_train=None, y_t
     }
     
     try:
-        # Qualità dati prima
+        # QualitÃ  data prima
         report['data_quality_before'] = DataQualityChecker.check_data_quality(X_train, y_train)
         
         # Applica pipeline
         X_train_transformed = pipeline.fit_transform(X_train, y_train)
         X_test_transformed = pipeline.transform(X_test)
         
-        # Qualità dati dopo
+        # QualitÃ  data dopo
         if isinstance(X_train_transformed, np.ndarray):
             # Converti in DataFrame per analisi
             feature_names = [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
@@ -974,26 +974,26 @@ def validate_preprocessing_pipeline(pipeline, X_train, X_test, y_train=None, y_t
         
         # Warnings
         if X_train_transformed.shape[1] < X_train.shape[1] * 0.5:
-            report['warnings'].append("Più del 50% delle features sono state rimosse")
+            report['warnings'].append("PiÃ¹ del 50% delle features sono state rimosse")
         
         if X_train_transformed.shape[0] != X_train.shape[0]:
-            report['warnings'].append("Il numero di samples è cambiato")
+            report['warnings'].append("Il numero di samples Ã¨ cambiato")
         
         # Check per valori infiniti o NaN
         if isinstance(X_train_transformed, np.ndarray):
             if np.any(np.isnan(X_train_transformed)) or np.any(np.isinf(X_train_transformed)):
                 report['errors'].append("Presenza di valori NaN o infiniti dopo preprocessing")
-                report['validation_passed'] = False
+                report['validataon_passed'] = False
         else:
             if X_train_transformed.isnull().any().any():
                 report['errors'].append("Presenza di valori NaN dopo preprocessing")
-                report['validation_passed'] = False
+                report['validataon_passed'] = False
         
     except Exception as e:
-        report['errors'].append(f"Errore durante validazione: {str(e)}")
-        report['validation_passed'] = False
+        report['errors'].append(f"Error durante validazione: {str(e)}")
+        report['validataon_passed'] = False
     
-    logger.info(f"Validazione completata: {'successo' if report['validation_passed'] else 'fallita'}")
+    logger.info(f"Validazione completata: {'successo' if report['validataon_passed'] else 'fallita'}")
     return report
 
 def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=3):
@@ -1001,10 +1001,10 @@ def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=
     Ottimizza iperparametri della pipeline di preprocessing
     
     Args:
-        X, y: Dati di training
+        X, y: Data di training
         base_pipeline: Pipeline base da ottimizzare
         scoring: Metrica per ottimizzazione
-        cv: Numero fold cross-validation
+        cv: Numero fold cross-validataon
     
     Returns:
         Pipeline ottimizzata
@@ -1079,9 +1079,9 @@ def optimize_preprocessing_pipeline(X, y, base_pipeline, scoring='accuracy', cv=
         'optimization_results': grid_search.cv_results_
     }
 
-def get_preprocessing_recommendations(X, y=None):
+def get_preprocessing_recommendataons(X, y=None):
     """
-    Fornisce raccomandazioni per preprocessing basate sui dati
+    Fornisce raccomandazioni per preprocessing basate sui data
     
     Args:
         X: Features
@@ -1090,11 +1090,11 @@ def get_preprocessing_recommendations(X, y=None):
     Returns:
         Dizionario con raccomandazioni
     """
-    logger.info("Generazione raccomandazioni preprocessing")
-    # Analisi qualità dati
+    logger.info("Generating raccomandazioni preprocessing")
+    # Analisi qualitÃ  data
     quality_report = DataQualityChecker.check_data_quality(X, y)
     
-    recommendations = {
+    recommendataons = {
         'suggested_pipeline_config': 'standard',
         'required_steps': [],
         'optional_steps': [],
@@ -1110,76 +1110,76 @@ def get_preprocessing_recommendations(X, y=None):
         max_missing_pct = max(info['percentage'] for info in quality_report['missing_values'].values())
         if max_missing_pct > 50:
             complexity_score += 2
-            recommendations['required_steps'].append('advanced_imputation')
+            recommendataons['required_steps'].append('advanced_imputation')
         elif max_missing_pct > 20:
             complexity_score += 1
-            recommendations['required_steps'].append('smart_imputation')
+            recommendataons['required_steps'].append('smart_imputation')
     
     # Outliers
     if quality_report['outliers_summary']:
         total_outlier_pct = sum(info['percentage'] for info in quality_report['outliers_summary'].values())
         if total_outlier_pct > 20:
             complexity_score += 1
-            recommendations['required_steps'].append('outlier_handling')
+            recommendataons['required_steps'].append('outlier_handling')
     
     # High cardinality features
     if quality_report['high_cardinality_features']:
         complexity_score += 1
-        recommendations['required_steps'].append('advanced_encoding')
+        recommendataons['required_steps'].append('advanced_encoding')
     
     # Skewed features
     if quality_report['skewed_features']:
         complexity_score += 1
-        recommendations['optional_steps'].append('power_transformation')
+        recommendataons['optional_steps'].append('power_transformation')
     
     # Target imbalance
     if 'target_analysis' in quality_report and not quality_report['target_analysis']['is_balanced']:
-        recommendations['warnings'].append('Dataset sbilanciato - considera tecniche di sampling')
+        recommendataons['warnings'].append('Dataset sbilanciato - considera tecniche di sampling')
     
     # Molte features
     if quality_report['n_features'] > 20:
         complexity_score += 1
-        recommendations['optional_steps'].append('feature_selection')
+        recommendataons['optional_steps'].append('feature_selection')
     
     # Determina configurazione
     if complexity_score <= 2:
-        recommendations['suggested_pipeline_config'] = 'minimal'
-        recommendations['estimated_complexity'] = 'low'
+        recommendataons['suggested_pipeline_config'] = 'minimal'
+        recommendataons['estimated_complexity'] = 'low'
     elif complexity_score <= 4:
-        recommendations['suggested_pipeline_config'] = 'standard'
-        recommendations['estimated_complexity'] = 'medium'
+        recommendataons['suggested_pipeline_config'] = 'standard'
+        recommendataons['estimated_complexity'] = 'medium'
     else:
-        recommendations['suggested_pipeline_config'] = 'advanced'
-        recommendations['estimated_complexity'] = 'high'
+        recommendataons['suggested_pipeline_config'] = 'advanced'
+        recommendataons['estimated_complexity'] = 'high'
     
     # Suggerimenti aggiuntivi
     suggestions = DataQualityChecker.suggest_preprocessing_steps(quality_report)
-    recommendations['detailed_suggestions'] = suggestions
+    recommendataons['detailed_suggestions'] = suggestions
     
-    logger.info(f"Raccomandazioni generate: config={recommendations['suggested_pipeline_config']}")
-    return recommendations
+    logger.info(f"Raccomandazioni generate: config={recommendataons['suggested_pipeline_config']}")
+    return recommendataons
 
 def create_preprocessing_report(X_before, X_after, y=None, pipeline_steps=None):
     """
-    Crea report dettagliato del preprocessing
+    Crea report detailsato del preprocessing
     
     Args:
-        X_before: Dati prima del preprocessing
-        X_after: Dati dopo il preprocessing
+        X_before: Data prima del preprocessing
+        X_after: Data dopo il preprocessing
         y: Target (opzionale)
         pipeline_steps: Lista degli step applicati
     
     Returns:
         Report completo
     """
-    logger.info("Creazione report preprocessing")
+    logger.info("Creating report preprocessing")
     report = {
         'timestamp': pd.Timestamp.now().isoformat(),
         'pipeline_steps': pipeline_steps or [],
         'data_transformation_summary': {},
         'quality_improvement': {},
         'feature_analysis': {},
-        'recommendations': []
+        'recommendataons': []
     }
     
     # Summary trasformazione
@@ -1191,7 +1191,7 @@ def create_preprocessing_report(X_before, X_after, y=None, pipeline_steps=None):
         'transformation_ratio': X_after.shape[1] / X_before.shape[1]
     }
     
-    # Miglioramento qualità
+    # Miglioramento qualitÃ 
     quality_before = DataQualityChecker.check_data_quality(X_before, y)
     
     if isinstance(X_after, np.ndarray):
@@ -1227,15 +1227,15 @@ def create_preprocessing_report(X_before, X_after, y=None, pipeline_steps=None):
     
     # Raccomandazioni post-processing
     if report['quality_improvement']['missing_values_after'] > 0:
-        report['recommendations'].append("Ancora presenti missing values - verifica imputation")
+        report['recommendataons'].append("Ancora presenti missing values - verifica imputation")
     
     if report['data_transformation_summary']['features_removed'] > X_before.shape[1] * 0.7:
-        report['recommendations'].append("Molte features rimosse - verifica soglie feature selection")
+        report['recommendataons'].append("Molte features rimosse - verifica soglie feature selection")
     
     if isinstance(X_after, np.ndarray) and (np.any(np.isnan(X_after)) or np.any(np.isinf(X_after))):
-        report['recommendations'].append("Valori NaN/infiniti nel risultato finale")
+        report['recommendataons'].append("Valori NaN/infiniti nel risultato finale")
     
-    logger.debug(f"Report creato con {len(report['recommendations'])} raccomandazioni")
+    logger.debug(f"Report creato con {len(report['recommendataons'])} raccomandazioni")
     return report
 
 # ----------------7. Export Functions
@@ -1249,7 +1249,7 @@ def save_preprocessing_pipeline(pipeline, filepath):
 
 def load_preprocessing_pipeline(filepath):
     """Carica pipeline di preprocessing"""
-    logger.info(f"Caricamento pipeline da {filepath}")
+    logger.info(f"Loading pipeline da {filepath}")
     import joblib
     return joblib.load(filepath)
 
@@ -1290,7 +1290,7 @@ def export_feature_names(pipeline, original_features, output_path):
         return mapping
         
     except Exception as e:
-        logger.error(f"Errore nell'export feature names: {str(e)}")
+        logger.error(f"Error nell'export feature names: {str(e)}")
         return None
 
-logger.info(f"Caricamento completato {__name__}")
+logger.info(f"Loading completato {__name__}")

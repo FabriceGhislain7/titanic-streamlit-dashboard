@@ -1,156 +1,151 @@
 """
 src/utils/data_loader.py
-Funzioni per il caricamento e gestione dei dati Titanic
+Functions for loading and managing Titanic data.
 """
+
+import logging
+import os
 
 import pandas as pd
 import streamlit as st
-import os
-import logging
+
 from src.config import DATA_FILE, DATA_URL
 
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
-# ----------------1. Caricamento Dataset (da notebook sezione 2.1 - Structure of dataset)
+
 @st.cache_data(ttl=3600)
 def load_titanic_data():
     """
-    Carica il dataset Titanic da file locale o URL remoto
-    Implementa la logica di caricamento dal notebook sezione 2.1
+    Load the Titanic dataset from a local file or remote URL.
+    Implements the loading logic used in notebook section 2.1.
     """
-    logger.info("Esecuzione load_titanic_data")
+    logger.info("Running load_titanic_data")
     try:
-        # Prova prima a caricare da file locale
         if os.path.exists(DATA_FILE):
-            logger.debug(f"Trovato file locale: {DATA_FILE}")
+            logger.debug(f"Found local file: {DATA_FILE}")
             df = pd.read_csv(DATA_FILE)
-            st.success(f"Dati caricati da file locale: {DATA_FILE}")
+            st.success(f"Data loaded from local file: {DATA_FILE}")
         else:
-            # Carica da URL GitHub come nel notebook
-            logger.debug(f"File locale non trovato, caricamento da URL: {DATA_URL}")
+            logger.debug(f"Local file not found, loading from URL: {DATA_URL}")
             df = pd.read_csv(DATA_URL)
-            st.info("Dati caricati da repository GitHub")
-        
-        logger.info(f"Dataset caricato con {len(df)} righe e {len(df.columns)} colonne")
+            st.info("Data loaded from the GitHub repository")
+
+        logger.info(f"Dataset loaded with {len(df)} rows and {len(df.columns)} columns")
         return df
-    
+
     except Exception as e:
-        logger.error(f"Errore nel caricamento dati: {str(e)}")
-        st.error(f"Errore nel caricamento dati: {str(e)}")
+        logger.error(f"Error while loading data: {str(e)}")
+        st.error(f"Error while loading data: {str(e)}")
         return None
 
-# ----------------2. Informazioni Dataset (da notebook sezione 2.1 - Dataset information)
+
 def get_data_summary(df):
     """
-    Calcola statistiche riassuntive del dataset
-    Basato sull'analisi del notebook sezione 2.1
+    Calculate summary statistics for the dataset.
+    Based on notebook section 2.1 analysis.
     """
-    logger.info("Esecuzione get_data_summary")
+    logger.info("Running get_data_summary")
     if df is None:
-        logger.warning("DataFrame vuoto in input")
+        logger.warning("Empty input DataFrame")
         return None
-    
-    # Calcoli base dal notebook
+
     total_passengers = len(df)
-    survived_count = df['Survived'].sum()
+    survived_count = df["Survived"].sum()
     died_count = total_passengers - survived_count
     survival_rate = (survived_count / total_passengers) * 100
     missing_values = df.isnull().sum().sum()
-    
-    logger.debug(f"Calcolate statistiche: {survived_count} sopravvissuti, {missing_values} valori mancanti")
-    
+
+    logger.debug(f"Calculated statistics: {survived_count} survivors, {missing_values} missing values")
+
     return {
-        'rows': total_passengers,
-        'columns': len(df.columns),
-        'survived': survived_count,
-        'died': died_count,
-        'survival_rate': survival_rate,
-        'missing_values': missing_values
+        "rows": total_passengers,
+        "columns": len(df.columns),
+        "survived": survived_count,
+        "died": died_count,
+        "survival_rate": survival_rate,
+        "missing_values": missing_values,
     }
 
-# ----------------3. Controllo Qualita Dati (da notebook sezione 2.2 - Missing values)
+
 def get_missing_values_info(df):
     """
-    Analizza i valori mancanti come nel notebook sezione 2.2
+    Analyze missing values as in notebook section 2.2.
     """
-    logger.info("Esecuzione get_missing_values_info")
+    logger.info("Running get_missing_values_info")
     if df is None:
-        logger.warning("DataFrame vuoto in input")
+        logger.warning("Empty input DataFrame")
         return None
-    
+
     missing_counts = df.isnull().sum()
     missing_percentages = (missing_counts / len(df)) * 100
-    
-    missing_info = pd.DataFrame({
-        'Colonna': missing_counts.index,
-        'Valori_Mancanti': missing_counts.values,
-        'Percentuale': missing_percentages.values
-    })
-    
-    result = missing_info[missing_info['Valori_Mancanti'] > 0].sort_values('Valori_Mancanti', ascending=False)
-    logger.debug(f"Trovate {len(result)} colonne con valori mancanti")
-    
+
+    missing_info = pd.DataFrame(
+        {
+            "Column": missing_counts.index,
+            "Missing_Values": missing_counts.values,
+            "Percentage": missing_percentages.values,
+        }
+    )
+
+    result = missing_info[missing_info["Missing_Values"] > 0].sort_values("Missing_Values", ascending=False)
+    logger.debug(f"Found {len(result)} columns with missing values")
     return result
 
-# ----------------4. Controllo Duplicati (da notebook sezione 2.3 - Check duplicates)
+
 def check_duplicates(df):
     """
-    Verifica presenza duplicati come nel notebook sezione 2.3
+    Check for duplicates as in notebook section 2.3.
     """
-    logger.info("Esecuzione check_duplicates")
+    logger.info("Running check_duplicates")
     if df is None:
-        logger.warning("DataFrame vuoto in input")
+        logger.warning("Empty input DataFrame")
         return 0
-    
+
     duplicates = df.duplicated().sum()
-    logger.debug(f"Trovati {duplicates} duplicati")
-    
+    logger.debug(f"Found {duplicates} duplicates")
     return duplicates
 
-# ----------------5. Preparazione Dati Base (da notebook sezione 3 - Data Cleaning)
+
 def prepare_basic_dataset(df):
     """
-    Applica pulizia base dei dati seguendo notebook sezione 3
+    Apply basic data cleaning following notebook section 3.
     """
-    logger.info("Esecuzione prepare_basic_dataset")
+    logger.info("Running prepare_basic_dataset")
     if df is None:
-        logger.warning("DataFrame vuoto in input")
+        logger.warning("Empty input DataFrame")
         return None
-    
-    # Copia del dataframe originale
+
     df_clean = df.copy()
-    logger.debug("Creato copy del DataFrame")
-    
-    # Rimuovi righe duplicate (sezione 3.1)
+    logger.debug("Created a DataFrame copy")
+
     duplicates = df_clean.duplicated().sum()
     if duplicates > 0:
-        logger.debug(f"Rimossi {duplicates} duplicati")
+        logger.debug(f"Removed {duplicates} duplicates")
         df_clean = df_clean.drop_duplicates()
-    
-    # Rimuovi colonne con troppi valori mancanti (sezione 3.2)
-    if 'Cabin' in df_clean.columns:
-        logger.debug("Rimossa colonna Cabin (77% valori mancanti)")
-        df_clean = df_clean.drop('Cabin', axis=1)
-    
-    logger.info(f"Dataset pulito: {len(df_clean)} righe, {len(df_clean.columns)} colonne")
+
+    if "Cabin" in df_clean.columns:
+        logger.debug("Removed Cabin column (77% missing values)")
+        df_clean = df_clean.drop("Cabin", axis=1)
+
+    logger.info(f"Cleaned dataset: {len(df_clean)} rows, {len(df_clean.columns)} columns")
     return df_clean
 
-# ----------------6. Dataset Statistics (da notebook sezione 4.1.1 - Descriptive Statistics)
+
 def get_descriptive_statistics(df):
     """
-    Calcola statistiche descrittive come nel notebook sezione 4.1.1
+    Calculate descriptive statistics as in notebook section 4.1.1.
     """
-    logger.info("Esecuzione get_descriptive_statistics")
+    logger.info("Running get_descriptive_statistics")
     if df is None:
-        logger.warning("DataFrame vuoto in input")
+        logger.warning("Empty input DataFrame")
         return None
-    
-    # Seleziona solo colonne numeriche
-    numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
+
+    numeric_columns = df.select_dtypes(include=["int64", "float64"]).columns
     stats = df[numeric_columns].describe()
-    logger.debug(f"Calcolate statistiche per {len(numeric_columns)} colonne numeriche")
-    
+    logger.debug(f"Calculated statistics for {len(numeric_columns)} numerical columns")
     return stats
 
-logger.info(f"Caricamento completato {__name__}")
+
+logger.info(f"Loading completed {__name__}")

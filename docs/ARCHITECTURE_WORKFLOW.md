@@ -44,7 +44,7 @@ Dataset --> DataProcessing
 
 # Layered Architecture Diagram
 
-Questo diagramma mostra **i livelli architetturali**.
+This diagram shows the **architectural layers**.
 
 ```mermaid
 flowchart TB
@@ -97,7 +97,7 @@ Factory --> Evaluator
 
 # Internal Module Architecture
 
-Questo rappresenta **la tua struttura reale del progetto**.
+This represents **the actual structure of the project**.
 
 ```mermaid
 flowchart LR

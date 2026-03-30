@@ -1,8 +1,8 @@
-"""
+﻿"""
 Initialization file for utils package
 
 This module initializes the utilities package and makes all helper functions
-and classes available at the package level for easier imports.
+and classs available at the package level for easier imports.
 """
 
 import logging

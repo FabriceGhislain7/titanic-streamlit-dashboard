@@ -1,6 +1,6 @@
-"""
+﻿"""
 src/components/advanced_charts.py
-Grafici specializzati per analisi avanzate e feature engineering
+Grafici specializzati per analysis avanzate e feature engineering
 """
 
 import plotly.express as px
@@ -10,16 +10,16 @@ import pandas as pd
 import numpy as np
 from src.config import COLOR_PALETTES, COLUMN_LABELS, VALUE_MAPPINGS
 
-# ----------------1. Matrice Correlazione Avanzata (da notebook sezione 4.1.2 estesa)
+# ----------------1. Matrice Correlazione Avanzata (da notebook section 4.1.2 estesa)
 def create_correlation_matrix(df, method='pearson'):
     """
-    Crea matrice di correlazione con metodo specificato
-    Estende notebook sezione 4.1.2
+    Crea matrice di correlazione con method specificato
+    Estende notebook section 4.1.2
     """
     if df is None:
         return None
     
-    # Seleziona solo variabili numeriche
+    # Select solo variables numeriche
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     numeric_cols = [col for col in numeric_cols if col != 'PassengerId']
     
@@ -39,31 +39,31 @@ def create_correlation_matrix(df, method='pearson'):
         y=[COLUMN_LABELS.get(col, col) for col in corr_matrix.index],
         colorscale='RdBu',
         zmid=0,
-        # Rimuovi i numeri dal grafico per migliore leggibilità
+        # Rimuovi i numeri dal chart per beste leggibilitÃ 
         text=None,
-        hovertemplate='%{x} vs %{y}<br>Correlazione: %{z:.3f}<extra></extra>',
-        colorbar=dict(title=f"Correlazione {method.title()}")
+        hovertemplate='%{x} vs %{y}<br>Correlation: %{z:.3f}<extra></extra>',
+        colorbar=dict(title=f"{method.title()} Correlation")
     ))
     
     fig.update_layout(
-        title=f"Matrice Correlazione {method.title()}",
+        title=f"{method.title()} Correlation Matrix",
         height=500,
-        # Migliora la leggibilità
+        # Besta la leggibilitÃ 
         xaxis_tickangle=-45,
         margin=dict(l=100, r=50, t=80, b=100)
     )
     
     return fig
 
-# ----------------2. Correlazioni con Target
+# ----------------2. Correlations con Target
 def create_target_correlation_chart(correlations_df):
     """
-    Grafico correlazioni con variabile target
+    Grafico correlations con variable target
     """
     if correlations_df is None:
         return None
     
-    # Prendi top 10 correlazioni (assolute)
+    # Prendi top 10 correlations (assolute)
     top_corr = correlations_df.head(10)
     
     fig = go.Figure(data=[go.Bar(
@@ -76,15 +76,15 @@ def create_target_correlation_chart(correlations_df):
     )])
     
     fig.update_layout(
-        title="Top Correlazioni con Sopravvivenza",
-        xaxis_title="Correlazione",
-        yaxis_title="Variabili",
+        title="Top Correlations with Survival",
+        xaxis_title="Correlation",
+        yaxis_title="Variables",
         height=400
     )
     
     return fig
 
-# ----------------3. Correlazioni per Categoria
+# ----------------3. Correlations per Categoria
 def create_correlation_by_category(df, category_col):
     """
     Matrice correlazione separata per categorie
@@ -105,7 +105,7 @@ def create_correlation_by_category(df, category_col):
     
     for i, category in enumerate(categories):
         subset = df[df[category_col] == category]
-        if len(subset) > 5:  # Solo se abbiamo abbastanza dati
+        if len(subset) > 5:  # Solo se abbiamo abbastanza data
             corr_matrix = subset[numeric_cols].corr()
             
             fig.add_trace(
@@ -121,16 +121,16 @@ def create_correlation_by_category(df, category_col):
             )
     
     fig.update_layout(
-        title=f"Correlazioni per {COLUMN_LABELS.get(category_col, category_col)}",
+        title=f"Correlations by {COLUMN_LABELS.get(category_col, category_col)}",
         height=400
     )
     
     return fig
 
-# ----------------4. Analisi Titolo (da feature engineering nome)
+# ----------------4. Analysis Title (da feature engineering nome)
 def create_title_survival_analysis(df):
     """
-    Analisi sopravvivenza per titolo estratto dal nome
+    Analysis survival per title estratto dal nome
     """
     if df is None or 'Title' not in df.columns:
         return None
@@ -151,18 +151,18 @@ def create_title_survival_analysis(df):
     )])
     
     fig.update_layout(
-        title="Sopravvivenza per Titolo",
-        xaxis_title="Titolo",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        title="Survival by Title",
+        xaxis_title="Title",
+        yaxis_title="Survival Rate (%)",
         height=400
     )
     
     return fig
 
-# ----------------5. Analisi Deck (da feature engineering cabina)
+# ----------------5. Analysis Deck (da feature engineering cabin)
 def create_deck_survival_analysis(df):
     """
-    Analisi sopravvivenza per deck estratto dalla cabina
+    Analysis survival per deck estratto dalla cabin
     """
     if df is None or 'Deck' not in df.columns:
         return None
@@ -183,9 +183,9 @@ def create_deck_survival_analysis(df):
     )])
     
     fig.update_layout(
-        title="Sopravvivenza per Deck",
+        title="Survival by Deck",
         xaxis_title="Deck",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        yaxis_title="Survival Rate (%)",
         height=400
     )
     
@@ -212,8 +212,8 @@ def create_feature_importance_chart(importance_df):
     )])
     
     fig.update_layout(
-        title="Importanza Features (Proxy)",
-        xaxis_title="Importanza",
+        title="Feature Importance (Proxy)",
+        xaxis_title="Importance",
         yaxis_title="Features",
         height=500
     )
@@ -224,14 +224,14 @@ def create_feature_importance_chart(importance_df):
 def create_outliers_scatter_plot(df, var1, var2):
     """
     Scatter plot con outliers evidenziati
-    Estende analisi outliers notebook sezione 4.1.1
+    Estende analysis outliers notebook section 4.1.1
     """
     if df is None or var1 not in df.columns or var2 not in df.columns:
         return None
     
     from src.utils.data_processor import detect_outliers_iqr
     
-    # Rileva outliers per entrambe le variabili
+    # Rileva outliers per entrambe le variables
     outliers1, _, _ = detect_outliers_iqr(df[var1].dropna())
     outliers2, _, _ = detect_outliers_iqr(df[var2].dropna())
     
@@ -257,7 +257,7 @@ def create_outliers_scatter_plot(df, var1, var2):
 # ----------------8. Boxplot Comparison Outliers
 def create_outliers_comparison_boxplot(df, variables):
     """
-    Boxplot confronto multiple variabili per outliers
+    Boxplot comparison multiple variables per outliers
     """
     if df is None or not variables:
         return None
@@ -276,17 +276,17 @@ def create_outliers_comparison_boxplot(df, variables):
             ))
     
     fig.update_layout(
-        title="Confronto Distribuzioni per Outliers",
+        title="Comparison Distribuzioni per Outliers",
         yaxis_title="Valori",
         height=400
     )
     
     return fig
 
-# ----------------9. Test Normalità Plots
+# ----------------9. Test NormalitÃ  Plots
 def create_normality_test_plots(df, variable):
     """
-    Grafici per test di normalità
+    Grafici per test di normalitÃ 
     """
     if df is None or variable not in df.columns:
         return None
@@ -296,12 +296,12 @@ def create_normality_test_plots(df, variable):
     # Crea subplot con istogramma e Q-Q plot
     fig = make_subplots(
         rows=1, cols=2,
-        subplot_titles=('Distribuzione', 'Q-Q Plot Normale')
+        subplot_titles=('Distribution', 'Q-Q Plot Normale')
     )
     
     # Istogramma
     fig.add_trace(
-        go.Histogram(x=data, nbinsx=20, name="Distribuzione", opacity=0.7),
+        go.Histogram(x=data, nbinsx=20, name="Distribution", opacity=0.7),
         row=1, col=1
     )
     
@@ -337,17 +337,17 @@ def create_normality_test_plots(df, variable):
     )
     
     fig.update_layout(
-        title=f"Test Normalità - {COLUMN_LABELS.get(variable, variable)}",
+        title=f"Normality Test - {COLUMN_LABELS.get(variable, variable)}",
         height=400,
         showlegend=False
     )
     
     return fig
 
-# ----------------10. Confronto Distribuzioni per Gruppo
+# ----------------10. Comparison Distribuzioni per Gruppo
 def create_distribution_comparison_by_group(df, numeric_var, group_var):
     """
-    Confronta distribuzioni di variabile numerica per gruppi
+    Confronta distribuzioni di variable numerica per gruppi
     """
     if df is None or numeric_var not in df.columns or group_var not in df.columns:
         return None
@@ -372,7 +372,7 @@ def create_distribution_comparison_by_group(df, numeric_var, group_var):
         ))
     
     fig.update_layout(
-        title=f"Distribuzione {COLUMN_LABELS.get(numeric_var, numeric_var)} per {COLUMN_LABELS.get(group_var, group_var)}",
+        title=f"Distribution {COLUMN_LABELS.get(numeric_var, numeric_var)} per {COLUMN_LABELS.get(group_var, group_var)}",
         xaxis_title=COLUMN_LABELS.get(numeric_var, numeric_var),
         yaxis_title="Frequenza",
         barmode='overlay',
@@ -384,7 +384,7 @@ def create_distribution_comparison_by_group(df, numeric_var, group_var):
 # ----------------11. Grafici per Segmentazione
 def create_segments_survival_chart(df):
     """
-    Grafico sopravvivenza per segmenti
+    Grafico survival per segments
     """
     if df is None or 'Segment' not in df.columns:
         return None
@@ -400,18 +400,18 @@ def create_segments_survival_chart(df):
     )])
     
     fig.update_layout(
-        title="Tasso Sopravvivenza per Segmento",
+        title="Survival Rate per Segmento",
         xaxis_title="Segmento",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        yaxis_title="Survival Rate (%)",
         height=400
     )
     
     return fig
 
-# ----------------12. Distribuzione Segmenti
+# ----------------12. Distribution Segments
 def create_segments_distribution_chart(df):
     """
-    Distribuzione dei segmenti nel dataset
+    Distribution dei segments nel dataset
     """
     if df is None or 'Segment' not in df.columns:
         return None
@@ -425,58 +425,58 @@ def create_segments_distribution_chart(df):
     )])
     
     fig.update_layout(
-        title="Distribuzione Segmenti Passeggeri",
+        title="Distribution Segments Passengers",
         height=400
     )
     
     return fig
 
-# ----------------13. Grafici Profili AFC (Age-Fare-Class)
+# ----------------13. Grafici Profiles AFC (Age-Fare-Class)
 def create_profiles_chart(profile_survival):
     """
-    Grafico per profili Age-Fare-Class
+    Grafico per profiles Age-Fare-Class
     """
     if profile_survival is None:
         return None
     
-    # Bubble chart: dimensione = conteggio, y = tasso sopravvivenza
+    # Bubble chart: dimensione = count, y = tasso survival
     fig = go.Figure(data=go.Scatter(
         x=profile_survival.index,
-        y=profile_survival['Tasso_Sopravvivenza'] * 100,
+        y=profile_survival['Survival_Rate'] * 100,
         mode='markers',
         marker=dict(
-            size=profile_survival['Conteggio'],
+            size=profile_survival['Count'],
             sizemode='diameter',
-            sizeref=2.*max(profile_survival['Conteggio'])/(40.**2),
+            sizeref=2.*max(profile_survival['Count'])/(40.**2),
             sizemin=4,
-            color=profile_survival['Tasso_Sopravvivenza'] * 100,
+            color=profile_survival['Survival_Rate'] * 100,
             colorscale='Viridis',
             showscale=True,
-            colorbar=dict(title="Tasso Sopravvivenza (%)")
+            colorbar=dict(title="Survival Rate (%)")
         ),
-        text=[f"Conteggio: {cnt}<br>Tasso: {rate*100:.1f}%" 
-              for cnt, rate in zip(profile_survival['Conteggio'], profile_survival['Tasso_Sopravvivenza'])],
-        hovertemplate='Profilo: %{x}<br>%{text}<extra></extra>'
+        text=[f"Count: {cnt}<br>Rate: {rate*100:.1f}%"
+              for cnt, rate in zip(profile_survival['Count'], profile_survival['Survival_Rate'])],
+        hovertemplate='Profile: %{x}<br>%{text}<extra></extra>'
     ))
     
     fig.update_layout(
-        title="Profili Age-Fare-Class",
-        xaxis_title="Profilo",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        title="Age-Fare-Class Profiles",
+        xaxis_title="Profile",
+        yaxis_title="Survival Rate (%)",
         height=400
     )
     
     return fig
 
-# ----------------14. Heatmap Pattern Sopravvivenza
+# ----------------14. Heatmap Pattern Survival
 def create_survival_patterns_heatmap(df, var1, var2):
     """
-    Heatmap pattern sopravvivenza per 2 variabili
+    Heatmap pattern survival per 2 variables
     """
     if df is None or var1 not in df.columns or var2 not in df.columns:
         return None
     
-    # Calcola tasso sopravvivenza per combinazioni
+    # Calcola tasso survival per combinazioni
     survival_matrix = df.groupby([var1, var2])['Survived'].mean() * 100
     survival_pivot = survival_matrix.unstack(fill_value=0)
     
@@ -492,11 +492,11 @@ def create_survival_patterns_heatmap(df, var1, var2):
         text=survival_pivot.round(1).values,
         texttemplate="%{text}%",
         textfont={"size": 10},
-        colorbar=dict(title="Tasso Sopravvivenza (%)")
+        colorbar=dict(title="Survival Rate (%)")
     ))
     
     fig.update_layout(
-        title=f"Pattern Sopravvivenza: {COLUMN_LABELS.get(var1, var1)} vs {COLUMN_LABELS.get(var2, var2)}",
+        title=f"Pattern Survival: {COLUMN_LABELS.get(var1, var1)} vs {COLUMN_LABELS.get(var2, var2)}",
         xaxis_title=COLUMN_LABELS.get(var2, var2),
         yaxis_title=COLUMN_LABELS.get(var1, var1),
         height=400
@@ -504,15 +504,15 @@ def create_survival_patterns_heatmap(df, var1, var2):
     
     return fig
 
-# ----------------15. Radar Chart Confronto Segmenti
+# ----------------15. Radar Chart Comparison Segments
 def create_segments_radar_chart(df, segments_col='Segment'):
     """
-    Radar chart per confrontare caratteristiche dei segmenti
+    Radar chart per confrontare caratteristiche dei segments
     """
     if df is None or segments_col not in df.columns:
         return None
     
-    # Variabili per radar chart
+    # Variables per radar chart
     numeric_vars = ['Age', 'Fare', 'Family_Size', 'Survived']
     available_vars = [var for var in numeric_vars if var in df.columns]
     
@@ -530,7 +530,7 @@ def create_segments_radar_chart(df, segments_col='Segment'):
         values = []
         for var in available_vars:
             if var == 'Survived':
-                val = segment_data[var].mean()  # Già 0-1
+                val = segment_data[var].mean()  # GiÃ  0-1
             else:
                 val = (segment_data[var].mean() - df[var].min()) / (df[var].max() - df[var].min())
             values.append(val)
@@ -548,8 +548,10 @@ def create_segments_radar_chart(df, segments_col='Segment'):
                 visible=True,
                 range=[0, 1]
             )),
-        title="Confronto Caratteristiche Segmenti",
+        title="Comparison Caratteristiche Segments",
         height=500
     )
     
     return fig
+
+

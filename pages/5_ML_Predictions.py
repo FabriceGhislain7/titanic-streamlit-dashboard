@@ -1,7 +1,7 @@
 """
 pages/5_ML_Predictions.py
-Machine Learning Models per Predizione Sopravvivenza Titanic
-Versione modulare con architettura completa
+Machine learning models for Titanic survival prediction
+Modular version with complete architecture
 """
 
 import streamlit as st
@@ -10,14 +10,14 @@ import numpy as np
 import time
 from datetime import datetime
 
-# Import dei moduli ML sviluppati
+# Import ML modules
 from src.config import *
 from src.utils.data_loader import load_titanic_data
 from src.utils.data_processor import clean_dataset_basic
 from src.utils.ml_preprocessing import (
     create_titanic_preprocessing_pipeline, 
     DataQualityChecker,
-    get_preprocessing_recommendations,
+    get_preprocessing_recommendataons,
     validate_preprocessing_pipeline
 )
 from src.models.ml_models import ModelFactory, ModelConfigurations, HyperparameterGrids
@@ -32,50 +32,50 @@ import logging
 
 # Logger setup
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
-# ----------------1. Configurazione pagina (da config.py)
+# ----------------1. Page configuration (da config.py)
 def setup_page():
-    """Configura la pagina Streamlit"""
-    logger.info("Configurazione pagina Streamlit")
+    """Configure the Streamlit page"""
+    logger.info("Page configuration Streamlit")
     st.set_page_config(**PAGE_CONFIG)
 
 setup_page()
 
-# ----------------2. Caricamento e preparazione dati base
+# ----------------2. Loading and preparing base data
 @st.cache_data(ttl=3600)
 def load_and_prepare_base_data():
-    """Carica e prepara dati base"""
-    logger.info("Funzione caricamento e preparazione dati base")
+    """Load and prepare base data"""
+    logger.info("Loading and preparing base data")
     df_original = load_titanic_data()
     if df_original is None:
-        logger.error("Impossibile caricare dati originali")
+        logger.error("Unable to load original data")
         return None, None
     
     df_cleaned = clean_dataset_basic(df_original)
-    logger.debug(f"Dati caricati e puliti. Shape originale: {df_original.shape}, puliti: {df_cleaned.shape}")
+    logger.debug(f"Data loaded and cleaned. Original shape: {df_original.shape}, puliti: {df_cleaned.shape}")
     return df_original, df_cleaned
 
-logger.info("Caricamento dati Titanic")
+logger.info("Loading data Titanic")
 df_original, df = load_and_prepare_base_data()
 if df is None:
-    logger.error("Impossibile caricare i dati Titanic")
-    st.error("Impossibile caricare i dati")
+    logger.error("Unable to load Titanic data")
+    st.error("Unable to load the data")
     st.stop()
 
-# ----------------3. Header pagina
-logger.info("Setup header pagina")
+# ----------------3. Page header
+logger.info("Setting up page header")
 st.title("Machine Learning Predictions")
-st.markdown("Pipeline completa di Machine Learning per predire la sopravvivenza dei passeggeri del Titanic")
+st.markdown("Complete machine learning pipeline for predicting Titanic passenger survival")
 
 # ----------------4. Sidebar controlli avanzati
-logger.info("Setup sidebar controlli avanzati")
+logger.info("Setting up advanced sidebar controls")
 with st.sidebar:
-    st.header("Controlli ML Avanzati")
+    st.header("Advanced ML Controls")
     
-    # Sezione principale
+    # Main section
     ml_section = st.selectbox(
-        "Sezione ML:",
+        "ML Section:",
         [
             "Data Quality & Preprocessing",
             "Model Training",
@@ -86,58 +86,58 @@ with st.sidebar:
             "Model Reports"
         ]
     )
-    logger.debug(f"Sezione ML selezionata: {ml_section}")
+    logger.debug(f"Selected ML section: {ml_section}")
     
     st.markdown("---")
     
-    # Configurazioni preprocessing
+    # Preprocessing settings
     st.subheader("Preprocessing")
     preprocessing_config = st.selectbox(
-        "Configurazione preprocessing:",
+        "Preprocessing configuration:",
         ["minimal", "standard", "advanced"],
         index=1,
-        help="Minimal: basic, Standard: completo, Advanced: con feature selection"
+        help="Minimal: basic, Standard: complete, Advanced: with feature selection"
     )
-    logger.debug(f"Configurazione preprocessing: {preprocessing_config}")
+    logger.debug(f"Preprocessing configuration: {preprocessing_config}")
     
-    # Configurazioni training
+    # Training settings
     st.subheader("Training Configuration")
     training_mode = st.selectbox(
-        "Modalità training:",
+        "Training mode:",
         ["QUICK_TRAINING", "COMPREHENSIVE_TRAINING", "DEEP_TRAINING"],
         index=1,
-        help="Quick: veloce, Comprehensive: completo, Deep: con ensemble"
+        help="Quick: fast, Comprehensive: complete, Deep: with ensemble methods"
     )
-    logger.debug(f"Modalità training: {training_mode}")
+    logger.debug(f"ModalitÃ  training: {training_mode}")
     
-    # Modelli da utilizzare
+    # Models to use
     available_models = ModelFactory.get_available_models()
     selected_models = st.multiselect(
-        "Seleziona modelli:",
+        "Select models:",
         available_models,
         default=available_models[:4],
         format_func=lambda x: ML_MODELS.get(x, {}).get('name', x)
     )
-    logger.debug(f"Modelli selezionati: {selected_models}")
+    logger.debug(f"Selected models: {selected_models}")
     
-    # Opzioni avanzate
-    st.subheader("Opzioni Avanzate")
+    # Advanced options
+    st.subheader("Advanced Options")
     use_hyperparameter_tuning = st.checkbox("Hyperparameter Tuning", value=False)
-    use_cross_validation = st.checkbox("Cross Validation", value=True)
-    save_models = st.checkbox("Salva modelli addestrati", value=False)
-    logger.debug(f"Opzioni avanzate: hp_tuning={use_hyperparameter_tuning}, cv={use_cross_validation}, save={save_models}")
+    use_cross_validataon = st.checkbox("Cross Validataon", value=True)
+    save_models = st.checkbox("Save trained models", value=False)
+    logger.debug(f"Advanced options: hp_tuning={use_hyperparameter_tuning}, cv={use_cross_validataon}, save={save_models}")
 
 # ----------------5. Data Quality & Preprocessing
 if ml_section == "Data Quality & Preprocessing":
-    logger.info("Avvio sezione Data Quality & Preprocessing")
-    st.header("1. Analisi Qualità Dati e Preprocessing")
+    logger.info("Starting section Data Quality & Preprocessing")
+    st.header("1. Data Quality Analysis and Preprocessing")
     
     # ----------------6. Data Quality Analysis
-    logger.info("Analisi qualità dati")
-    st.subheader("Report Qualità Completo")
+    logger.info("Analyzing data quality")
+    st.subheader("Complete Quality Report")
     
-    with st.expander("Report Qualità Completo", expanded=True):
-        logger.debug("Esecuzione check qualità dati")
+    with st.expander("Complete Quality Report", expanded=True):
+        logger.debug("Running data quality check")
         quality_report = DataQualityChecker.check_data_quality(df)
         
         col1, col2, col3, col4 = st.columns(4)
@@ -155,7 +155,7 @@ if ml_section == "Data Quality & Preprocessing":
             constant_count = len(quality_report['constant_features'])
             st.metric("Constant Features", constant_count)
             outliers_count = len(quality_report['outliers_summary'])
-            st.metric("Features con Outliers", outliers_count)
+            st.metric("Features with Outliers", outliers_count)
         
         with col4:
             memory_mb = quality_report['memory_usage'] / (1024 * 1024)
@@ -165,10 +165,10 @@ if ml_section == "Data Quality & Preprocessing":
         
         logger.debug(f"Quality report: samples={quality_report['n_samples']}, features={quality_report['n_features']}, missing={missing_count}")
         
-        # Dettagli problemi
+        # Problem details
         if quality_report['missing_values']:
-            logger.debug("Visualizzazione dettagli missing values")
-            st.write("**Missing Values Dettaglio:**")
+            logger.debug("Displaying missing value details")
+            st.write("**Missing Values Details:**")
             missing_df = pd.DataFrame([
                 {
                     'Feature': col,
@@ -179,119 +179,119 @@ if ml_section == "Data Quality & Preprocessing":
             ])
             st.dataframe(missing_df, use_container_width=True)
     
-    # ----------------7. Preprocessing Recommendations
-    logger.info("Generazione raccomandazioni preprocessing")
-    st.subheader("Raccomandazioni Preprocessing")
+    # ----------------7. Preprocessing Recommendataons
+    logger.info("Generating preprocessing recommendations")
+    st.subheader("Preprocessing Recommendations")
     
-    recommendations = get_preprocessing_recommendations(df)
-    logger.debug(f"Raccomandazioni: config={recommendations['suggested_pipeline_config']}, complexity={recommendations['estimated_complexity']}")
+    recommendataons = get_preprocessing_recommendataons(df)
+    logger.debug(f"Recommendations: config={recommendataons['suggested_pipeline_config']}, complexity={recommendataons['estimated_complexity']}")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.info(f"**Configurazione Suggerita:** {recommendations['suggested_pipeline_config'].title()}")
-        st.info(f"**Complessità Stimata:** {recommendations['estimated_complexity'].title()}")
+        st.info(f"**Suggested Configuration:** {recommendataons['suggested_pipeline_config'].title()}")
+        st.info(f"**Estimated Complexity:** {recommendataons['estimated_complexity'].title()}")
         
-        if recommendations['required_steps']:
-            logger.debug(f"Step richiesti: {len(recommendations['required_steps'])}")
-            st.write("**Step Richiesti:**")
-            for step in recommendations['required_steps']:
+        if recommendataons['required_steps']:
+            logger.debug(f"Required steps: {len(recommendataons['required_steps'])}")
+            st.write("**Required Steps:**")
+            for step in recommendataons['required_steps']:
                 st.write(f"- {step}")
     
     with col2:
-        if recommendations['optional_steps']:
-            logger.debug(f"Step opzionali: {len(recommendations['optional_steps'])}")
-            st.write("**Step Opzionali:**")
-            for step in recommendations['optional_steps']:
+        if recommendataons['optional_steps']:
+            logger.debug(f"Optional steps: {len(recommendataons['optional_steps'])}")
+            st.write("**Optional Steps:**")
+            for step in recommendataons['optional_steps']:
                 st.write(f"- {step}")
         
-        if recommendations['warnings']:
-            logger.debug(f"Warnings: {len(recommendations['warnings'])}")
-            st.warning("**Avvertimenti:**")
-            for warning in recommendations['warnings']:
+        if recommendataons['warnings']:
+            logger.debug(f"Warnings: {len(recommendataons['warnings'])}")
+            st.warning("**Warnings:**")
+            for warning in recommendataons['warnings']:
                 st.write(f"- {warning}")
     
-    # ----------------8. Pipeline Creation & Validation
-    logger.info("Sezione creazione e validazione pipeline")
-    st.subheader("Creazione e Validazione Pipeline")
+    # ----------------8. Pipeline Creation & Validataon
+    logger.info("Pipeline creation and validation section")
+    st.subheader("Pipeline Creation and Validation")
     
-    if st.button("Crea e Valida Pipeline", type="primary"):
-        logger.info("Avvio creazione e validazione pipeline")
-        with st.spinner("Creazione pipeline in corso..."):
-            # Crea pipeline
-            logger.debug("Creazione pipeline preprocessing")
+    if st.button("Create and Validate Pipeline", type="primary"):
+        logger.info("Starting pipeline creation and validation")
+        with st.spinner("Creating pipeline..."):
+            # Create pipeline
+            logger.debug("Creating pipeline preprocessing")
             pipeline = create_titanic_preprocessing_pipeline(preprocessing_config)
             
-            # Prepara dati per validazione
+            # Prepare data for validation
             target_col = 'Survived'
             X = df.drop(target_col, axis=1)
             y = df[target_col]
             
             from sklearn.model_selection import train_test_split
-            logger.debug("Split train/test per validazione")
+            logger.debug("Train/test split for validation")
             X_train, X_test, y_train, y_test = train_test_split(
                 X, y, test_size=0.2, random_state=42, stratify=y
             )
             
             # Valida pipeline
-            logger.debug("Validazione pipeline")
-            validation_report = validate_preprocessing_pipeline(
+            logger.debug("Pipeline validation")
+            validataon_report = validate_preprocessing_pipeline(
                 pipeline, X_train, X_test, y_train, y_test
             )
             
             # Salva in session state
             st.session_state['preprocessing_pipeline'] = pipeline
-            st.session_state['validation_report'] = validation_report
+            st.session_state['validataon_report'] = validataon_report
             st.session_state['prepared_data'] = (X_train, X_test, y_train, y_test)
-            logger.debug("Pipeline e dati salvati in session state")
+            logger.debug("Pipeline and data saved in session state")
             
-        # Mostra risultati validazione
-        if validation_report['validation_passed']:
-            logger.info("Pipeline validata con successo")
-            st.success("Pipeline validata con successo!")
+        # Show results validazione
+        if validataon_report['validataon_passed']:
+            logger.info("Pipeline validated successfully")
+            st.success("Pipeline validated successfully!")
         else:
-            logger.error("Problemi nella validazione pipeline")
-            st.error("Problemi nella validazione pipeline")
+            logger.error("Problems during pipeline validation")
+            st.error("Pipeline validation issues detected")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.write("**Cambiamenti Shape:**")
-            shape_changes = validation_report['shape_changes']
-            st.write(f"Train: {shape_changes['train_before']} → {shape_changes['train_after']}")
-            st.write(f"Test: {shape_changes['test_before']} → {shape_changes['test_after']}")
+            st.write("**Shape Changes:**")
+            shape_changes = validataon_report['shape_changes']
+            st.write(f"Train: {shape_changes['train_before']} -> {shape_changes['train_after']}")
+            st.write(f"Test: {shape_changes['test_before']} -> {shape_changes['test_after']}")
         
         with col2:
-            if validation_report['warnings']:
-                logger.debug(f"Warnings validazione: {len(validation_report['warnings'])}")
+            if validataon_report['warnings']:
+                logger.debug(f"Warnings validazione: {len(validataon_report['warnings'])}")
                 st.warning("**Warnings:**")
-                for warning in validation_report['warnings']:
+                for warning in validataon_report['warnings']:
                     st.write(f"- {warning}")
             
-            if validation_report['errors']:
-                logger.error(f"Errori validazione: {len(validation_report['errors'])}")
-                st.error("**Errori:**")
-                for error in validation_report['errors']:
+            if validataon_report['errors']:
+                logger.error(f"Errori validazione: {len(validataon_report['errors'])}")
+                st.error("**Errors:**")
+                for error in validataon_report['errors']:
                     st.write(f"- {error}")
 
 # ----------------9. Model Training
 elif ml_section == "Model Training":
-    logger.info("Avvio sezione Model Training")
-    st.header("2. Training Modelli Machine Learning")
+    logger.info("Starting section Model Training")
+    st.header("2. Machine Learning Model Training")
     
     # Verifica prerequisiti
     if 'preprocessing_pipeline' not in st.session_state:
         logger.warning("Pipeline preprocessing non trovata")
-        st.warning("Prima esegui la sezione 'Data Quality & Preprocessing' per creare la pipeline")
+        st.warning("Run the Data Quality & Preprocessing section first to create the pipeline")
         st.stop()
     
     pipeline = st.session_state['preprocessing_pipeline']
     X_train, X_test, y_train, y_test = st.session_state['prepared_data']
-    logger.debug(f"Dati preparati caricati. Train shape: {X_train.shape}, Test shape: {X_test.shape}")
+    logger.debug(f"Data preparati uploadti. Train shape: {X_train.shape}, Test shape: {X_test.shape}")
     
     # ----------------10. Training Configuration Display
-    logger.info("Visualizzazione configurazione training")
-    st.subheader("Configurazione Training")
+    logger.info("Displaying training configuration")
+    st.subheader("Training Configuration")
     
     training_config = TrainingPipelineManager(training_mode).config
     
@@ -302,24 +302,24 @@ elif ml_section == "Model Training":
         st.info(f"**CV Folds:** {training_config['cv_folds']}")
     
     with col2:
-        st.info(f"**Hyperparameter Tuning:** {'✅' if use_hyperparameter_tuning else '❌'}")
-        st.info(f"**Cross Validation:** {'✅' if use_cross_validation else '❌'}")
+        st.info(f"**Hyperparameter Tuning:** {'Yes' if use_hyperparameter_tuning else 'No'}")
+        st.info(f"**Cross Validation:** {'Yes' if use_cross_validataon else 'No'}")
     
     with col3:
-        st.info(f"**Modelli Selezionati:** {len(selected_models)}")
-        st.info(f"**Salvataggio:** {'✅' if save_models else '❌'}")
+        st.info(f"**Selected Models:** {len(selected_models)}")
+        st.info(f"**Model Saving:** {'Yes' if save_models else 'No'}")
     
     # ----------------11. Training Execution
     logger.info("Sezione esecuzione training")
-    st.subheader("Esecuzione Training")
+    st.subheader("Training Execution")
     
-    if st.button("Avvia Training Completo", type="primary"):
+    if st.button("Start Full Training", type="primary"):
         if not selected_models:
-            logger.error("Nessun modello selezionato")
-            st.error("Seleziona almeno un modello dalla sidebar")
+            logger.error("No model selectto")
+            st.error("Select at least one model from the sidebar")
             st.stop()
         
-        logger.info(f"Avvio training con {len(selected_models)} modelli")
+        logger.info(f"Avvio training con {len(selected_models)} models")
         
         # Progress tracking
         progress_bar = st.progress(0)
@@ -334,7 +334,7 @@ elif ml_section == "Model Training":
         logger.debug("Inizializzazione trainer")
         trainer = ModelTrainer(random_state=42)
         
-        # Imposta dati già splittati direttamente
+        # Imposta data giÃ  splittati direttamente
         trainer.X_train = X_train
         trainer.y_train = y_train
         trainer.X_test = X_test
@@ -342,11 +342,11 @@ elif ml_section == "Model Training":
         
         # Applica preprocessing
         with st.spinner("Applicazione preprocessing..."):
-            logger.debug("Applicazione preprocessing ai dati")
+            logger.debug("Applicazione preprocessing ai data")
             X_train_processed = pipeline.fit_transform(trainer.X_train)
             X_test_processed = pipeline.transform(trainer.X_test)
             
-            # Aggiorna trainer con dati processati
+            # Aggiorna trainer con data processati
             trainer.X_train = pd.DataFrame(X_train_processed) if hasattr(X_train_processed, 'shape') else X_train_processed
             trainer.X_test = pd.DataFrame(X_test_processed) if hasattr(X_test_processed, 'shape') else X_test_processed
             logger.debug(f"Preprocessing applicato. Train shape: {trainer.X_train.shape}, Test shape: {trainer.X_test.shape}")
@@ -358,7 +358,7 @@ elif ml_section == "Model Training":
         # Training loop
         for i, model_type in enumerate(selected_models):
             update_progress(i / len(selected_models), f"Training {ML_MODELS[model_type]['name']}...")
-            logger.info(f"Training modello: {model_type}")
+            logger.info(f"Training model: {model_type}")
             
             try:
                 # Training
@@ -366,9 +366,9 @@ elif ml_section == "Model Training":
                 training_results[model_type] = result
                 logger.debug(f"Training {model_type} completato")
                 
-                # Cross validation se richiesto
-                if use_cross_validation:
-                    logger.debug(f"Cross validation {model_type}")
+                # Cross validataon se richiesto
+                if use_cross_validataon:
+                    logger.debug(f"Cross validataon {model_type}")
                     cv_result = trainer.cross_validate_model(model_type)
                     cv_results[model_type] = cv_result
                 
@@ -380,90 +380,90 @@ elif ml_section == "Model Training":
                 evaluation_results[model_type] = eval_result
                 
             except Exception as e:
-                logger.error(f"Errore nel training di {model_type}: {str(e)}")
-                st.error(f"Errore nel training di {model_type}: {str(e)}")
+                logger.error(f"Error nel training di {model_type}: {str(e)}")
+                st.error(f"Error while training {model_type}: {str(e)}")
                 continue
         
         update_progress(1.0, "Training completato!")
-        logger.info("Training completato per tutti i modelli")
+        logger.info("Training completato per tutti i models")
         
-        # Salva risultati in session state
+        # Salva results in session state
         st.session_state['training_results'] = training_results
         st.session_state['evaluation_results'] = evaluation_results
         st.session_state['cv_results'] = cv_results
         st.session_state['trained_models'] = trainer.trained_models
-        logger.debug("Risultati training salvati in session state")
+        logger.debug("Training results saved in session state")
         
         # ----------------12. Training Results Display
-        st.success("Training completato con successo!")
+        st.success("Training completed successfully!")
         
         # Summary veloce
         comparison = ModelComparison(evaluation_results)
         best_model = comparison.find_best_model('f1')
         
         if best_model:
-            logger.info(f"Miglior modello: {best_model['model_name']} (F1: {best_model['score']:.3f})")
-            st.success(f"**Miglior Modello:** {best_model['model_name']} (F1: {best_model['score']:.3f})")
+            logger.info(f"Best model: {best_model['model_name']} (F1: {best_model['score']:.3f})")
+            st.success(f"**Best Model:** {best_model['model_name']} (F1: {best_model['score']:.3f})")
         
-        # Tabella risultati
-        logger.debug("Creazione tabella risultati")
-        st.subheader("Risultati Training")
+        # Tabella results
+        logger.debug("Creating tabella results")
+        st.subheader("Training Results")
         results_table = comparison.create_comparison_table()
         st.dataframe(results_table, use_container_width=True)
         
-        # Visualizzazione training times
+        # Display training times
         if training_results:
-            logger.debug("Creazione visualizzazioni training")
+            logger.debug("Creating visualizzazioni training")
             train_viz = TrainingVisualizer()
             fig_times = train_viz.create_training_progress_chart(training_results)
             st.plotly_chart(fig_times, use_container_width=True)
         
-        # Cross validation results
+        # Cross validataon results
         if cv_results:
-            logger.debug("Creazione visualizzazioni cross validation")
-            fig_cv = train_viz.create_cross_validation_chart(cv_results)
+            logger.debug("Creating visualizzazioni cross validataon")
+            fig_cv = train_viz.create_cross_validataon_chart(cv_results)
             st.plotly_chart(fig_cv, use_container_width=True)
 
 # ----------------13. Model Evaluation
 elif ml_section == "Model Evaluation":
-    logger.info("Avvio sezione Model Evaluation")
-    st.header("3. Valutazione Dettagliata Modelli")
+    logger.info("Starting section Model Evaluation")
+    st.header("3. Detailed Model Evaluation")
     
     # Verifica prerequisiti
     if 'evaluation_results' not in st.session_state:
-        logger.warning("Risultati evaluation non trovati")
-        st.warning("Prima esegui il training dei modelli")
+        logger.warning("Evaluation results not found")
+        st.warning("Prima esegui il training dei models")
         st.stop()
     
     evaluation_results = st.session_state['evaluation_results']
-    logger.debug(f"Risultati evaluation caricati per {len(evaluation_results)} modelli")
+    logger.debug(f"Results evaluation uploadti per {len(evaluation_results)} models")
     
     # ----------------14. Performance Overview
-    logger.info("Creazione performance overview")
+    logger.info("Creating performance overview")
     st.subheader("Performance Overview")
     
     # Metrics radar chart
-    logger.debug("Creazione radar chart metriche")
+    logger.debug("Creating radar chart metriche")
     perf_viz = PerformanceVisualizer()
     fig_radar = perf_viz.create_metrics_comparison_radar(evaluation_results)
     st.plotly_chart(fig_radar, use_container_width=True)
     
     # Performance heatmap
-    logger.debug("Creazione heatmap performance")
+    logger.debug("Creating heatmap performance")
     fig_heatmap = perf_viz.create_performance_heatmap(evaluation_results)
     st.plotly_chart(fig_heatmap, use_container_width=True)
     
     # ----------------15. Detailed Metrics Analysis
-    logger.info("Analisi metriche dettagliate")
-    st.subheader("Analisi Metriche Dettagliate")
+    logger.info("Analysis metriche detailsate")
+    st.subheader("Detailed Metric Analysis")
     
-    # Selettore modello per analisi dettagliata
+    # Selettore model per analysis detailsata
     selected_model_detail = st.selectbox(
-        "Seleziona modello per analisi dettagliata:",
+        "Select model for detailed analysis:",
         list(evaluation_results.keys()),
         format_func=lambda x: ML_MODELS.get(x, {}).get('name', x)
     )
-    logger.debug(f"Modello selezionato per dettagli: {selected_model_detail}")
+    logger.debug(f"Modello selectto per details: {selected_model_detail}")
     
     if selected_model_detail:
         model_results = evaluation_results[selected_model_detail]
@@ -486,9 +486,9 @@ elif ml_section == "Model Evaluation":
             st.metric("Matthews Corr", f"{model_results.get('matthews_corrcoef', 0):.3f}")
             st.metric("Cohen Kappa", f"{model_results.get('cohen_kappa', 0):.3f}")
         
-        # Confusion Matrix dettagliata
+        # Confusion Matrix detailsata
         if 'confusion_matrix' in model_results:
-            logger.debug("Creazione confusion matrix dettagliata")
+            logger.debug("Creating confusion matrix detailsata")
             cm_viz = ConfusionMatrixVisualizer()
             fig_cm = cm_viz.create_confusion_matrix_detailed(
                 model_results['confusion_matrix'], 
@@ -498,24 +498,24 @@ elif ml_section == "Model Evaluation":
 
 # ----------------16. Model Comparison
 elif ml_section == "Model Comparison":
-    logger.info("Avvio sezione Model Comparison")
-    st.header("4. Confronto Approfondito Modelli")
+    logger.info("Starting section Model Comparison")
+    st.header("4. In-Depth Model Comparison")
     
     if 'evaluation_results' not in st.session_state:
-        logger.warning("Risultati evaluation non trovati per comparison")
-        st.warning("Prima esegui il training dei modelli")
+        logger.warning("Evaluation results not found per comparison")
+        st.warning("Prima esegui il training dei models")
         st.stop()
     
     evaluation_results = st.session_state['evaluation_results']
-    logger.debug(f"Confronto tra {len(evaluation_results)} modelli")
+    logger.debug(f"Comparison tra {len(evaluation_results)} models")
     
     # ----------------17. ROC Curves Comparison
-    logger.info("Creazione curve ROC")
+    logger.info("Creating curve ROC")
     st.subheader("Curve ROC")
     
     if 'trained_models' in st.session_state:
-        logger.debug("Calcolo probabilità per curve ROC")
-        # Calcola probabilità per ROC
+        logger.debug("Calcolo probabilitÃ  per curve ROC")
+        # Calcola probabilitÃ  per ROC
         probabilities = {}
         X_test = st.session_state['prepared_data'][1]
         y_test = st.session_state['prepared_data'][3]
@@ -528,48 +528,48 @@ elif ml_section == "Model Comparison":
                 try:
                     proba = model_data['model'].predict_proba(X_test_processed)[:, 1]
                     probabilities[model_name] = proba
-                    logger.debug(f"Probabilità calcolate per {model_name}")
+                    logger.debug(f"Calculated probabilities for {model_name}")
                 except:
                     probabilities[model_name] = None
-                    logger.debug(f"Errore calcolo probabilità per {model_name}")
+                    logger.debug(f"Error calculating probabilities for {model_name}")
         
         curve_viz = CurveVisualizer()
         fig_roc = curve_viz.create_roc_curves_comparison(evaluation_results, y_test, probabilities)
         st.plotly_chart(fig_roc, use_container_width=True)
         
         # Precision-Recall curves
-        logger.debug("Creazione curve Precision-Recall")
+        logger.debug("Creating curve Precision-Recall")
         fig_pr = curve_viz.create_precision_recall_curves(evaluation_results, y_test, probabilities)
         st.plotly_chart(fig_pr, use_container_width=True)
     
     # ----------------18. Statistical Significance Tests
-    logger.info("Test significatività statistica")
-    st.subheader("Test Significatività Statistica")
+    logger.info("Statistical significance tests")
+    st.subheader("Statistical Significance Tests")
     
     if len(evaluation_results) >= 2:
-        logger.debug("Setup selettori per confronto statistico")
-        # Selettori per confronto
+        logger.debug("Setting up selectors for statistical comparison")
+        # Selettori per comparison
         col1, col2 = st.columns(2)
         
         with col1:
             model1 = st.selectbox(
-                "Modello 1:",
+                "Model 1:",
                 list(evaluation_results.keys()),
                 format_func=lambda x: ML_MODELS.get(x, {}).get('name', x)
             )
         
         with col2:
             model2 = st.selectbox(
-                "Modello 2:",
+                "Model 2:",
                 [m for m in evaluation_results.keys() if m != model1],
                 format_func=lambda x: ML_MODELS.get(x, {}).get('name', x)
             )
         
-        logger.debug(f"Modelli per confronto statistico: {model1} vs {model2}")
+        logger.debug(f"Models for statistical comparison: {model1} vs {model2}")
         
-        if st.button("Esegui Test Statistici"):
-            logger.info(f"Esecuzione test statistici: {model1} vs {model2}")
-            # McNemar test (richiede predizioni)
+        if st.button("Run Statistical Tests"):
+            logger.info(f"Running statistical tests: {model1} vs {model2}")
+            # McNemar test (richiede predictions)
             if 'trained_models' in st.session_state:
                 y_test = st.session_state['prepared_data'][3]
                 X_test_processed = pipeline.transform(st.session_state['prepared_data'][1])
@@ -578,63 +578,63 @@ elif ml_section == "Model Comparison":
                 pred2 = st.session_state['trained_models'][model2]['model'].predict(X_test_processed)
                 
                 mcnemar_result = StatisticalTests.mcnemar_test(y_test, pred1, pred2)
-                logger.debug(f"Risultato McNemar test: statistic={mcnemar_result['statistic']:.3f}, p-value={mcnemar_result['p_value']:.4f}")
+                logger.debug(f"McNemar test result: statistic={mcnemar_result['statistic']:.3f}, p-value={mcnemar_result['p_value']:.4f}")
                 
-                st.write("**Test di McNemar:**")
+                st.write("**McNemar Test:**")
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    st.metric("Statistica", f"{mcnemar_result['statistic']:.3f}")
+                    st.metric("Statistic", f"{mcnemar_result['statistic']:.3f}")
                 
                 with col2:
                     st.metric("P-value", f"{mcnemar_result['p_value']:.4f}")
                 
                 with col3:
-                    significance = "Significativo" if mcnemar_result['significant'] else "Non Significativo"
-                    st.metric("Risultato", significance)
+                    significance = "Significant" if mcnemar_result['significant'] else "Not Significant"
+                    st.metric("Result", significance)
     else:
-        logger.debug("Numero insufficiente di modelli per test statistici")
+        logger.debug("Numero insufficiente di models per test statistici")
     
     # ----------------19. Model Rankings
-    logger.info("Creazione ranking modelli")
-    st.subheader("Classifiche Modelli")
+    logger.info("Creating ranking models")
+    st.subheader("Model Rankings")
     
     metrics_for_ranking = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
     
     for metric in metrics_for_ranking:
-        with st.expander(f"Ranking per {metric.title()}"):
-            logger.debug(f"Creazione ranking per metrica: {metric}")
+        with st.expander(f"Ranking by {metric.title()}"):
+            logger.debug(f"Creating ranking by metric: {metric}")
             fig_ranking = perf_viz.create_model_ranking_chart(evaluation_results, metric)
             st.plotly_chart(fig_ranking, use_container_width=True)
 
 # ----------------20. Feature Analysis
 elif ml_section == "Feature Analysis":
-    logger.info("Avvio sezione Feature Analysis")
-    st.header("5. Analisi Feature Importance")
+    logger.info("Starting Feature Analysis section")
+    st.header("5. Feature Importance Analysis")
     
     if 'trained_models' not in st.session_state:
-        logger.warning("Modelli addestrati non trovati per feature analysis")
-        st.warning("Prima esegui il training dei modelli")
+        logger.warning("Trained models not found for feature analysis")
+        st.warning("Run model training first")
         st.stop()
     
-    # ----------------21. Feature Importance per modello
-    logger.info("Analisi feature importance per modello")
-    st.subheader("Feature Importance per Modello")
+    # ----------------21. Feature Importance per model
+    logger.info("Analysis feature importance per model")
+    st.subheader("Feature Importance by Model")
     
     models_with_importance = ['RandomForestClassifier', 'GradientBoostingClassifier', 'DecisionTreeClassifier']
     available_models = [m for m in st.session_state['trained_models'].keys() if m in models_with_importance]
     logger.debug(f"Modelli con feature importance disponibili: {available_models}")
     
     if not available_models:
-        logger.warning("Nessun modello con feature importance disponibile")
-        st.warning("Nessun modello con feature importance disponibile")
+        logger.warning("No model con feature importance disponibile")
+        st.warning("No model with feature importance available")
     else:
         selected_model_fi = st.selectbox(
-            "Seleziona modello per feature importance:",
+            "Select model per feature importance:",
             available_models,
             format_func=lambda x: ML_MODELS.get(x, {}).get('name', x)
         )
-        logger.debug(f"Modello selezionato per feature importance: {selected_model_fi}")
+        logger.debug(f"Selected model for feature importance: {selected_model_fi}")
         
         model_obj = st.session_state['trained_models'][selected_model_fi]['model']
         
@@ -665,10 +665,10 @@ elif ml_section == "Feature Analysis":
         else:
             logger.debug(f"Modello {selected_model_fi} non ha feature_importances_")
     
-    # ----------------22. Confronto Feature Importance
+    # ----------------22. Comparison Feature Importance
     if len(available_models) > 1:
-        logger.info("Confronto feature importance tra modelli")
-        st.subheader("Confronto Feature Importance")
+        logger.info("Comparison feature importance tra models")
+        st.subheader("Comparison Feature Importance")
         
         importance_data = {}
         for model_name in available_models:
@@ -682,56 +682,56 @@ elif ml_section == "Feature Analysis":
                 
                 importance_data[model_name] = dict(zip(feature_names, model_obj.feature_importances_))
         
-        logger.debug(f"Dati importanza per confronto: {len(importance_data)} modelli")
+        logger.debug(f"Data importanza per comparison: {len(importance_data)} models")
         
         if importance_data:
-            logger.debug("Creazione grafico confronto feature importance")
+            logger.debug("Creating chart comparison feature importance")
             fig_fi_comp = fi_viz.create_feature_importance_comparison(importance_data)
             st.plotly_chart(fig_fi_comp, use_container_width=True)
 
 # ----------------23. Predictions & Deployment
 elif ml_section == "Predictions & Deployment":
-    logger.info("Avvio sezione Predictions & Deployment")
-    st.header("6. Predizioni e Deploy")
+    logger.info("Starting Predictions & Deployment section")
+    st.header("6. Predictions and Deployment")
     
     if 'trained_models' not in st.session_state:
-        logger.warning("Modelli addestrati non trovati per predizioni")
-        st.warning("Prima esegui il training dei modelli")
+        logger.warning("Trained models not found for predictions")
+        st.warning("Run model training first")
         st.stop()
     
     # ----------------24. Single Prediction Interface
-    logger.info("Setup interfaccia predizione singola")
-    st.subheader("Predizione Singola")
+    logger.info("Setting up single prediction interface")
+    st.subheader("Single Prediction")
     
-    st.write("Inserisci i dati di un passeggero per predire la sopravvivenza:")
+    st.write("Enter passenger data to predict survival:")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        new_pclass = st.selectbox("Classe", [1, 2, 3], format_func=lambda x: f"{x}ª Classe")
-        new_sex = st.selectbox("Sesso", ["male", "female"], format_func=lambda x: "Uomo" if x == "male" else "Donna")
-        new_age = st.number_input("Età", min_value=0, max_value=100, value=30)
+        new_pclass = st.selectbox("Class", [1, 2, 3], format_func=lambda x: f"Class {x}")
+        new_sex = st.selectbox("Sex", ["male", "female"], format_func=lambda x: "Male" if x == "male" else "Female")
+        new_age = st.number_input("Age", min_value=0, max_value=100, value=30)
     
     with col2:
-        new_sibsp = st.number_input("Fratelli/Coniugi", min_value=0, max_value=10, value=0)
-        new_parch = st.number_input("Genitori/Figli", min_value=0, max_value=10, value=0)
-        new_fare = st.number_input("Prezzo Biglietto", min_value=0.0, max_value=500.0, value=50.0)
+        new_sibsp = st.number_input("Siblings/Spouses", min_value=0, max_value=10, value=0)
+        new_parch = st.number_input("Parents/Children", min_value=0, max_value=10, value=0)
+        new_fare = st.number_input("Ticket Fare", min_value=0.0, max_value=500.0, value=50.0)
     
     with col3:
-        new_embarked = st.selectbox("Porto Imbarco", ["S", "C", "Q"], 
+        new_embarked = st.selectbox("Port of Embarkation", ["S", "C", "Q"], 
                                    format_func=lambda x: {"S": "Southampton", "C": "Cherbourg", "Q": "Queenstown"}[x])
         
-        # Info famiglia calcolate
+        # Derived family information
         family_size = new_sibsp + new_parch + 1
-        is_alone = "Sì" if family_size == 1 else "No"
-        st.info(f"**Famiglia:** {family_size} membri")
-        st.info(f"**Solo:** {is_alone}")
+        is_alone = "Yes" if family_size == 1 else "No"
+        st.info(f"**Family Size:** {family_size} members")
+        st.info(f"**Traveling Alone:** {is_alone}")
     
-    logger.debug(f"Dati input: classe={new_pclass}, sesso={new_sex}, età={new_age}, famiglia={family_size}")
+    logger.debug(f"Input data: class={new_pclass}, sex={new_sex}, age={new_age}, family={family_size}")
     
-    # ----------------25. Esegui Predizione
-    if st.button("Predici Sopravvivenza", type="primary"):
-        logger.info("Esecuzione predizione singola")
+    # ----------------25. Esegui Prediction
+    if st.button("Predict Survival", type="primary"):
+        logger.info("Running single prediction")
         # Crea DataFrame input
         input_data = pd.DataFrame({
             'Pclass': [new_pclass],
@@ -744,12 +744,12 @@ elif ml_section == "Predictions & Deployment":
         })
         
         # Applica preprocessing
-        logger.debug("Applicazione preprocessing a input singolo")
+        logger.debug("Applying preprocessing to single input")
         pipeline = st.session_state['preprocessing_pipeline']
         input_processed = pipeline.transform(input_data)
         
-        # Predizioni da tutti i modelli
-        logger.debug("Esecuzione predizioni da tutti i modelli")
+        # Predictions da tutti i models
+        logger.debug("Running predictions from all models")
         predictions = {}
         probabilities = {}
         
@@ -762,52 +762,52 @@ elif ml_section == "Predictions & Deployment":
             if hasattr(model, 'predict_proba'):
                 proba = model.predict_proba(input_processed)[0][1]
                 probabilities[model_name] = proba
-                logger.debug(f"Predizione {model_name}: {pred}, prob: {proba:.3f}")
+                logger.debug(f"Prediction {model_name}: {pred}, probability: {proba:.3f}")
             else:
                 probabilities[model_name] = None
-                logger.debug(f"Predizione {model_name}: {pred}")
+                logger.debug(f"Prediction {model_name}: {pred}")
         
-        # ----------------26. Visualizza Risultati
-        logger.info("Visualizzazione risultati predizione")
-        st.subheader("Risultati Predizione")
+        # ----------------26. Visualizza Results
+        logger.info("Displaying prediction results")
+        st.subheader("Prediction Results")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.write("**Predizioni per Modello:**")
+            st.write("**Predictions by Model:**")
             for model_name, pred in predictions.items():
                 model_display_name = ML_MODELS.get(model_name, {}).get('name', model_name)
                 prob = probabilities[model_name]
                 
                 if pred == 1:
-                    st.success(f"**{model_display_name}:** SOPRAVVIVE")
+                    st.success(f"**{model_display_name}:** SURVIVES")
                 else:
-                    st.error(f"**{model_display_name}:** NON SOPRAVVIVE")
+                    st.error(f"**{model_display_name}:** DOES NOT SURVIVE")
                 
                 if prob is not None:
-                    st.write(f"Probabilità: {prob:.2%}")
+                    st.write(f"Probability: {prob:.2%}")
         
         with col2:
-            # Consensus predizione
+            # Consensus prediction
             survival_votes = sum(predictions.values())
             total_votes = len(predictions)
             consensus_prob = survival_votes / total_votes
             logger.debug(f"Consensus: {survival_votes}/{total_votes} = {consensus_prob:.3f}")
             
-            st.write("**Consensus Predizione:**")
+            st.write("**Consensus Prediction:**")
             if consensus_prob > 0.5:
-                st.success(f"**CONSENSUS: SOPRAVVIVE**")
-                st.write(f"Accordo: {survival_votes}/{total_votes} modelli")
+                st.success(f"**CONSENSUS: SURVIVES**")
+                st.write(f"Agreement: {survival_votes}/{total_votes} models")
             else:
-                st.error(f"**CONSENSUS: NON SOPRAVVIVE**")
-                st.write(f"Accordo: {total_votes - survival_votes}/{total_votes} modelli")
+                st.error(f"**CONSENSUS: DOES NOT SURVIVE**")
+                st.write(f"Agreement: {total_votes - survival_votes}/{total_votes} models")
             
             confidence = max(consensus_prob, 1-consensus_prob)
             st.metric("Confidence Level", f"{confidence:.1%}")
         
-        # Grafico probabilità
+        # Probability chart
         if any(prob is not None for prob in probabilities.values()):
-            logger.debug("Creazione grafico probabilità predizioni")
+            logger.debug("Creating prediction probability chart")
             prob_data = []
             for model_name, prob in probabilities.items():
                 if prob is not None:
@@ -815,7 +815,7 @@ elif ml_section == "Predictions & Deployment":
                     prob_data.append({
                         'Model': model_display_name,
                         'Probability': prob,
-                        'Prediction': 'Sopravvive' if prob > 0.5 else 'Non Sopravvive'
+                        'Prediction': 'Survives' if prob > 0.5 else 'Does Not Survive'
                     })
             
             if prob_data:
@@ -825,107 +825,107 @@ elif ml_section == "Predictions & Deployment":
                 st.plotly_chart(fig_pred, use_container_width=True)
     
     # ----------------27. Batch Predictions
-    logger.info("Setup predizioni batch")
-    st.subheader("Predizioni Batch")
+    logger.info("Setting up batch predictions")
+    st.subheader("Batch Predictions")
     
     uploaded_file = st.file_uploader(
-        "Carica file CSV per predizioni batch:",
+        "Upload CSV file for batch predictions:",
         type=['csv'],
-        help="Il file deve contenere le stesse colonne del dataset di training"
+        help="The file must contain the same columns as the training dataset"
     )
     
     if uploaded_file is not None:
-        logger.debug("File CSV caricato per predizioni batch")
+        logger.debug("CSV file uploaded for batch predictions")
         batch_data = pd.read_csv(uploaded_file)
-        st.write("**Preview dati caricati:**")
+        st.write("**Uploaded Data Preview:**")
         st.dataframe(batch_data.head(), use_container_width=True)
-        logger.debug(f"Dati batch caricati. Shape: {batch_data.shape}")
+        logger.debug(f"Uploaded batch data. Shape: {batch_data.shape}")
         
-        if st.button("Esegui Predizioni Batch"):
-            logger.info("Esecuzione predizioni batch")
+        if st.button("Run Batch Predictions"):
+            logger.info("Running batch predictions")
             try:
                 # Preprocessing
-                logger.debug("Preprocessing dati batch")
+                logger.debug("Preprocessing data batch")
                 pipeline = st.session_state['preprocessing_pipeline']
                 batch_processed = pipeline.transform(batch_data)
                 
-                # Predizioni
+                # Predictions
                 batch_results = batch_data.copy()
                 
-                # Usa il miglior modello per batch predictions
+                # Usa il best model per batch predictions
                 evaluation_results = st.session_state['evaluation_results']
                 comparison = ModelComparison(evaluation_results)
                 best_model_info = comparison.find_best_model('f1')
                 
                 if best_model_info:
-                    logger.info(f"Usando miglior modello per batch: {best_model_info['model_name']}")
+                    logger.info(f"Usando best model per batch: {best_model_info['model_name']}")
                     best_model_name = best_model_info['model_type']
                     best_model = st.session_state['trained_models'][best_model_name]['model']
                     
                     predictions = best_model.predict(batch_processed)
                     batch_results['Predicted_Survival'] = predictions
-                    batch_results['Predicted_Survival_Text'] = batch_results['Predicted_Survival'].map({0: 'Non Sopravvive', 1: 'Sopravvive'})
+                    batch_results['Predicted_Survival_Text'] = batch_results['Predicted_Survival'].map({0: 'Does Not Survive', 1: 'Survives'})
                     
                     if hasattr(best_model, 'predict_proba'):
                         probabilities = best_model.predict_proba(batch_processed)[:, 1]
                         batch_results['Survival_Probability'] = probabilities
                     
-                    logger.debug(f"Predizioni batch completate: {len(predictions)} predizioni")
-                    st.success(f"Predizioni completate usando {best_model_info['model_name']}")
+                    logger.debug(f"Predictions batch completate: {len(predictions)} predictions")
+                    st.success(f"Predictions completed using {best_model_info['model_name']}")
                     st.dataframe(batch_results, use_container_width=True)
                     
-                    # Download risultati
+                    # Download results
                     csv = batch_results.to_csv(index=False)
                     st.download_button(
-                        label="Scarica Risultati CSV",
+                        label="Download Results CSV",
                         data=csv,
                         file_name=f"titanic_predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                         mime='text/csv'
                     )
                 
             except Exception as e:
-                logger.error(f"Errore nelle predizioni batch: {str(e)}")
-                st.error(f"Errore nelle predizioni batch: {str(e)}")
+                logger.error(f"Error nelle predictions batch: {str(e)}")
+                st.error(f"Error nelle predictions batch: {str(e)}")
     
     # ----------------28. Model Deployment Info
     logger.info("Sezione informazioni deployment")
-    st.subheader("Informazioni Deployment")
+    st.subheader("Deployment Information")
     
-    with st.expander("Guida Deployment", expanded=False):
+    with st.expander("Deployment Guide", expanded=False):
         st.markdown("""
-        **Opzioni per deployment del modello:**
+        **Model deployment options:**
         
-        1. **API REST**: Usa FastAPI o Flask per creare endpoint
-        2. **Streamlit Cloud**: Deploy diretto di questa app
-        3. **Docker Container**: Containerizza l'applicazione
+        1. **REST API**: Use FastAPI or Flask to create endpoints
+        2. **Streamlit Cloud**: Direct deployment of this app
+        3. **Docker Container**: Containerize the application
         4. **Cloud Services**: AWS SageMaker, Azure ML, Google AI Platform
         
-        **File necessari per deployment:**
-        - Modello addestrato (pickle/joblib)
-        - Pipeline preprocessing
-        - Requirements.txt
-        - Dockerfile (opzionale)
+        **Files required for deployment:**
+        - Trained model (`pickle`/`joblib`)
+        - Preprocessing pipeline
+        - `requirements.txt`
+        - `Dockerfile` (optional)
         
-        **Considerazioni produzione:**
-        - Monitoring performance modelli
-        - A/B testing tra modelli
-        - Retraining automatico
+        **Production considerations:**
+        - Model performance monitoring
+        - A/B testing between models
+        - Automated retraining
         - Data drift detection
         """)
     
     # Model saving
     if save_models:
-        logger.info("Sezione salvataggio modelli")
-        st.subheader("Salvataggio Modelli")
+        logger.info("Model saving section")
+        st.subheader("Model Saving")
         
-        if st.button("Salva Tutti i Modelli"):
-            logger.info("Avvio salvataggio tutti i modelli")
+        if st.button("Save All Models"):
+            logger.info("Starting save for all models")
             saved_models = []
             
             for model_name, model_data in st.session_state['trained_models'].items():
                 try:
-                    logger.debug(f"Salvataggio modello: {model_name}")
-                    # Salva modello
+                    logger.debug(f"Salvataggio model: {model_name}")
+                    # Salva model
                     model_path = ModelPersistence.save_model(
                         model_data['model'], 
                         model_name
@@ -940,30 +940,30 @@ elif ml_section == "Predictions & Deployment":
                     saved_models.append(f"Pipeline {model_name}: {pipeline_path}")
                     
                 except Exception as e:
-                    logger.error(f"Errore salvando {model_name}: {str(e)}")
-                    st.error(f"Errore salvando {model_name}: {str(e)}")
+                    logger.error(f"Error saving {model_name}: {str(e)}")
+                    st.error(f"Error saving {model_name}: {str(e)}")
             
             if saved_models:
-                logger.info(f"Modelli salvati con successo: {len(saved_models)}")
-                st.success("Modelli salvati con successo!")
+                logger.info(f"Models saved successfully: {len(saved_models)}")
+                st.success("Models saved successfully!")
                 for saved in saved_models:
-                    st.write(f"✅ {saved}")
+                    st.write(f"- {saved}")
 
 # ----------------29. Model Reports
 elif ml_section == "Model Reports":
-    logger.info("Avvio sezione Model Reports")
-    st.header("7. Report Completi Modelli")
+    logger.info("Starting section Model Reports")
+    st.header("7. Complete Model Reports")
     
     if 'evaluation_results' not in st.session_state:
-        logger.warning("Risultati evaluation non trovati per reports")
-        st.warning("Prima esegui il training e valutazione dei modelli")
+        logger.warning("Evaluation results not found per reports")
+        st.warning("Run training and evaluation first")
         st.stop()
     
     evaluation_results = st.session_state['evaluation_results']
-    logger.debug(f"Report per {len(evaluation_results)} modelli")
+    logger.debug(f"Report per {len(evaluation_results)} models")
     
     # ----------------30. Executive Summary
-    logger.info("Creazione executive summary")
+    logger.info("Creating executive summary")
     st.subheader("Executive Summary")
     
     comparison = ModelComparison(evaluation_results)
@@ -1006,43 +1006,43 @@ elif ml_section == "Model Reports":
                 f"{best_f1['score']:.3f}",
                 delta=best_f1['model_name']
             )
-            logger.debug(f"Miglior F1: {best_f1['model_name']} ({best_f1['score']:.3f})")
+            logger.debug(f"Best F1: {best_f1['model_name']} ({best_f1['score']:.3f})")
     
     # ----------------31. Comprehensive Visualizations
-    logger.info("Creazione visualizzazioni complete")
+    logger.info("Creating visualizzazioni complete")
     st.subheader("Visualizzazioni Complete")
     
     # Crea report visualizzazioni complete
     training_results = st.session_state.get('training_results')
-    logger.debug("Creazione comprehensive visualization report")
+    logger.debug("Creating comprehensive visualization report")
     comprehensive_viz = create_comprehensive_model_report_visualization(
         evaluation_results, training_results
     )
     
     for i, fig in enumerate(comprehensive_viz):
         if fig is not None:
-            logger.debug(f"Visualizzazione figura {i}")
+            logger.debug(f"Display figura {i}")
             st.plotly_chart(fig, use_container_width=True)
     
     # ----------------32. Error Analysis
-    logger.info("Analisi errori avanzata")
-    st.subheader("Analisi Errori Avanzata")
+    logger.info("Analysis errori avanzata")
+    st.subheader("Advanced Error Analysis")
     
     if 'trained_models' in st.session_state:
-        # Selettore modello per error analysis
+        # Selettore model per error analysis
         selected_model_error = st.selectbox(
-            "Seleziona modello per analisi errori:",
+            "Select model per analysis errori:",
             list(st.session_state['trained_models'].keys()),
             format_func=lambda x: ML_MODELS.get(x, {}).get('name', x)
         )
-        logger.debug(f"Modello selezionato per error analysis: {selected_model_error}")
+        logger.debug(f"Modello selectto per error analysis: {selected_model_error}")
         
-        # Calcola predizioni per error analysis
+        # Calcola predictions per error analysis
         X_test = st.session_state['prepared_data'][1]
         y_test = st.session_state['prepared_data'][3]
         pipeline = st.session_state['preprocessing_pipeline']
         
-        logger.debug("Calcolo predizioni per error analysis")
+        logger.debug("Calcolo predictions per error analysis")
         X_test_processed = pipeline.transform(X_test)
         model = st.session_state['trained_models'][selected_model_error]['model']
         predictions = model.predict(X_test_processed)
@@ -1078,12 +1078,12 @@ elif ml_section == "Model Reports":
             difficult_samples = error_analyzer.find_difficult_samples()
             
             if difficult_samples['difficult_samples'] > 0:
-                logger.debug(f"Campioni difficili trovati: {difficult_samples['difficult_samples']} ({difficult_samples['percentage']:.1f}%)")
-                st.write(f"**Campioni Difficili da Classificare:** {difficult_samples['difficult_samples']} ({difficult_samples['percentage']:.1f}%)")
+                logger.debug(f"Difficult samples found: {difficult_samples['difficult_samples']} ({difficult_samples['percentage']:.1f}%)")
+                st.write(f"**Difficult Samples to Classify:** {difficult_samples['difficult_samples']} ({difficult_samples['percentage']:.1f}%)")
     
     # ----------------33. Model Comparison Table
-    logger.info("Creazione tabella confronto completa")
-    st.subheader("Tabella Confronto Completa")
+    logger.info("Creating tabella comparison completa")
+    st.subheader("Complete Comparison Table")
     
     detailed_metrics = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc', 'balanced_accuracy', 'matthews_corrcoef']
     comparison_table = comparison.create_comparison_table(detailed_metrics)
@@ -1097,7 +1097,7 @@ elif ml_section == "Model Reports":
     
     with col1:
         if st.button("Genera Report JSON"):
-            logger.info("Generazione report JSON")
+            logger.info("Generating report JSON")
             # Crea report strutturato
             report_data = {
                 'timestamp': datetime.now().isoformat(),
@@ -1117,7 +1117,7 @@ elif ml_section == "Model Reports":
             json_str = json.dumps(report_data, indent=2, default=str)
             
             st.download_button(
-                label="Scarica Report JSON",
+                label="Download Report JSON",
                 data=json_str,
                 file_name=f"ml_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                 mime='application/json'
@@ -1125,89 +1125,43 @@ elif ml_section == "Model Reports":
     
     with col2:
         if st.button("Genera Report CSV"):
-            logger.info("Generazione report CSV")
+            logger.info("Generating report CSV")
             csv_report = comparison_table.to_csv(index=False)
             
             st.download_button(
-                label="Scarica Report CSV",
+                label="Download Report CSV",
                 data=csv_report,
                 file_name=f"ml_comparison_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 mime='text/csv'
             )
 
 # ----------------35. Footer e Summary Generale
-logger.info("Creazione footer e summary generale")
+logger.info("Creating footer e summary generale")
 st.markdown("---")
 
 # Summary stato corrente
 if 'trained_models' in st.session_state:
     n_models = len(st.session_state['trained_models'])
-    logger.debug(f"Pipeline attiva con {n_models} modelli")
-    st.success(f"**Pipeline ML Attiva:** {n_models} modelli addestrati con configurazione {preprocessing_config}")
+    logger.debug(f"Pipeline attiva con {n_models} models")
+    st.success(f"**Active ML Pipeline:** {n_models} models trained with configuration {preprocessing_config}")
     
     if 'evaluation_results' in st.session_state:
         comparison = ModelComparison(st.session_state['evaluation_results'])
         best_model = comparison.find_best_model('f1')
         if best_model:
-            logger.info(f"Miglior modello globale: {best_model['model_name']} (F1: {best_model['score']:.3f})")
-            st.info(f"**Miglior Modello Globale:** {best_model['model_name']} (F1: {best_model['score']:.3f})")
-
-# Note metodologiche
-with st.expander("Note Metodologiche e Architettura", expanded=False):
-    st.markdown("""
-    **Architettura Modulare Implementata:**
-    
-    **Data & Preprocessing:**
-    - `ml_preprocessing.py`: Pipeline intelligente con feature engineering automatico
-    - `DataQualityChecker`: Analisi qualità dati e raccomandazioni
-    - Configurazioni: Minimal, Standard, Advanced
-    
-    **Models & Training:**
-    - `ml_models.py`: Factory pattern per modelli con configurazioni ottimizzate
-    - `model_trainer.py`: Pipeline training completa con CV e hyperparameter tuning
-    - Supporto ensemble e persistence
-    
-    **Evaluation & Analysis:**
-    - `model_evaluator.py`: Metriche avanzate, test statistici, error analysis
-    - `ModelComparison`: Confronti automatici e ranking
-    - Monitoring performance e drift detection
-    
-    **Visualization:**
-    - `ml_charts.py`: Visualizzazioni professionali per ogni aspetto ML
-    - Dashboard interattive e report automatici
-    - Export multi-formato
-    
-    **Features Avanzate:**
-    - **Preprocessing intelligente** con raccomandazioni automatiche
-    - **Training configurabile** (Quick/Comprehensive/Deep)
-    - **Evaluation completa** con 15+ metriche
-    - **Statistical significance** testing
-    - **Feature importance** analysis
-    - **Batch predictions** e deployment ready
-    - **Error analysis** avanzata
-    - **Report automatici** JSON/CSV
-    
-    **Limitazioni:**
-    - Dataset storicamente limitato (1912)
-    - Bias nei dati originali
-    - Generalizzazione a contesti moderni limitata
-    
-    **Best Practices Implementate:**
-    - Modular architecture con separation of concerns
-    - Error handling robusto
-    - Caching intelligente per performance
-    - Validation pipeline completa
-    - Reproducibility con random states
-    - Scalabilità per nuovi modelli/metriche
-    """)
+            logger.info(f"Best model globale: {best_model['model_name']} (F1: {best_model['score']:.3f})")
+            st.info(f"**Best Overall Model:** {best_model['model_name']} (F1: {best_model['score']:.3f})")
 
 st.markdown("""
-**Machine Learning Pipeline completata**
+**Machine Learning Pipeline Completed**
 
-Questa implementazione rappresenta una pipeline ML completa e production-ready per l'analisi del Titanic,
-con architettura modulare, preprocessing intelligente, training automatizzato e evaluation approfondita.
+This implementation represents a complete, production-ready ML pipeline for Titanic analysis,
+with a modular architecture, intelligent preprocessing, automated training, and in-depth evaluation.
 
-**Prossimi Step:** Considera deployment, monitoring in produzione e retraining automatico per un sistema ML completo.
+**Next Steps:** Consider deployment, production monitoring, and automated retraining for a fully operational ML system.
 """)
 
 logger.info(f"Pagina {__name__} completata con successo")
+
+
+

@@ -1,252 +1,237 @@
 """
 pages/1_Data_Overview.py
-Panoramica completa del dataset Titanic
+Complete overview of the Titanic dataset.
 """
 
-import streamlit as st
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
-import matplotlib.pyplot as plt
-from src.config import PAGE_CONFIG, COLUMN_LABELS
-from src.utils.data_loader import load_titanic_data, get_data_summary, get_missing_values_info, check_duplicates
+import streamlit as st
+
+from src.components.charts import create_missing_values_heatmap
+from src.config import COLUMN_LABELS, PAGE_CONFIG
+from src.utils.data_loader import check_duplicates, get_missing_values_info, load_titanic_data
 from src.utils.data_processor import clean_dataset_basic, detect_outliers_summary
-from src.components.charts import create_missing_values_heatmap, create_data_types_chart
 from src.utils.log import logger
 
-# Logger per l'ingresso del file
-logger.info(f"Caricamento pagina {__name__}")
+logger.info(f"Loading page {__name__}")
 
-# ----------------1. Configurazione pagina (da config.py)
+
 def setup_page():
-    """Configura la pagina Streamlit"""
-    logger.info("Configurazione pagina Streamlit")
+    """Configure the Streamlit page."""
+    logger.info("Configuring the Streamlit page")
     st.set_page_config(**PAGE_CONFIG)
+
 
 setup_page()
 
-# ----------------2. Caricamento dati (da notebook sezione 2.1 - Structure of dataset)
-logger.info("Caricamento dati Titanic")
+logger.info("Loading Titanic data")
 df_original = load_titanic_data()
 if df_original is None:
-    logger.error("Impossibile caricare i dati Titanic")
-    st.error("Impossibile caricare i dati")
+    logger.error("Unable to load Titanic data")
+    st.error("Unable to load the data")
     st.stop()
-logger.info(f"Dati caricati con successo. Shape: {df_original.shape}")
+logger.info(f"Data loaded successfully. Shape: {df_original.shape}")
 
-# ----------------3. Header pagina
-logger.info("Setup header pagina")
-st.title("Panoramica Dataset Titanic")
-st.markdown("Analisi completa della struttura, qualità e caratteristiche del dataset")
+logger.info("Setting up page header")
+st.title("Titanic Dataset Overview")
+st.markdown("Complete analysis of the dataset structure, quality, and characteristics")
 
-# ----------------4. Sidebar controlli
-logger.info("Setup sidebar controlli")
+logger.info("Setting up sidebar controls")
 with st.sidebar:
-    st.header("Controlli Visualizzazione")
-    
-    # Opzioni di visualizzazione
-    show_raw_data = st.checkbox("Mostra dati grezzi", value=False)
-    show_cleaned_data = st.checkbox("Mostra dati puliti", value=True)
-    show_statistics = st.checkbox("Mostra statistiche", value=True)
-    
-    # Numero righe da visualizzare
-    n_rows = st.slider("Righe da visualizzare", 5, 50, 10)
-    logger.debug(f"Parametri visualizzazione: raw={show_raw_data}, cleaned={show_cleaned_data}, stats={show_statistics}, rows={n_rows}")
+    st.header("Display Controls")
+    show_raw_data = st.checkbox("Show raw data", value=False)
+    show_cleaned_data = st.checkbox("Show cleaned data", value=True)
+    show_statistics = st.checkbox("Show statistics", value=True)
+    n_rows = st.slider("Rows to display", 5, 50, 10)
+    logger.debug(
+        f"Display parameters: raw={show_raw_data}, cleaned={show_cleaned_data}, "
+        f"stats={show_statistics}, rows={n_rows}"
+    )
 
-# ----------------5. Informazioni generali dataset (da notebook sezione 2.1)
-logger.info("Visualizzazione informazioni generali dataset")
-st.header("1. Informazioni Generali")
+logger.info("Displaying general dataset information")
+st.header("1. General Information")
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("Numero Righe", f"{len(df_original):,}")
+    st.metric("Number of Rows", f"{len(df_original):,}")
 with col2:
-    st.metric("Numero Colonne", len(df_original.columns))
+    st.metric("Number of Columns", len(df_original.columns))
 with col3:
-    st.metric("Dimensione Dataset", f"{df_original.memory_usage().sum() / 1024:.1f} KB")
+    st.metric("Dataset Size", f"{df_original.memory_usage().sum() / 1024:.1f} KB")
 with col4:
     duplicates_count = check_duplicates(df_original)
-    st.metric("Righe Duplicate", duplicates_count)
-    logger.debug(f"Trovate {duplicates_count} righe duplicate")
+    st.metric("Duplicate Rows", duplicates_count)
+    logger.debug(f"Found {duplicates_count} duplicate rows")
 
-# ----------------6. Struttura delle colonne (da notebook sezione 2.1)
-logger.info("Visualizzazione struttura colonne")
-st.subheader("Struttura delle Colonne")
+logger.info("Displaying column structure")
+st.subheader("Column Structure")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.write("**Informazioni colonne:**")
-    column_info = pd.DataFrame({
-        'Colonna': df_original.columns,
-        'Tipo': df_original.dtypes.astype(str),
-        'Valori Non-Null': df_original.count(),
-        'Valori Null': df_original.isnull().sum(),
-        'Percentuale Null': (df_original.isnull().sum() / len(df_original) * 100).round(2)
-    })
+    st.write("**Column information:**")
+    column_info = pd.DataFrame(
+        {
+            "Column": df_original.columns,
+            "Type": df_original.dtypes.astype(str),
+            "Non-Null Values": df_original.count(),
+            "Null Values": df_original.isnull().sum(),
+            "Null Percentage": (df_original.isnull().sum() / len(df_original) * 100).round(2),
+        }
+    )
     st.dataframe(column_info, use_container_width=True)
 
 with col2:
-    logger.debug("Creazione grafico tipi di dati")
-    st.write("**Distribuzione tipi di dati:**")
+    logger.debug("Creating data type chart")
+    st.write("**Data type distribution:**")
     data_types = df_original.dtypes.value_counts()
     fig_types = px.pie(
         values=data_types.values,
         names=data_types.index.astype(str),
-        title="Distribuzione Tipi di Dati"
+        title="Data Type Distribution",
     )
     st.plotly_chart(fig_types, use_container_width=True)
 
-# ----------------8. Analisi valori mancanti (da notebook sezione 2.2 - Missing values)
-logger.info("Analisi valori mancanti")
-st.header("2. Analisi Valori Mancanti")
+logger.info("Analyzing missing values")
+st.header("2. Missing Values Analysis")
 
 missing_info = get_missing_values_info(df_original)
 
 if missing_info is not None and not missing_info.empty:
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        st.subheader("Riepilogo Valori Mancanti")
+        st.subheader("Missing Values Summary")
         st.dataframe(missing_info, use_container_width=True)
-    
+
     with col2:
-        logger.debug("Creazione grafico valori mancanti")
-        st.subheader("Visualizzazione Missing Values")
+        logger.debug("Creating missing values chart")
+        st.subheader("Missing Values Visualization")
         fig_missing = px.bar(
             missing_info,
-            x='Colonna',
-            y='Percentuale',
-            title="Percentuale Valori Mancanti per Colonna",
-            color='Percentuale',
-            color_continuous_scale='Reds'
+            x="Column",
+            y="Percentage",
+            title="Missing Value Percentage by Column",
+            color="Percentage",
+            color_continuous_scale="Reds",
         )
         st.plotly_chart(fig_missing, use_container_width=True)
-    
-    # Heatmap valori mancanti
-    logger.debug("Creazione heatmap valori mancanti")
-    st.subheader("Heatmap Valori Mancanti")
+
+    logger.debug("Creating missing values heatmap")
+    st.subheader("Missing Values Heatmap")
     fig_heatmap = create_missing_values_heatmap(df_original)
     st.plotly_chart(fig_heatmap, use_container_width=True)
 else:
-    logger.info("Nessun valore mancante rilevato")
-    st.success("Nessun valore mancante rilevato nel dataset!")
+    logger.info("No missing values detected")
+    st.success("No missing values detected in the dataset.")
 
-# ----------------10. Data Cleaning Preview (da notebook sezione 3 - Data Cleaning)
-logger.info("Anteprima pulizia dati")
-st.header("3. Anteprima Pulizia Dati")
+logger.info("Previewing data cleaning")
+st.header("3. Data Cleaning Preview")
 
-# Applica pulizia base
 df_cleaned = clean_dataset_basic(df_original)
-logger.info(f"Dataset pulito. Shape: {df_cleaned.shape}")
+logger.info(f"Dataset cleaned. Shape: {df_cleaned.shape}")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Dataset Originale")
-    st.write(f"Righe: {len(df_original)}")
-    st.write(f"Colonne: {len(df_original.columns)}")
-    st.write(f"Valori mancanti: {df_original.isnull().sum().sum()}")
+    st.subheader("Original Dataset")
+    st.write(f"Rows: {len(df_original)}")
+    st.write(f"Columns: {len(df_original.columns)}")
+    st.write(f"Missing values: {df_original.isnull().sum().sum()}")
 
 with col2:
-    st.subheader("Dataset Pulito")
-    st.write(f"Righe: {len(df_cleaned)}")
-    st.write(f"Colonne: {len(df_cleaned.columns)}")
-    st.write(f"Valori mancanti: {df_cleaned.isnull().sum().sum()}")
+    st.subheader("Cleaned Dataset")
+    st.write(f"Rows: {len(df_cleaned)}")
+    st.write(f"Columns: {len(df_cleaned.columns)}")
+    st.write(f"Missing values: {df_cleaned.isnull().sum().sum()}")
 
-# ----------------11. Visualizzazione dati (da notebook sezione 2.1)
 if show_raw_data:
-    logger.debug("Visualizzazione dati grezzi")
-    st.header("4. Dati Grezzi")
-    st.subheader("Prime righe del dataset originale")
+    logger.debug("Displaying raw data")
+    st.header("4. Raw Data")
+    st.subheader("First rows of the original dataset")
     st.dataframe(df_original.head(n_rows), use_container_width=True)
-    
-    st.subheader("Ultime righe del dataset")
+    st.subheader("Last rows of the dataset")
     st.dataframe(df_original.tail(n_rows), use_container_width=True)
 
 if show_cleaned_data:
-    logger.debug("Visualizzazione dati puliti")
-    st.header("5. Dati Puliti")
-    st.subheader("Dataset dopo pulizia base")
+    logger.debug("Displaying cleaned data")
+    st.header("5. Cleaned Data")
+    st.subheader("Dataset after basic cleaning")
     st.dataframe(df_cleaned.head(n_rows), use_container_width=True)
 
-# ----------------12. Statistiche descrittive (da notebook sezione 4.1.1 - Descriptive Statistics)
+numeric_cols = df_cleaned.select_dtypes(include=[np.number]).columns
+categorical_cols = df_cleaned.select_dtypes(include=["object"]).columns
+categorical_cols = [col for col in categorical_cols if col != "Name"]
+
 if show_statistics:
-    logger.info("Calcolo statistiche descrittive")
-    st.header("6. Statistiche Descrittive")
-    
-    # Statistiche per variabili numeriche
-    st.subheader("Variabili Numeriche")
-    numeric_cols = df_cleaned.select_dtypes(include=[np.number]).columns
+    logger.info("Calculating descriptive statistics")
+    st.header("6. Descriptive Statistics")
+
+    st.subheader("Numerical Variables")
     if len(numeric_cols) > 0:
         st.dataframe(df_cleaned[numeric_cols].describe(), use_container_width=True)
-    
-    # Statistiche per variabili categoriche
-    st.subheader("Variabili Categoriche")
-    categorical_cols = df_cleaned.select_dtypes(include=['object']).columns
-    categorical_cols = [col for col in categorical_cols if col != 'Name']  # Escludi Name
-    
+
+    st.subheader("Categorical Variables")
     if len(categorical_cols) > 0:
         for col in categorical_cols:
-            with st.expander(f"Analisi {COLUMN_LABELS.get(col, col)}"):
+            with st.expander(f"Analysis of {COLUMN_LABELS.get(col, col)}"):
                 value_counts = df_cleaned[col].value_counts()
-                
+
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.write("**Conteggi:**")
-                    st.dataframe(value_counts.reset_index())
-                
+                    st.write("**Counts:**")
+                    st.dataframe(value_counts.reset_index(), use_container_width=True)
+
                 with col2:
-                    logger.debug(f"Creazione grafico per {col}")
-                    st.write("**Distribuzione:**")
+                    logger.debug(f"Creating chart for {col}")
+                    st.write("**Distribution:**")
                     fig = px.bar(
                         x=value_counts.index,
                         y=value_counts.values,
-                        title=f"Distribuzione {COLUMN_LABELS.get(col, col)}"
+                        title=f"Distribution of {COLUMN_LABELS.get(col, col)}",
                     )
                     st.plotly_chart(fig, use_container_width=True)
 
-# ----------------13. Rilevamento outliers (da notebook sezione 4.1.1 - Outlier detection)
-logger.info("Rilevamento outliers")
-st.header("7. Rilevamento Outliers")
+logger.info("Detecting outliers")
+st.header("7. Outlier Detection")
 
 outliers_summary = detect_outliers_summary(df_cleaned)
 if outliers_summary is not None:
-    st.subheader("Riepilogo Outliers per Variabile")
+    st.subheader("Outlier Summary by Variable")
     st.dataframe(outliers_summary, use_container_width=True)
-    
-    # Boxplot per visualizzare outliers
-    st.subheader("Visualizzazione Outliers")
-    numeric_cols_for_outliers = [col for col in numeric_cols if col not in ['PassengerId']]
-    
+
+    st.subheader("Outlier Visualization")
+    numeric_cols_for_outliers = [col for col in numeric_cols if col != "PassengerId"]
+
     if len(numeric_cols_for_outliers) > 0:
         selected_col = st.selectbox(
-            "Seleziona variabile per analisi outliers:",
+            "Select a variable for outlier analysis:",
             numeric_cols_for_outliers,
-            format_func=lambda x: COLUMN_LABELS.get(x, x)
+            format_func=lambda x: COLUMN_LABELS.get(x, x),
         )
-        
-        logger.debug(f"Creazione boxplot per {selected_col}")
+
+        logger.debug(f"Creating boxplot for {selected_col}")
         fig_box = px.box(
             df_cleaned,
             y=selected_col,
-            title=f"Boxplot per {COLUMN_LABELS.get(selected_col, selected_col)}"
+            title=f"Boxplot for {COLUMN_LABELS.get(selected_col, selected_col)}",
         )
         st.plotly_chart(fig_box, use_container_width=True)
 
-# ----------------14. Summary finale
-logger.info("Generazione riepilogo qualità dati")
-st.header("8. Riepilogo Qualità Dati")
+logger.info("Generating data quality summary")
+st.header("8. Data Quality Summary")
 
 quality_metrics = {
-    "Completezza": f"{((df_cleaned.count().sum() / (len(df_cleaned) * len(df_cleaned.columns))) * 100):.1f}%",
-    "Duplicati": f"{duplicates_count} righe",
-    "Outliers rilevati": f"{outliers_summary['Outliers_Count'].sum() if outliers_summary is not None else 0} valori",
-    "Variabili numeriche": f"{len(numeric_cols)} colonne",
-    "Variabili categoriche": f"{len(categorical_cols)} colonne"
+    "Completeness": f"{((df_cleaned.count().sum() / (len(df_cleaned) * len(df_cleaned.columns))) * 100):.1f}%",
+    "Duplicates": f"{duplicates_count} rows",
+    "Detected outliers": f"{outliers_summary['Outliers_Count'].sum() if outliers_summary is not None else 0} values",
+    "Numerical variables": f"{len(numeric_cols)} columns",
+    "Categorical variables": f"{len(categorical_cols)} columns",
 }
 
 col1, col2, col3 = st.columns(3)
@@ -256,21 +241,4 @@ for i, (metric, value) in enumerate(metrics_items):
     with [col1, col2, col3][i % 3]:
         st.metric(metric, value)
 
-# ----------------15. Note metodologiche (da notebook)
-with st.expander("Note Metodologiche"):
-    st.markdown("""
-    **Metodologia di analisi basata su:**
-    
-    - **Sezione 2.1 del notebook**: Struttura iniziale del dataset
-    - **Sezione 2.2 del notebook**: Analisi valori mancanti
-    - **Sezione 2.3 del notebook**: Controllo duplicati
-    - **Sezione 3 del notebook**: Metodi di pulizia dati
-    - **Sezione 4.1.1 del notebook**: Statistiche descrittive
-    
-    **Trasformazioni applicate:**
-    - Rimozione colonna 'Cabin' (77% valori mancanti)
-    - Rimozione righe duplicate
-    - Rilevamento outliers con metodo IQR
-    """)
-
-logger.info("Pagina 1_Data_Overview caricata con successo")
+logger.info("Page 1_Data_Overview loaded successfully")

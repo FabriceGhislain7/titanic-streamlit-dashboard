@@ -1,13 +1,13 @@
 """
 src/utils/helpers.py
-Funzioni di utilità generiche per il progetto
+General utility helpers for the project.
 """
 
 import logging
 
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
-# [Il file è vuoto - verranno aggiunte funzioni in futuro]
+# This file is intentionally minimal for now.
 
-logger.info(f"Caricamento completato {__name__}")
+logger.info(f"Loading completed {__name__}")

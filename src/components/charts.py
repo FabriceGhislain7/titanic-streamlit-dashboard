@@ -1,6 +1,6 @@
-"""
+﻿"""
 src/components/charts.py
-Componenti per la creazione di grafici e visualizzazioni
+Componenti per la creating di charts e visualizzazioni
 """
 
 import plotly.express as px
@@ -8,16 +8,16 @@ import plotly.graph_objects as go
 import pandas as pd
 from src.config import COLOR_PALETTES, VALUE_MAPPINGS
 
-# ----------------1. Grafico Sopravvivenza Generale (da notebook sezione 4.2.2 - Survival Analysis)
+# ----------------1. Grafico Overall Survival (da notebook section 4.2.2 - Survival Analysis)
 def create_survival_overview_chart(df):
     """
-    Crea grafico a torta della sopravvivenza generale
-    Basato sull'analisi del notebook sezione 4.2.2
+    Crea chart a torta della survival generale
+    Basato sull'analysis del notebook section 4.2.2
     """
     if df is None:
         return None
     
-    # Calcola conteggi sopravvivenza
+    # Calcola conteggi survival
     survival_counts = df['Survived'].value_counts().sort_index()
     
     # Mappa i valori alle etichette
@@ -25,7 +25,7 @@ def create_survival_overview_chart(df):
     values = survival_counts.values
     colors = COLOR_PALETTES['survival']
     
-    # Crea grafico a torta
+    # Crea chart a torta
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
@@ -36,7 +36,7 @@ def create_survival_overview_chart(df):
     )])
     
     fig.update_layout(
-        title="Distribuzione Sopravvivenza",
+        title="Survival Distribution",
         showlegend=True,
         height=400,
         margin=dict(t=50, b=0, l=0, r=0)
@@ -44,16 +44,16 @@ def create_survival_overview_chart(df):
     
     return fig
 
-# ----------------2. Distribuzione per Classe (da notebook sezione 4.2.2.1 - Tickets by Class)
+# ----------------2. Class Distribution (da notebook section 4.2.2.1 - Tickets by Class)
 def create_class_distribution_chart(df):
     """
-    Crea grafico distribuzione passeggeri per classe
-    Da notebook sezione 4.2.2.1
+    Crea chart distribution passengers per class
+    Da notebook section 4.2.2.1
     """
     if df is None:
         return None
     
-    # Conta passeggeri per classe
+    # Conta passengers per class
     class_counts = df['Pclass'].value_counts().sort_index()
     
     # Mappa le classi alle etichette
@@ -61,7 +61,7 @@ def create_class_distribution_chart(df):
     values = class_counts.values
     colors = COLOR_PALETTES['class']
     
-    # Crea grafico a barre
+    # Crea chart a barre
     fig = go.Figure(data=[go.Bar(
         x=labels,
         y=values,
@@ -71,75 +71,75 @@ def create_class_distribution_chart(df):
     )])
     
     fig.update_layout(
-        title="Distribuzione Passeggeri per Classe",
-        xaxis_title="Classe",
-        yaxis_title="Numero Passeggeri",
+        title="Passenger Distribution by Class",
+        xaxis_title="Class",
+        yaxis_title="Number of Passengers",
         height=400,
         margin=dict(t=50, b=0, l=0, r=0)
     )
     
     return fig
 
-# ----------------3. Sopravvivenza per Classe (da notebook sezione 4.2.2.2 - Survival by Class)
+# ----------------3. Survival by Class (da notebook section 4.2.2.2 - Survival by Class)
 def create_survival_by_class_chart(df):
     """
-    Grafico sopravvivenza per classe passeggeri
-    Da notebook sezione 4.2.2.2
+    Grafico survival per class passengers
+    Da notebook section 4.2.2.2
     """
     if df is None:
         return None
     
-    # Calcola sopravvivenza per classe
+    # Calcola survival per class
     survival_by_class = df.groupby(['Pclass', 'Survived']).size().unstack(fill_value=0)
-    survival_by_class.columns = ['Morti', 'Sopravvissuti']
+    survival_by_class.columns = ['Deaths', 'Survivors']
     
     # Mappa le classi
     class_labels = [VALUE_MAPPINGS['Pclass'][idx] for idx in survival_by_class.index]
     
     fig = go.Figure()
     
-    # Aggiungi barre per morti e sopravvissuti
+    # Aggiungi barre per morti e survivors
     fig.add_trace(go.Bar(
-        name='Morti',
+        name='Deaths',
         x=class_labels,
-        y=survival_by_class['Morti'],
+        y=survival_by_class['Deaths'],
         marker_color=COLOR_PALETTES['survival'][0]
     ))
     
     fig.add_trace(go.Bar(
-        name='Sopravvissuti',
+        name='Survivors',
         x=class_labels,
-        y=survival_by_class['Sopravvissuti'],
+        y=survival_by_class['Survivors'],
         marker_color=COLOR_PALETTES['survival'][1]
     ))
     
     fig.update_layout(
-        title='Sopravvivenza per Classe',
-        xaxis_title='Classe',
-        yaxis_title='Numero Passeggeri',
+        title='Survival by Class',
+        xaxis_title='Class',
+        yaxis_title='Number of Passengers',
         barmode='stack',
         height=400
     )
     
     return fig
 
-# ----------------4. Distribuzione Eta (da notebook sezione 4.2.1 - Age Analysis)
+# ----------------4. Distribution Eta (da notebook section 4.2.1 - Age Analysis)
 def create_age_distribution_chart(df):
     """
-    Istogramma distribuzione eta
-    Da notebook sezione 4.2.1
+    Istogramma distribution eta
+    Da notebook section 4.2.1
     """
     if df is None:
         return None
     
-    # Rimuovi valori mancanti per l'eta
+    # Rimuovi missing values per l'eta
     age_data = df['Age'].dropna()
     
     fig = px.histogram(
         x=age_data,
         nbins=20,
-        title="Distribuzione Eta Passeggeri",
-        labels={'x': 'Eta (anni)', 'y': 'Frequenza'},
+        title="Passenger Age Distribution",
+        labels={'x': 'Age (years)', 'y': 'Frequency'},
         color_discrete_sequence=[COLOR_PALETTES['primary']]
     )
     
@@ -150,16 +150,16 @@ def create_age_distribution_chart(df):
     
     return fig
 
-# ----------------5. Sopravvivenza per Genere (da notebook sezione 4.2.2.3 - Survival by Gender)
+# ----------------5. Survival by Gender (da notebook section 4.2.2.3 - Survival by Gender)
 def create_survival_by_gender_chart(df):
     """
-    Grafico sopravvivenza per genere
-    Da notebook sezione 4.2.2.3
+    Grafico survival per gender
+    Da notebook section 4.2.2.3
     """
     if df is None:
         return None
     
-    # Calcola percentuali sopravvivenza per genere
+    # Calcola percentuali survival per gender
     gender_survival = df.groupby('Sex')['Survived'].mean() * 100
     
     # Mappa i generi
@@ -175,9 +175,9 @@ def create_survival_by_gender_chart(df):
     )])
     
     fig.update_layout(
-        title="Tasso di Sopravvivenza per Genere",
-        xaxis_title="Genere",
-        yaxis_title="Tasso Sopravvivenza (%)",
+        title="Survival Rate by Gender",
+        xaxis_title="Gender",
+        yaxis_title="Survival Rate (%)",
         height=400,
         margin=dict(t=50, b=0, l=0, r=0)
     )
@@ -193,7 +193,7 @@ def create_dashboard_summary_chart(df):
     if df is None:
         return None
     
-    # Sottografici: Classe vs Genere vs Sopravvivenza
+    # Sottocharts: Class vs Gender vs Survival
     survival_summary = df.groupby(['Pclass', 'Sex'])['Survived'].mean().unstack()
     
     # Mappa etichette
@@ -201,7 +201,7 @@ def create_dashboard_summary_chart(df):
     
     fig = go.Figure()
     
-    # Aggiungi tracce per ogni genere
+    # Aggiungi tracce per ogni gender
     for i, gender in enumerate(survival_summary.columns):
         gender_label = VALUE_MAPPINGS['Sex'][gender]
         fig.add_trace(go.Bar(
@@ -212,28 +212,28 @@ def create_dashboard_summary_chart(df):
         ))
     
     fig.update_layout(
-        title='Tasso Sopravvivenza per Classe e Genere',
-        xaxis_title='Classe',
-        yaxis_title='Tasso Sopravvivenza (%)',
+        title='Survival Rate by Class and Gender',
+        xaxis_title='Class',
+        yaxis_title='Survival Rate (%)',
         barmode='group',
         height=400
     )
     
     return fig
 
-# ----------------7. Heatmap Valori Mancanti (da notebook sezione 2.2)
+# ----------------7. Heatmap Missing Values (da notebook section 2.2)
 def create_missing_values_heatmap(df):
     """
-    Crea heatmap dei valori mancanti
-    Da notebook sezione 2.2 - Missing values visualization
+    Crea heatmap dei missing values
+    Da notebook section 2.2 - Missing values visualization
     """
     if df is None:
         return None
     
-    # Calcola missing values per riga
+    # Calcola missing values per row
     missing_data = df.isnull()
     
-    # Se ci sono troppi dati, campiona le righe
+    # Se ci sono troppi data, campiona le rows
     if len(df) > 100:
         missing_data = missing_data.sample(n=100, random_state=42)
     
@@ -247,18 +247,18 @@ def create_missing_values_heatmap(df):
     ))
     
     fig.update_layout(
-        title="Heatmap Valori Mancanti (campione 100 righe)",
-        xaxis_title="Colonne",
-        yaxis_title="Righe (campione)",
+        title="Heatmap Missing Values (campione 100 rows)",
+        xaxis_title="Columns",
+        yaxis_title="Rows (campione)",
         height=400
     )
     
     return fig
 
-# ----------------8. Grafico Tipi di Dati (da notebook - data types analysis)
+# ----------------8. Grafico Tipi di Data (da notebook - data types analysis)
 def create_data_types_chart(df):
     """
-    Visualizza distribuzione tipi di dati
+    Visualizza distribution tipi di data
     """
     if df is None:
         return None
@@ -272,9 +272,11 @@ def create_data_types_chart(df):
     fig = px.pie(
         values=values,
         names=names,
-        title="Distribuzione Tipi di Dati",
+        title="Data Type Distribution",
         color_discrete_sequence=px.colors.qualitative.Set3
     )
     
     fig.update_layout(height=400)
     return fig
+
+
