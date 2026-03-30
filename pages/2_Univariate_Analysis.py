@@ -12,6 +12,7 @@ import seaborn as sns
 import streamlit as st
 from plotly.subplots import make_subplots
 
+from src.components.charts import create_survival_overview_chart
 from src.components.univariate_charts import *
 from src.config import COLOR_PALETTES, COLUMN_LABELS, PAGE_CONFIG
 from src.utils.data_loader import load_titanic_data
