@@ -52,10 +52,10 @@ This structure allows the application to remain **maintainable, extensible, and 
 
 # Live Demo
 
-🌐 Live Application
-[https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/](https://titanic-app-dashboard-ogxxezhe82g8tggobo5l2n.streamlit.app/)
+Live Application
+[https://titanic-streamlit-dashboard.onrender.com/](https://titanic-streamlit-dashboard.onrender.com/)
 
-💻 GitHub Repository
+GitHub Repository
 [https://github.com/FabriceGhislain7/titanic-streamlit-dashboard](https://github.com/FabriceGhislain7/titanic-streamlit-dashboard)
 
 ---
@@ -109,17 +109,17 @@ Main system layers include:
 
 ```
 User Interface Layer
-        │
-        ▼
+        |
+        v
 Application Logic Layer
-        │
-        ▼
+        |
+        v
 Data Processing Layer
-        │
-        ▼
+        |
+        v
 Machine Learning Layer
-        │
-        ▼
+        |
+        v
 Data Layer
 ```
 
@@ -206,21 +206,21 @@ Evaluation --> Prediction
 
 ## Application Framework
 
-* Streamlit – interactive web applications
+* Streamlit - interactive web applications
 * Python 3.8+
 
 ## Data Science Libraries
 
-* Pandas – data manipulation
-* NumPy – numerical computing
-* Scikit-learn – machine learning models
-* SciPy – statistical analysis
+* Pandas - data manipulation
+* NumPy - numerical computing
+* Scikit-learn - machine learning models
+* SciPy - statistical analysis
 
 ## Visualization
 
-* Plotly – interactive visualizations
-* Matplotlib – static charts
-* Seaborn – statistical plots
+* Plotly - interactive visualizations
+* Matplotlib - static charts
+* Seaborn - statistical plots
 
 ---
 
@@ -228,28 +228,28 @@ Evaluation --> Prediction
 
 ```
 titanic-streamlit-dashboard
-│
-├── app.py
-│
-├── src
-│   ├── components
-│   ├── data
-│   ├── models
-│   ├── utils
-│   └── config.py
-│
-├── pages
-│
-├── assets
-│
-├── tests
-│
-├── docs
-│   ├── ARCHITECTURE.md
-│   ├── ARCHITECTURE_WORKFLOW.md
-│   └── TECHNICAL_DOCUMENTATION.md
-│
-└── requirements.txt
+|
+|-- app.py
+|
+|-- src
+|   |-- components
+|   |-- data
+|   |-- models
+|   |-- utils
+|   `-- config.py
+|
+|-- pages
+|
+|-- assets
+|
+|-- tests
+|
+|-- docs
+|   |-- ARCHITECTURE.md
+|   |-- ARCHITECTURE_WORKFLOW.md
+|   `-- TECHNICAL_DOCUMENTATION.md
+|
+`-- requirements.txt
 ```
 
 The architecture separates:
@@ -280,13 +280,13 @@ Activate it:
 
 Windows
 
-```
+```powershell
 venv\Scripts\activate
 ```
 
 Linux / Mac
 
-```
+```bash
 source venv/bin/activate
 ```
 
@@ -327,7 +327,7 @@ The repository already includes a [`render.yaml`](render.yaml) blueprint with:
 ## Option 1: Blueprint Deploy
 
 1. Push the repository to GitHub.
-2. In Render, click **New +** → **Blueprint**.
+2. In Render, click **New +** -> **Blueprint**.
 3. Select this repository.
 4. Confirm the service creation from `render.yaml`.
 5. Wait for the first build to complete.
@@ -371,9 +371,9 @@ pytest
 
 Detailed technical documentation is available in the **docs** directory.
 
-* `docs/ARCHITECTURE.md` → detailed system architecture
-* `docs/ARCHITECTURE_WORKFLOW.md` → architecture and workflow diagrams
-* `docs/TECHNICAL_DOCUMENTATION.md` → technical implementation details
+* `docs/ARCHITECTURE.md` -> detailed system architecture
+* `docs/ARCHITECTURE_WORKFLOW.md` -> architecture and workflow diagrams
+* `docs/TECHNICAL_DOCUMENTATION.md` -> technical implementation details
 
 ---
 
@@ -411,5 +411,3 @@ GitHub
 # License
 
 MIT License
-
-
