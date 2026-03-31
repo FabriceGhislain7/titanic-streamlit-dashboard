@@ -1,6 +1,6 @@
 """
 src/models/ml_models.py
-Definizioni e configurazioni dei modelli Machine Learning
+Machine learning model definitions and configurations
 """
 
 import logging
@@ -16,16 +16,16 @@ from sklearn.neural_network import MLPClassifier
 from src.config import ML_MODELS
 
 logger = logging.getLogger(__name__)
-logger.info(f"Caricamento {__name__}")
+logger.info(f"Loading {__name__}")
 
 # ----------------1. Base Model Class
 
 class TitanicModel:
     """
-    Classe base per tutti i modelli Titanic
+    Base class for all Titanic models
     """
     def __init__(self, model_type, **kwargs):
-        logger.info(f"Inizializzazione TitanicModel per {model_type}")
+        logger.info(f"Initializing TitanicModel for {model_type}")
         self.model_type = model_type
         self.model = None
         self.is_trained = False
@@ -34,8 +34,8 @@ class TitanicModel:
         self.hyperparameters = kwargs
         
     def get_model_info(self):
-        """Restituisce informazioni sul modello"""
-        logger.debug("Richiesta informazioni modello")
+        """Return model information"""
+        logger.debug("Requesting model information")
         return {
             'type': self.model_type,
             'name': ML_MODELS.get(self.model_type, {}).get('name', self.model_type),
@@ -48,89 +48,89 @@ class TitanicModel:
 
 class ModelFactory:
     """
-    Factory per creare istanze dei modelli ML
+    Factory for creating ML model instances
     """
     
     @staticmethod
     def create_model(model_type, custom_params=None):
         """
-        Crea istanza del modello specificato
+        Create an instance of the specified model
         
         Args:
-            model_type (str): Tipo di modello da creare
-            custom_params (dict): Parametri personalizzati
+            model_type (str): Type of model to create
+            custom_params (dict): Custom parameters
         
         Returns:
-            Istanza del modello richiesto
+            Requested model instance
         """
-        logger.info(f"Creazione modello {model_type}")
+        logger.info(f"Creating model {model_type}")
         
-        # Combina parametri di default con quelli personalizzati
+        # Combine default and custom parameters
         default_params = ML_MODELS.get(model_type, {}).get('params', {})
         params = {**default_params, **(custom_params or {})}
         
         if model_type == 'LogisticRegression':
-            logger.debug("Creazione LogisticRegressionModel")
+            logger.debug("Creating LogisticRegressionModel")
             return LogisticRegressionModel(**params)
         elif model_type == 'RandomForestClassifier':
-            logger.debug("Creazione RandomForestModel")
+            logger.debug("Creating RandomForestModel")
             return RandomForestModel(**params)
         elif model_type == 'GradientBoostingClassifier':
-            logger.debug("Creazione GradientBoostingModel")
+            logger.debug("Creating GradientBoostingModel")
             return GradientBoostingModel(**params)
         elif model_type == 'SVC':
-            logger.debug("Creazione SVMModel")
+            logger.debug("Creating SVMModel")
             return SVMModel(**params)
         elif model_type == 'DecisionTreeClassifier':
-            logger.debug("Creazione DecisionTreeModel")
+            logger.debug("Creating DecisionTreeModel")
             return DecisionTreeModel(**params)
         elif model_type == 'GaussianNB':
-            logger.debug("Creazione NaiveBayesModel")
+            logger.debug("Creating NaiveBayesModel")
             return NaiveBayesModel(**params)
         elif model_type == 'KNeighborsClassifier':
-            logger.debug("Creazione KNNModel")
+            logger.debug("Creating KNNModel")
             return KNNModel(**params)
         elif model_type == 'ExtraTreesClassifier':
-            logger.debug("Creazione ExtraTreesModel")
+            logger.debug("Creating ExtraTreesModel")
             return ExtraTreesModel(**params)
         elif model_type == 'AdaBoostClassifier':
-            logger.debug("Creazione AdaBoostModel")
+            logger.debug("Creating AdaBoostModel")
             return AdaBoostModel(**params)
         elif model_type == 'MLPClassifier':
-            logger.debug("Creazione MLPModel")
+            logger.debug("Creating MLPModel")
             return MLPModel(**params)
         else:
-            logger.error(f"Tipo di modello non supportato: {model_type}")
-            raise ValueError(f"Tipo di modello non supportato: {model_type}")
+            logger.error(f"Unsupported model type: {model_type}")
+            raise ValueError(f"Unsupported model type: {model_type}")
     
     @staticmethod
     def get_available_models():
-        """Restituisce lista dei modelli disponibili"""
-        logger.debug("Richiesta modelli disponibili")
+        """Return the list of available models"""
+        logger.debug("Requesting available models")
         return list(ML_MODELS.keys())
     
     @staticmethod
     def create_ensemble_models(model_types=None):
         """
-        Crea un insieme di modelli per ensemble
+        Create a set of models for an ensemble
         
         Args:
-            model_types (list): Lista dei tipi di modello da creare
+            model_types (list): List of model types to create
         
         Returns:
-            dict: Dizionario con istanze dei modelli
+            dict: Dictionary with model instances
         """
-        logger.info("Creazione ensemble models")
+        logger.info("Creating ensemble models")
         
         if model_types is None:
             model_types = ['LogisticRegression', 'RandomForestClassifier', 'GradientBoostingClassifier']
-            logger.debug(f"Usando modelli di default per ensemble: {model_types}")
+            logger.debug(f"Using default ensemble models: {model_types}")
         
         models = {}
         for model_type in model_types:
             models[model_type] = ModelFactory.create_model(model_type)
         
-        logger.info(f"Creati {len(models)} modelli per ensemble")
+        logger.info(f"Created {len(models)} models for the ensemble")
         return models
 
 # ----------------3. Concrete Model Classes
@@ -254,4 +254,4 @@ class ModelEnsemble:
         logger.debug("Predizione ensemble completata")
         return ensemble_pred
 
-logger.info(f"Caricamento completato {__name__}")
+logger.info(f"Finished loading {__name__}")

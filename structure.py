@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script per creare la struttura del progetto Titanic Streamlit App
+Script to create the Titanic Streamlit App project structure
 """
 
 import os
